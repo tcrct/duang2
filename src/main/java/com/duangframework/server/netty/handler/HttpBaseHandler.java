@@ -128,7 +128,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
         HeadDto headDto = new HeadDto();
         headDto.setMsg(message);
         headDto.setRet(code);
-        headDto.setTimestamp(System.currentTimeMillis());
+        headDto.setTimestamp(ToolsKit.getCurrentDateString());
         headDto.setRequestId(httpResponse.getRequestId());
         headDto.setClientIp(IpUtils.getLocalHostIP());
         returnDto.setHead(headDto);

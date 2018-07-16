@@ -1,5 +1,7 @@
 package com.duangframework.mvc.dto;
 
+import com.duangframework.kit.ToolsKit;
+
 import java.util.Map;
 
 /**
@@ -15,7 +17,7 @@ public class HeadDto implements java.io.Serializable {
     private String method;
     private String clientIp;
 	private String token;
-	private long timestamp = System.currentTimeMillis();
+	private String timestamp = ToolsKit.getCurrentDateString();
 	private String requestId;
     private Map<String, String> headerMap ;
 	
@@ -41,7 +43,7 @@ public class HeadDto implements java.io.Serializable {
 		this.uri = uri;
 	}
 
-    public HeadDto(int ret, String msg, String uri, String method, String clientIp, String token, long timestamp, String requestId, Map<String, String> headerMap) {
+    public HeadDto(int ret, String msg, String uri, String method, String clientIp, String token, String timestamp, String requestId, Map<String, String> headerMap) {
         this.ret = ret;
         this.msg = msg;
         this.uri = uri;
@@ -73,11 +75,11 @@ public class HeadDto implements java.io.Serializable {
 		this.token = token;
 	}
 
-	public long getTimestamp() {
+	public String getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(long timestamp) {
+	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
 

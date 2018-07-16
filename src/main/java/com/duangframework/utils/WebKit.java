@@ -75,7 +75,7 @@ public class WebKit {
         headDto.setRequestId(request.getRequestId());
         headDto.setRet(1);
         headDto.setUri(request.getRequestURI());
-        headDto.setTimestamp(System.currentTimeMillis());
+        headDto.setTimestamp(ToolsKit.getCurrentDateString());
         headDto.setMsg(e.getMessage());
         returnDto.setData("ERROR");
         returnDto.setParams(request.getParameterMap());
