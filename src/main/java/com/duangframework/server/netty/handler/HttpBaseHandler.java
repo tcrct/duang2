@@ -1,6 +1,6 @@
 package com.duangframework.server.netty.handler;
 
-import com.duangframework.exception.AbstractDaggerException;
+import com.duangframework.exception.AbstractDuangException;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.kit.ThreadPoolKit;
@@ -8,6 +8,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.helper.RouteHelper;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
+import com.duangframework.mvc.http.HttpResponse;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.route.Route;
 import com.duangframework.server.common.BootStrap;
@@ -43,6 +44,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;
+
         try {
             FullHttpRequest httpRequest = request.copy();
             verificationRequest(httpRequest);
@@ -57,14 +59,15 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
             }
         } catch (TimeoutException e) {
             // 超时时，会执行该异常
-            response = buildExceptionResponse(requestTask.getResponse(), new com.duangframework.exception.TimeoutException(e.getMessage()));
+            response = buildExceptionResponse(requestTask, new com.duangframework.exception.TimeoutException(e.getMessage()));
             // 中止线程，参数为true时，会中止正在运行的线程，为false时，如果线程未开始，则停止运行
             futureTask.cancel(true);
         } catch (ValidatorException ve) {
             logger.warn(ve.getMessage());
-            response = buildExceptionResponse(requestTask.getResponse(), ve);
+            response = buildExceptionResponse(requestTask, ve);
         } catch (Exception e) {
-            response = buildExceptionResponse(requestTask.getResponse(), new MvcException(e.getMessage(), e));
+            logger.warn(e.getMessage(),e);
+            response = buildExceptionResponse(requestTask, new MvcException(e.getMessage(), e));
         } finally {
             if(null != request && null != response) {
                 WebKit.recoverClient(ctx, request, response);
@@ -116,9 +119,10 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
     }
 
 
-    private IResponse buildExceptionResponse(IResponse httpResponse, AbstractDaggerException daggerException) {
-        int code = daggerException.getCode();
-        String message = daggerException.getMessage();
+    private IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
+        IResponse httpResponse = ToolsKit.isEmpty(requestTask) ? HttpResponse.build() : requestTask.getResponse();
+        int code = duangException.getCode();
+        String message = duangException.getMessage();
         ReturnDto<String> returnDto = new ReturnDto<>();
         returnDto.setData(null);
         HeadDto headDto = new HeadDto();
