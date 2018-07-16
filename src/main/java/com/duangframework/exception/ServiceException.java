@@ -5,7 +5,7 @@ package com.duangframework.exception;
  * @author laotang
  * @date 2017/11/2
  */
-public class ServiceException extends AbstractDaggerException implements IException {
+public class ServiceException extends AbstractDuangException implements IException {
 
     private IException iException;
 

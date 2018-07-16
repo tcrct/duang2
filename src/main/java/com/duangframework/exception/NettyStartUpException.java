@@ -7,7 +7,7 @@ import com.duangframework.kit.ToolsKit;
  * @author laotang
  * @date 2017/11/2
  */
-public class NettyStartUpException extends AbstractDaggerException implements IException {
+public class NettyStartUpException extends AbstractDuangException implements IException {
 
     public NettyStartUpException() {
         super();

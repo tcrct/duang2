@@ -6,7 +6,7 @@ import com.duangframework.kit.ToolsKit;
  * 对netty请求对象解码时异常
  * Created by laotang on 2018/6/9.
  */
-public class HttpDecoderException extends AbstractDaggerException implements IException {
+public class HttpDecoderException extends AbstractDuangException implements IException {
 
     public HttpDecoderException() {
         super();

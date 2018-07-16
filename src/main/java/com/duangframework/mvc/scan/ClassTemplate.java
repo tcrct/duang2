@@ -30,7 +30,10 @@ public abstract class ClassTemplate {
 
     protected ClassTemplate(String packageName, List<String> jarNames) {
         this.packageName = packageName;
-        this.jarNames = ToolsKit.isEmpty(jarNames) ? new ArrayList<String>(1) : jarNames;
+        List<String> jarNameList = new ArrayList<String>(){{
+           this.add(ConstEnums.FRAMEWORK_OWNER.getValue());
+        }};
+        this.jarNames = ToolsKit.isEmpty(jarNames) ? jarNameList : jarNames;
     }
 
     /**
@@ -105,7 +108,8 @@ public abstract class ClassTemplate {
                         JarEntry jarEntry = jarEntries.nextElement();
                         String fileName = jarEntry.getName();
                         // 是class文件
-                        if(fileName.endsWith(".class")) {
+                        String packagePathItem = packagePath.replace(".", "/");
+                        if(fileName.startsWith(packagePathItem) && fileName.endsWith(".class")) {
                             String subFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length());
                             String filePkg = fileName.contains("/")? fileName.substring(0, fileName.length() - subFileName.length() - 1).replaceAll("/", ".") : "";
                             // 执行添加类操作

@@ -4,21 +4,21 @@ package com.duangframework.exception;
  * @author Created by laotang
  * @date createed in 2018/7/5.
  */
-public abstract class AbstractDaggerException extends RuntimeException implements IException {
+public abstract class AbstractDuangException extends RuntimeException implements IException {
 
     protected int code = IException.FAIL_CODE;
     protected String message = IException.FAIL_MESSAGE;
 
-    AbstractDaggerException() {
+    AbstractDuangException() {
         super();
     }
 
-    AbstractDaggerException(String msg) {
+    AbstractDuangException(String msg) {
         super(msg);
         setMessage(msg);
     }
 
-    public AbstractDaggerException(String msg , Throwable cause) {
+    public AbstractDuangException(String msg , Throwable cause) {
         super(msg, cause);
         setMessage(msg);
     }

@@ -7,7 +7,7 @@ import com.duangframework.kit.ToolsKit;
  * @author laotang
  * @date 2017/11/2
  */
-public class TimeoutException extends AbstractDaggerException implements IException {
+public class TimeoutException extends AbstractDuangException implements IException {
 
     public TimeoutException() {
         super();

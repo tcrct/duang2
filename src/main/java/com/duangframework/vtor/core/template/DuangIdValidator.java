@@ -7,7 +7,7 @@ import com.duangframework.vtor.annotation.DuangId;
 import java.lang.annotation.Annotation;
 
 /**
- * 邮箱验证处理器
+ * DuangId从验证处理器
  * @author Created by laotang
  * @date createed in 2018/6/30.
  */

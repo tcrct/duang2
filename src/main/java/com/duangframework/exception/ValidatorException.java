@@ -7,7 +7,7 @@ import com.duangframework.kit.ToolsKit;
  * @author laotang
  * @date 2017/11/2
  */
-public class ValidatorException extends AbstractDaggerException implements IException {
+public class ValidatorException extends AbstractDuangException implements IException {
 
     public ValidatorException() {
         super();

@@ -2,6 +2,7 @@ package com.duangframework.mvc.http;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.utils.DuangId;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -30,6 +31,10 @@ public class HttpResponse implements IResponse {
         returnObj = null;
     }
 
+    public static HttpResponse build() {
+        return new HttpResponse(null);
+    }
+
     public static HttpResponse build(IRequest request) {
         return new HttpResponse(request);
     }
@@ -37,7 +42,7 @@ public class HttpResponse implements IResponse {
 
     @Override
     public String getRequestId() {
-        return request.getRequestId();
+        return ToolsKit.isEmpty(request)? new DuangId().toString() : request.getRequestId();
     }
 
     @Override

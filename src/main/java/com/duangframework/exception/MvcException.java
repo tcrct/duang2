@@ -7,7 +7,7 @@ import com.duangframework.kit.ToolsKit;
  * @author laotang
  * @date 2017/11/2
  */
-public class MvcException extends AbstractDaggerException implements IException {
+public class MvcException extends AbstractDuangException implements IException {
 
     public MvcException() {
         super();

@@ -7,7 +7,7 @@ import com.duangframework.kit.ToolsKit;
  * @author laotang
  * @date 2017/11/2
  */
-public class MongodbException extends AbstractDaggerException implements IException {
+public class MongodbException extends AbstractDuangException implements IException {
 
     public MongodbException() {
         super();
