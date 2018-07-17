@@ -1,5 +1,6 @@
 package com.duangframework.server;
 
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.CustomInitRun;
 import com.duangframework.mvc.core.InitRun;
@@ -60,6 +61,10 @@ public class Application {
         return application;
     }
 
+    public Application security(PluginChain pluginChain) {
+        return application;
+    }
+
     public Application init(InitRun initRunObj) {
         CustomInitRun.getInstance().addRun(initRunObj);
         return application;
@@ -67,7 +72,10 @@ public class Application {
 
     public void run() {
         try {
-            String serverHost = System.getProperty(ConstEnums.SERVER_HOST.getValue());
+            String serverHost = System.getProperty(ConstEnums.PROPERTIES.SERVER_HOST.getValue());
+            if(ToolsKit.isEmpty(serverHost)) {
+                serverHost = PropKit.get(ConstEnums.PROPERTIES.SERVER_HOST.getValue());
+            }
             if(ToolsKit.isNotEmpty(serverHost)) {
                 host = serverHost;
             }
@@ -76,7 +84,10 @@ public class Application {
         }
 
         try {
-            String serverPort = System.getProperty(ConstEnums.SERVER_PORT.getValue());
+            String serverPort = System.getProperty(ConstEnums.PROPERTIES.SERVER_PORT.getValue());
+            if(ToolsKit.isEmpty(serverPort)) {
+                serverPort = PropKit.get(ConstEnums.PROPERTIES.SERVER_PORT.getValue());
+            }
             if(ToolsKit.isNotEmpty(serverPort)) {
                 port = Integer.parseInt(serverPort);
             }

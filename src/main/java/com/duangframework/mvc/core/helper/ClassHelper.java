@@ -32,8 +32,8 @@ public class ClassHelper {
      *
      */
     static {
-        String packagePath = PropKit.get(ConstEnums.BASE_PACKAGE_PATH.getValue());
-        List<String> jarNames = PropKit.getList(ConstEnums.JAR_PREFIX.getValue());
+        String packagePath = PropKit.get(ConstEnums.PROPERTIES.BASE_PACKAGE_PATH.getValue());
+        List<String> jarNames = PropKit.getList(ConstEnums.PROPERTIES.JAR_PREFIX.getValue());
         List<Class<?>> classList = ScanClassFactory.getAllClass(packagePath, jarNames);
         for(Class<?> clazz : classList) {
             for(ConstEnums.ANNOTATION_CLASS classEnums : ConstEnums.ANNOTATION_CLASS.values()) {

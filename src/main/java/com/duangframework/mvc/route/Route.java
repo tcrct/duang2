@@ -57,13 +57,13 @@ public class Route {
         String httpMethodString = getHttpMethodString(methodMapping);
         if(ToolsKit.isEmpty(methodMapping)) {
             if(ToolsKit.isEmpty(controllerKey)) {
-                String productCode = PropKit.get(ConstEnums.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+                String productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
                 controllerKey = "/"+productCode + (controllerKey.startsWith("/") ? controllerKey : "/" + controllerKey);
             }
             this.requestMapping = new RequestMapping(controllerKey+"/"+actionMethod.getName().toLowerCase(),
                     actionMethod.getName(),
                     0,
-                    Integer.parseInt(ConstEnums.REQUEST_TIMEOUT.getValue()),
+                    Integer.parseInt(ConstEnums.PROPERTIES.REQUEST_TIMEOUT.getValue()),
                     httpMethodString,
                     new ArrayList<ValidationParam>());
             return;

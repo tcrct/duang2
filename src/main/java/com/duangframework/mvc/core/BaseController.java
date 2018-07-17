@@ -373,7 +373,7 @@ public abstract class BaseController {
         Object inputStreamObj = getBodyString();
         try{
             if(ToolsKit.isNotEmpty(inputStreamObj)) {
-                is = IOUtils.toInputStream((String)inputStreamObj, ConstEnums.DEFAULT_ENCODING.getValue());
+                is = IOUtils.toInputStream((String)inputStreamObj, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
             }
         }catch(Exception e) {
             logger.warn("Controller.getInputStream() fail: " + e.getMessage() + " return null...", e);

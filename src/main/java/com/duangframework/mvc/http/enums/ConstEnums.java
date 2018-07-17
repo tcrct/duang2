@@ -16,15 +16,8 @@ public enum ConstEnums {
 
 
     INPUTSTREAM_STR_NAME("duang_inputstream_str", "以JSON或XML方式提交参数时，暂存在Request里的key"),
-    REQUEST_TIMEOUT("3000", "默认的请求过期时间毫秒"),
     CLASS_URL_PROTOCOL_FILE_FIELD("file", "calss类文件URL对象的类型"),
     CLASS_URL_PROTOCOL_JAR_FIELD("jar", "calss类文件URL对象的类型"),
-    DEFAULT_ENCODING("utf-8", "默认的编码格式"),
-    BASE_PACKAGE_PATH("base.package.path", "要扫描的类路径"),
-    PRODUCT_APPID("product.appid", "项目APPID"),
-    PRODUCT_CODE("product.code", "项目简单称"),
-    JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
-//    DAGGER_INPUTSTREAM_STR_FIELD("dagger_inputstream_str", "框架报告映射路径前缀"),
     FRAMEWORK_OWNER_FILED("framework-x-owenr", "laotang"),
     FRAMEWORK_MAPPING_KEY("/duang", "以框架名称作前缀的映射路径不在控制台打印，一般都是作特殊用途"),
     FRAMEWORK_OWNER("duang", "框架名称"),
@@ -32,9 +25,6 @@ public enum ConstEnums {
     RESPONSE_STATUS("status", "返回结果状态码"),
     DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
     DEFAULT_DATE_FORMAT_VALUE("yyyy-MM-dd HH:mm:ss", "默认的时间格式"),
-    SERVER_HOST("server.host", "服务器地址"),
-    SERVER_PORT("server.port", "服务器端口"),
-
 
     ;
 
@@ -114,13 +104,26 @@ public enum ConstEnums {
 
     public enum PROPERTIES {
         FILE_NAME("duang.properties", "框架配置文件名"),
-        USE_ENV("use.env", "框架配置文件名"),
+        USE_ENV("use.env", "开发环境"),
+        DEFAULT_ENCODING("utf-8", "默认的编码格式"),
+        BASE_PACKAGE_PATH("base.package.path", "要扫描的类路径"),
+        REQUEST_TIMEOUT("3000", "默认的请求过期时间毫秒"),
+        PRODUCT_APPID("product.appid", "项目APPID"),
+        PRODUCT_CODE("product.code", "项目简单称"),
+        JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
+        SERVER_HOST("server.host", "服务器地址"),
+        SERVER_PORT("server.port", "服务器端口"),
+
+        /**redis*/
         REDIS_DATABASE("redis.database", "redis默认数据库"),
         REDIS_HOST("redis.host", "redis地址"),
         REDIS_PWD("redis.password", "redis密码"),
         REDIS_PORT("redis.port", "redis端口"),
         REDIS_TIMEOUT("redis.timeout", "redis超时时间，秒作单位"),
 
+        /** security*/
+        SECURITY_URI_PREFIX("security.uri.prefix", "安全验证的URI前缀，左匹配方式"),
+        SECURITY_CENTER_URL("security.center.url", "安全中心，即权限系统请求地址"),
         ;
 
         private final String value;

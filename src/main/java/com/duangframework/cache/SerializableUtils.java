@@ -36,7 +36,7 @@ public class SerializableUtils {
 	
 	public static <T> T deserialize(byte[] data, TypeReference<T> type) {
 		try {
-			return ToolsKit.jsonParseObject(new String(data, ConstEnums.DEFAULT_ENCODING.getValue()), type);
+			return ToolsKit.jsonParseObject(new String(data, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue()), type);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -45,7 +45,7 @@ public class SerializableUtils {
 
 	public static <T> List<T> deserializeArray(byte[] data, Class<T> clazz) {
 		try {
-			return ToolsKit.jsonParseArray(new String(data, ConstEnums.DEFAULT_ENCODING.getValue()), clazz);
+			return ToolsKit.jsonParseArray(new String(data, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue()), clazz);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;

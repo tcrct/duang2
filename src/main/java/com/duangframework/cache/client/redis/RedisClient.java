@@ -86,7 +86,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
                 byte[] bytes = jedis.get(SafeEncoder.encode(options.getKey()));
                 if(ToolsKit.isNotEmpty(bytes)){
                     try {
-                        String str = new String(bytes, ConstEnums.DEFAULT_ENCODING.getValue());
+                        String str = new String(bytes, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
                         if(typeReference.equals(String.class)){
                             return (T)str;
                         } else if(typeReference.equals(Integer.class) || typeReference.equals(int.class)){

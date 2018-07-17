@@ -23,7 +23,7 @@ public class PropKit {
      * @see #use(String, String)
      */
     public static Prop use(String fileName) {
-        return use(fileName, ConstEnums.DEFAULT_ENCODING.getValue());
+        return use(fileName, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
     }
 
     /**
@@ -65,7 +65,7 @@ public class PropKit {
      * @see #use(File, String)
      */
     public static Prop use(File file) {
-        return use(file, ConstEnums.DEFAULT_ENCODING.getValue());
+        return use(file, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
     }
 
     /**
@@ -124,7 +124,7 @@ public class PropKit {
     }
 
     public static Prop append(String fileName) {
-        return append(fileName, ConstEnums.DEFAULT_ENCODING.getValue());
+        return append(fileName, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
     }
 
     public static Prop appendIfExists(String fileName, String encoding) {
@@ -136,7 +136,7 @@ public class PropKit {
     }
 
     public static Prop appendIfExists(String fileName) {
-        return appendIfExists(fileName, ConstEnums.DEFAULT_ENCODING.getValue());
+        return appendIfExists(fileName, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
     }
 
     public static Prop append(File file, String encoding) {
@@ -144,7 +144,7 @@ public class PropKit {
     }
 
     public static Prop append(File file) {
-        return append(file, ConstEnums.DEFAULT_ENCODING.getValue());
+        return append(file, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
     }
 
     public static Prop appendIfExists(File file, String encoding) {
@@ -155,7 +155,7 @@ public class PropKit {
     }
 
     public static Prop appendIfExists(File file) {
-        return appendIfExists(file, ConstEnums.DEFAULT_ENCODING.getValue());
+        return appendIfExists(file, ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue());
     }
 
     public static Prop getProp() {
