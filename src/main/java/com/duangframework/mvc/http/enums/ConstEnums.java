@@ -28,9 +28,13 @@ public enum ConstEnums {
     FRAMEWORK_OWNER_FILED("framework-x-owenr", "laotang"),
     FRAMEWORK_MAPPING_KEY("/duang", "以框架名称作前缀的映射路径不在控制台打印，一般都是作特殊用途"),
     FRAMEWORK_OWNER("duang", "框架名称"),
+    FRAMEWORK_BASE_PACKAGE_PATH("com.duangframework", "框架包路径前缀"),
     RESPONSE_STATUS("status", "返回结果状态码"),
     DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
     DEFAULT_DATE_FORMAT_VALUE("yyyy-MM-dd HH:mm:ss", "默认的时间格式"),
+    SERVER_HOST("server.host", "服务器地址"),
+    SERVER_PORT("server.port", "服务器端口"),
+
 
     ;
 

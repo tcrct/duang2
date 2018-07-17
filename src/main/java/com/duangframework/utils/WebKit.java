@@ -82,7 +82,4 @@ public class WebKit {
         returnDto.setHead(headDto);
         response.write(returnDto);
     }
-
-
-
 }

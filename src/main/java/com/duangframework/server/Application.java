@@ -1,9 +1,11 @@
 package com.duangframework.server;
 
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.CustomInitRun;
 import com.duangframework.mvc.core.InitRun;
 import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.core.helper.PluginHelper;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.handler.HandlerChain;
 import com.duangframework.mvc.plugin.PluginChain;
 import com.duangframework.server.common.BootStrap;
@@ -64,6 +66,23 @@ public class Application {
     }
 
     public void run() {
+        try {
+            String serverHost = System.getProperty(ConstEnums.SERVER_HOST.getValue());
+            if(ToolsKit.isNotEmpty(serverHost)) {
+                host = serverHost;
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+        }
+
+        try {
+            String serverPort = System.getProperty(ConstEnums.SERVER_PORT.getValue());
+            if(ToolsKit.isNotEmpty(serverPort)) {
+                port = Integer.parseInt(serverPort);
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+        }
         BootStrap bootStrap = new BootStrap(host, port);
         new NettyServer(bootStrap).start();
     }

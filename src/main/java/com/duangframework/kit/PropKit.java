@@ -3,6 +3,7 @@ package com.duangframework.kit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -209,7 +210,8 @@ public class PropKit {
             return null;
         }
         String[] arrayValue = value.split(",");
-        return Arrays.asList(arrayValue);
+        // 如果直接返回Arrays.asList的话，则不支持add,remove等操作，会抛出java.lang.UnsupportedOperationException
+        return new ArrayList(Arrays.asList(arrayValue));
     }
 
 

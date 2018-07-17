@@ -4,6 +4,7 @@ package com.duangframework.server.netty;
 
 
 import com.duangframework.exception.NettyStartUpException;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.OS;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.server.common.BootStrap;
@@ -130,7 +131,7 @@ public abstract class AbstractNettyServer implements IServer {
     private String pidFile() {
         String pidFile = System.getProperty("pidfile");
         if (ToolsKit.isEmpty(pidFile)) {
-            pidFile = "duangframework.pid";
+            pidFile = ConstEnums.FRAMEWORK_OWNER.getValue() + ".pid";
         }
         return pidFile;
     }

@@ -1,16 +1,18 @@
 package com.duangframework.mvc;
 
 import com.duangframework.exception.MvcException;
+import com.duangframework.exception.ServiceException;
+import com.duangframework.mvc.core.RequestAccessHandler;
 import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.core.helper.RouteHelper;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
-import com.duangframework.mvc.core.RequestAccessHandler;
 import com.duangframework.utils.WebKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by laotang on 2018/6/10.
@@ -70,6 +72,9 @@ public class MvcMain {
             RequestAccessHandler.doHandler(target, request, response);
             //返回结果处理器链，可以对返回结果进行提交日志，二次包装等操作
             HandlerHelper.doAfterChain(target, request, response);
+        } catch (InvocationTargetException ite) {
+            logger.warn(ite.getMessage(), ite);
+            WebKit.builderExceptionResponse(request, response, new ServiceException(ite.getCause().getMessage(), ite.getCause()));
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
             WebKit.builderExceptionResponse(request, response, e);

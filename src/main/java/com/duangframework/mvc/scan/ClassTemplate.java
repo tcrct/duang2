@@ -29,11 +29,15 @@ public abstract class ClassTemplate {
     protected List<String> jarNames;
 
     protected ClassTemplate(String packageName, List<String> jarNames) {
+        if(ToolsKit.isEmpty(jarNames)) {
+            jarNames = new ArrayList<>();
+        }
+        jarNames.add(ConstEnums.FRAMEWORK_OWNER.getValue());
+        if(ToolsKit.isNotEmpty(packageName)) {
+            packageName +=","+ConstEnums.FRAMEWORK_BASE_PACKAGE_PATH.getValue();
+        }
         this.packageName = packageName;
-        List<String> jarNameList = new ArrayList<String>(){{
-           this.add(ConstEnums.FRAMEWORK_OWNER.getValue());
-        }};
-        this.jarNames = ToolsKit.isEmpty(jarNames) ? jarNameList : jarNames;
+        this.jarNames = jarNames;
     }
 
     /**
