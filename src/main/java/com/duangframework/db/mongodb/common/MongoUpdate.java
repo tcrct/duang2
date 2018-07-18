@@ -32,11 +32,17 @@ public class MongoUpdate<T> {
 	
 	public DBObject getUpdateObj() {
 		logger.debug(" update: " + updateObj.toString());
+		if(updateObj.keySet().isEmpty()) {
+			throw new IllegalArgumentException("update can not be null");
+		}
 		return updateObj;
 	}
 
 	public Bson getUpdateBson() {
 		logger.debug(" update: " + updateObj.toString());
+		if(updateObj.keySet().isEmpty()) {
+			throw new IllegalArgumentException("update can not be null");
+		}
 		return (BasicDBObject)updateObj;
 	}
 	
