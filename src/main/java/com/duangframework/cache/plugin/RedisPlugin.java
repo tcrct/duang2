@@ -1,8 +1,10 @@
 package com.duangframework.cache.plugin;
 
+import com.duangframework.cache.CacheManager;
 import com.duangframework.cache.client.redis.RedisClient;
 import com.duangframework.cache.ds.RedisAdapter;
 import com.duangframework.db.IClient;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.plugin.IPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ public class RedisPlugin implements IPlugin {
 
     private final static Logger logger = LoggerFactory.getLogger(RedisPlugin.class);
     private List<IClient> cacheClientList = new ArrayList<>();
+    private static String defaultRedisClientId;
 
     public RedisPlugin(RedisAdapter cacheSource) {
         RedisClient redisClient = new RedisClient(cacheSource);
@@ -27,17 +30,26 @@ public class RedisPlugin implements IPlugin {
 
     public RedisPlugin(List<RedisAdapter> cacheSources) {
         for(RedisAdapter adapter : cacheSources) {
-            RedisClient redisClient = new RedisClient(adapter);
-            this.cacheClientList.add(redisClient);
+            if(adapter.isDefault()) {
+                defaultRedisClientId = adapter.getId();
+            }
+            this.cacheClientList.add(new RedisClient(adapter));
         }
+        if(ToolsKit.isEmpty(defaultRedisClientId)) {
+            defaultRedisClientId = cacheClientList.get(0).getId();
+        }
+        CacheManager.setDefaultRedis(defaultRedisClientId);
     }
 
     @Override
     public void start() throws Exception {
         for(IClient client : cacheClientList) {
-            client.getClient();
+            CacheManager.addCachePool(client);
             logger.warn("redis["+client.getId()+"] start success!");
         }
+
+
+
     }
 
     @Override

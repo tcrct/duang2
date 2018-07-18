@@ -1,5 +1,6 @@
 package com.duangframework.cache.plugin;
 
+import com.duangframework.cache.CacheManager;
 import com.duangframework.cache.client.eh.EhCacheClient;
 import com.duangframework.cache.ds.EhCacheAdapter;
 import com.duangframework.db.IClient;
@@ -19,6 +20,7 @@ public class EhCachePlugin implements IPlugin {
 
     private final static Logger logger = LoggerFactory.getLogger(EhCachePlugin.class);
     private List<IClient> cacheClientList = new ArrayList<>();
+    private static String defaultEhcacheClientId;
 
     public EhCachePlugin(EhCacheAdapter adapter) {
         EhCacheClient redisClient = new EhCacheClient(adapter);
@@ -28,14 +30,16 @@ public class EhCachePlugin implements IPlugin {
     public EhCachePlugin(List<EhCacheAdapter> cacheSources) {
         for(EhCacheAdapter adapter : cacheSources) {
             EhCacheClient redisClient = new EhCacheClient(adapter);
+            defaultEhcacheClientId = redisClient.getId();
             this.cacheClientList.add(redisClient);
         }
+        CacheManager.setDefaultEhcache(defaultEhcacheClientId);
     }
 
     @Override
     public void start() throws Exception {
         for(IClient client : cacheClientList) {
-            client.getClient();
+            CacheManager.addCachePool(client);
             logger.warn("ehcache["+client.getId()+"] start success!");
         }
     }

@@ -22,7 +22,7 @@ public class SecurityPlugin implements IPlugin {
 
     @Override
     public void start() throws Exception {
-        // 如果不为null且开启安全验证
+        // 如果不为null
         if(ToolsKit.isNotEmpty(uriPrefixSet)) {
             // 添加到第一位
             HandlerHelper.beforeHandlerList.add(0, new SecurityHandler(uriPrefixSet));

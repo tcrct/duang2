@@ -6,9 +6,7 @@ import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.handler.IHandler;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,8 +18,6 @@ import java.util.Set;
  */
 public class SecurityHandler implements IHandler {
 
-    // 用户权限集合，key为用户ID，value为权限集合即为请求uri的集合
-    public static final Map<String, Set<String>> SECURITY_MAP = new HashMap<>();
     // 需要进行权限验证的URI地址前缀集合
     public static final HashSet<String> URI_PREFIX_LIST = new HashSet<>();
 

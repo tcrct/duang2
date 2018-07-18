@@ -25,8 +25,9 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
     private int timeout;
     private String url;
     private RedisConnect redisConnect;
+    private boolean isDefault;
 
-    private RedisAdapter(String id, int database, String host, String username, String password, int port, int timeout, String url) {
+    private RedisAdapter(String id, int database, String host, String username, String password, int port, int timeout, String url, boolean isDefault) {
         this.id = id;
         this.database = database;
         this.host = host;
@@ -35,6 +36,7 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
         this.port = port;
         this.timeout = timeout;
         this.url = url;
+        this.isDefault = isDefault;
         redisConnect = new RedisConnect(host, port, database+"", username, password, url);
     }
 
@@ -47,6 +49,7 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
         private String url;
         private int timeout;
         private String id;
+        private boolean isDefault;
 
         public Builder() {
 
@@ -85,8 +88,13 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
             return this;
         }
 
+        public Builder isDefault(boolean isDefault) {
+            this.isDefault = isDefault;
+            return this;
+        }
+
         public RedisAdapter build() {
-            return new RedisAdapter(id, database, host, username, password, port, timeout, url);
+            return new RedisAdapter(id, database, host, username, password, port, timeout, url, isDefault);
         }
     }
 
@@ -161,6 +169,10 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
         getClient().close();
     }
 
+    public boolean isDefault() {
+        return isDefault;
+    }
+
     @Override
     public String toString() {
         return "RedisAdapter{" +
@@ -169,6 +181,8 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
                 ", password='" + password + '\'' +
                 ", port=" + port +
                 ", timeout=" + timeout +
+                ", url=" + url +
+                ", isDefault=" + isDefault +
                 '}';
     }
 }
