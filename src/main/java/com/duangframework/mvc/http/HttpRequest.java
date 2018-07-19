@@ -303,8 +303,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRequestURL() {
-//        return request.uri();
-        return getRemoteAddr();
+        return getRemoteHost() +"/"+ getRequestURI();
     }
 
     @Override
