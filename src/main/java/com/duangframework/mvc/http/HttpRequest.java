@@ -2,6 +2,7 @@ package com.duangframework.mvc.http;
 
 import com.duangframework.exception.HttpDecoderException;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.ServerConfig;
 import com.duangframework.server.netty.decoder.AbstractDecoder;
 import com.duangframework.server.netty.decoder.DecoderFactory;
@@ -50,6 +51,15 @@ public class HttpRequest implements IRequest{
     private InetSocketAddress remoteAddress;
     private InetSocketAddress localAddress;
     private String clientIp = "127.0.0.1";
+    private static List<String> headerHostNameList = new ArrayList<String>() {
+        {
+            this.add(HttpHeaderNames.ORIGIN.toString());
+            this.add(HttpHeaderNames.HOST.toString());
+            this.add(HttpHeaderNames.REFERER.toString());
+            this.add(ServerConfig.X_FORWARDED_FOR.toString());
+            this.add(ServerConfig.X_REAL_IP.toString());
+        }
+    };
 
     private HttpRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         requestId = new DuangId().toString();
@@ -202,8 +212,17 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRemoteHost() {
-        return remoteAddress.getHostString();
+//        return remoteAddress.getHostString();
+        for (String headerName : headerHostNameList) {
+            String host = getHeader(headerName);
+            if (ToolsKit.isNotEmpty(host)) {
+             return host;
+            }
+        }
+        return "";
     }
+
+
 
     /**
      * 取客户端IP地址
@@ -211,22 +230,14 @@ public class HttpRequest implements IRequest{
     @Override
     public String getRemoteIp() {
         if(ToolsKit.isEmpty(clientIp)) {
-            List<String> headerNameList = new ArrayList<String>() {
-                {
-                    this.add(ServerConfig.X_FORWARDED_FOR.toString());
-                    this.add(ServerConfig.X_REAL_IP.toString());
-                    this.add(HttpHeaderNames.HOST.toString());
-                    this.add(HttpHeaderNames.ORIGIN.toString());
-                }
-            };
-            for (String headerName : headerNameList) {
+            for (String headerName : headerHostNameList) {
                 clientIp = getHeader(headerName);
                 if (ToolsKit.isNotEmpty(clientIp)) {
                     clientIp = clientIp.split(",")[0];
                     break;
                 }
             }
-            clientIp = clientIp.toLowerCase().replace("https://", "").replace("http://", "");
+            clientIp = clientIp.toLowerCase().replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "");
             if("0:0:0:0:0:0:0:1".equals(clientIp) || ToolsKit.isEmpty(clientIp)){
                 clientIp = "127.0.0.1";
             }
@@ -292,6 +303,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRequestURL() {
+//        return request.uri();
         return getRemoteAddr();
     }
 

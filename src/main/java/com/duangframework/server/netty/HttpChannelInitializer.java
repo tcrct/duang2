@@ -1,6 +1,7 @@
 package com.duangframework.server.netty;
 
 import com.duangframework.server.common.BootStrap;
+import com.duangframework.server.netty.handler.CorsHandler;
 import com.duangframework.server.netty.handler.HttpBaseHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -10,9 +11,6 @@ import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
-import io.netty.handler.codec.http.cors.CorsConfig;
-import io.netty.handler.codec.http.cors.CorsConfigBuilder;
-import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
@@ -56,8 +54,9 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
         channelPipeline.addLast(new ChunkedWriteHandler());
         channelPipeline.addLast(new HttpServerExpectContinueHandler());
         if (bootStrap.isEnableCors()) {
-            CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build();
-            channelPipeline.addLast(new CorsHandler(corsConfig));
+//            CorsConfig corsConfig = CorsConfigBuilder.forOrigins(bootStrap.getCorsOrigins()).allowNullOrigin().allowCredentials().shortCircuit().build();
+//            channelPipeline.addLast(new CorsHandler(corsConfig));
+            channelPipeline.addLast(new CorsHandler());
         }
 //        channelPipeline.addLast(new HttpFilterRuleHandler());
         // 真正处理HTTP业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例

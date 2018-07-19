@@ -34,7 +34,10 @@ public abstract class ClassTemplate {
         }
         jarNames.add(ConstEnums.FRAMEWORK_OWNER.getValue());
         if(ToolsKit.isNotEmpty(packageName)) {
-            packageName +=","+ConstEnums.FRAMEWORK_BASE_PACKAGE_PATH.getValue();
+            String frameworkBasePackagePath = ConstEnums.FRAMEWORK_BASE_PACKAGE_PATH.getValue();
+            if(!packageName.startsWith(frameworkBasePackagePath)) {
+                packageName += "," +frameworkBasePackagePath;
+            }
         }
         this.packageName = packageName;
         this.jarNames = jarNames;

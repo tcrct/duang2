@@ -61,7 +61,7 @@ public class BootStrap implements Closeable {
     private boolean enableGzip = true;
     /**  是否开启请求跨域处理*/
     private boolean enableCors = true;
-
+    private String[] corsOrigins;
 
     public static BootStrap getInstants() {
         return _bootStrap;

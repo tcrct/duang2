@@ -3,9 +3,11 @@ package com.duangframework.vtor.core;
 
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ObjectKit;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
-import com.duangframework.mvc.scan.ScanClassFactory;
 import com.duangframework.mvc.annotation.Bean;
+import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.mvc.scan.ScanClassFactory;
 import com.duangframework.vtor.core.template.AbstractValidatorTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,8 @@ public final class VtorFactory {
 	private static void init() {
 		if(ToolsKit.isEmpty(VALIDATOR_HANDLE_MAP)) {
 			String packagePath = AbstractValidatorTemplate.class.getPackage().getName();
-			List<Class<?>> validatorHandleList = ScanClassFactory.getAllClass(packagePath, null);
+			List<String> jarNames = PropKit.getList(ConstEnums.PROPERTIES.JAR_PREFIX.getValue());
+			List<Class<?>> validatorHandleList = ScanClassFactory.getAllClass(packagePath, jarNames);
 			for (Class<?> clazz : validatorHandleList) {
 				if (!ClassKit.supportInstance(clazz)) {
 					continue;

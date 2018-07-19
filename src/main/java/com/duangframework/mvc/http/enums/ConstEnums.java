@@ -25,6 +25,8 @@ public enum ConstEnums {
     RESPONSE_STATUS("status", "返回结果状态码"),
     DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
     DEFAULT_DATE_FORMAT_VALUE("yyyy-MM-dd HH:mm:ss", "默认的时间格式"),
+    HTTP_SCHEME_FIELD("http://", "请求协议"),
+    HTTPS_SCHEME_FIELD("https://", "请求协议"),
 
     ;
 
@@ -124,6 +126,11 @@ public enum ConstEnums {
         /** security*/
         SECURITY_URI_PREFIX("security.uri.prefix", "安全验证的URI前缀，左匹配方式"),
         SECURITY_CENTER_URL("security.center.url", "安全中心，即权限系统请求地址"),
+
+        /** cors*/
+        CORS_ORIGINS("cors.origins", "允许跨域的域名，如有多个以小写,号分隔"),
+        CORS_ALLOW_HEADERS("cors.allow.headers", "允许跨域的header头信息，如有多个以小写,号分隔"),
+
         ;
 
         private final String value;

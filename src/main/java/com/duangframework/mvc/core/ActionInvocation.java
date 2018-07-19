@@ -5,7 +5,6 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.route.Route;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 /**
  * Method Invocation
@@ -50,9 +49,8 @@ public class ActionInvocation {
 			inters[index++].intercept(this);
 		} else {
 //			System.out.println("method.getReturnType(): " + method.getReturnType());
-			//如果方法体里有参数设置
-			Parameter[] actionParams = method.getParameters();
-			if (ToolsKit.isNotEmpty(actionParams)) {
+			//如果方法体里有参数设置并且返回值不是void
+			if (ToolsKit.isNotEmpty(method.getParameters())) {
 				// 先通过asm取出方法体里的参数名
                 String[] parameterNames = MethodParameterNameDiscoverer.getParameterNames(controller.getClass(), method);
                 if(ToolsKit.isEmpty(parameterNames)) {
