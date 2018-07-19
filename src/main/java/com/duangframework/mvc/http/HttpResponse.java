@@ -4,6 +4,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.DuangId;
 import io.netty.handler.codec.http.HttpConstants;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
@@ -29,6 +30,17 @@ public class HttpResponse implements IResponse {
         charset = HttpConstants.DEFAULT_CHARSET.toString();
         status = HttpResponseStatus.OK.code();
         returnObj = null;
+        init();
+    }
+
+    private void init() {
+        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString()));
+        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString()));
+        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString()));
+
+        request.getHeaderMap().remove(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString());
+        request.getHeaderMap().remove(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString());
+        request.getHeaderMap().remove(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString());
     }
 
     public static HttpResponse build() {

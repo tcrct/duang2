@@ -49,7 +49,10 @@ public class CorsHandler extends ChannelDuplexHandler {
                 origin = origin.substring(0, endIndex > -1 ? endIndex : origin.length());
                 ORIGIN_SET.add(origin.toLowerCase().trim());
             }
-            ALLOW_STRING +="," + PropKit.get(ConstEnums.PROPERTIES.CORS_ALLOW_HEADERS.getValue());
+            String corsAllowHeaders = PropKit.get(ConstEnums.PROPERTIES.CORS_ALLOW_HEADERS.getValue());
+            if(ToolsKit.isNotEmpty(corsAllowHeaders)) {
+                ALLOW_STRING += "," + corsAllowHeaders;
+            }
         }
     }
 
@@ -57,17 +60,19 @@ public class CorsHandler extends ChannelDuplexHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if(msg instanceof FullHttpRequest) {
             this.request = (FullHttpRequest) msg;
-            // 如果是OPTION请求且该域名是允许跨域请求的
-            if(isOptionsRequest(request)) {
-                String origin = getAllowOrigin(ctx, request.headers());
-                this.handlePreflight(ctx, this.request, origin);
-                return;
-            }
             // 如果请求地址里带有.的，则视为静态文件请求，退出
             if(request.uri().contains(".")) {
                 DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
                 respond(ctx, request, response);
                 return;
+            }
+            String origin = getAllowOrigin(ctx, request);
+            // 如果是OPTION请求且该域名是允许跨域请求的
+            if(isOptionsRequest(request)) {
+                this.handlePreflight(ctx, this.request, origin);
+                return;
+            } else {
+                allowOrigin(this.request, origin);
             }
         }
         ctx.fireChannelRead(msg);
@@ -81,6 +86,7 @@ public class CorsHandler extends ChannelDuplexHandler {
     private void handlePreflight(ChannelHandlerContext ctx, FullHttpRequest request, String origin ) {
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK, true, true);
         HttpHeaders responseHeaders = response.headers();
+
         responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
         responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
@@ -93,7 +99,15 @@ public class CorsHandler extends ChannelDuplexHandler {
         respond(ctx, request, response);
     }
 
-    private String getAllowOrigin(ChannelHandlerContext ctx, HttpHeaders headers) {
+    private void allowOrigin(FullHttpRequest request, String origin) {
+        HttpHeaders headers = request.headers();
+        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
+    }
+
+    private String getAllowOrigin(ChannelHandlerContext ctx, FullHttpRequest request) {
+        HttpHeaders headers = request.headers();
         String origin = headers.get(HttpHeaderNames.ORIGIN);
         if(ToolsKit.isEmpty(origin)) {
             origin = headers.get(HttpHeaderNames.HOST);
@@ -104,6 +118,9 @@ public class CorsHandler extends ChannelDuplexHandler {
                 origin = remoteAddress.getHostString();
             }
         }
+//        origin = origin.toLowerCase().replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace("*", "");
+//        String protocol = request.protocolVersion().protocolName().toLowerCase();
+//        System.out.println("protocol: " + protocol);
         origin = origin.toLowerCase().trim();
         for (String originItem : ORIGIN_SET) {
             if(origin.contains(originItem)){
@@ -121,6 +138,5 @@ public class CorsHandler extends ChannelDuplexHandler {
         if(!keepAlive) {
             future.addListener(ChannelFutureListener.CLOSE);
         }
-
     }
 }

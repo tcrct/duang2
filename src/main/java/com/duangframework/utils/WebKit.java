@@ -13,6 +13,9 @@ import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
@@ -46,6 +49,12 @@ public class WebKit {
 
     private static void builderResponseHeader(FullHttpResponse fullHttpResponse, IResponse response) {
         HttpHeaders responseHeaders = fullHttpResponse.headers();
+
+        for(Iterator<Map.Entry<String, String>> iterator = response.getHeaders().entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry<String, String> entry = iterator.next();
+            responseHeaders.set(entry.getKey(), entry.getValue());
+        }
+
         responseHeaders.set(HttpHeaderNames.DATE.toString(), ToolsKit.getCurrentDateString());
         int readableBytesLength = 0;
         try {

@@ -207,7 +207,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRemoteAddr() {
-        return getProtocol() + "://" + getRemoteHost() + ":" + getServerPort() + getRequestURI();
+        return getRemoteHost() + ":" + getServerPort() + getRequestURI();
     }
 
     @Override
@@ -303,7 +303,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRequestURL() {
-        return getRemoteHost() +"/"+ getRequestURI();
+        return getRemoteHost() +request.uri();
     }
 
     @Override
