@@ -9,14 +9,15 @@ import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.ReturnDto;
+import com.duangframework.mvc.dto.upload.DownLoadStream;
+import com.duangframework.mvc.dto.upload.FileItem;
+import com.duangframework.mvc.dto.upload.UploadFile;
+import com.duangframework.mvc.http.handler.UploadFileHandle;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.enums.ContentTypeEnums;
-import com.duangframework.mvc.render.JsonRender;
-import com.duangframework.mvc.render.Render;
-import com.duangframework.mvc.render.TextRender;
-import com.duangframework.mvc.render.XmlRender;
+import com.duangframework.mvc.render.*;
 import com.duangframework.utils.DataType;
 import com.duangframework.vtor.core.VtorFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -24,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
@@ -521,4 +523,60 @@ public abstract class BaseController {
         render = new JsonRender(obj, fieldSet);
     }
 
+    /**
+     * 下载文件
+     */
+    public void download(File file) throws Exception {
+        render = new FileRender(file);
+    }
+
+    public void download(UploadFile file) throws Exception {
+        render = new FileRender(file);
+    }
+
+    public void download(File file, boolean isDelete) throws Exception {
+        render = new FileRender(file, isDelete);
+    }
+
+    public void download(UploadFile file, boolean isDelete) throws Exception {
+        render = new FileRender(file, isDelete);
+    }
+
+    public void download(DownLoadStream downLoadStream) throws Exception {
+        render = new FileRender(downLoadStream);
+    }
+
+    public void download(DownLoadStream downLoadStream, boolean isDelete) throws Exception {
+        render = new FileRender(downLoadStream, isDelete);
+    }
+
+    /**
+     * 上传文件部份
+     */
+
+    public List<UploadFile> getUploadFiles() {
+        return getUploadFiles("", true);
+    }
+
+    public List<UploadFile> getUploadFiles(String saveDirectory) {
+        return getUploadFiles(saveDirectory, true);
+    }
+
+    public List<UploadFile> getUploadFiles(String saveDirectory,  boolean isUUIDName) {
+        Enumeration<String> enumeration = request.getAttributeNames();
+        List<UploadFile> uploadFileList = new ArrayList<>();
+        while (enumeration.hasMoreElements()) {
+            String key = enumeration.nextElement();
+            Object requestAttribute = request.getAttribute(key);
+            if(requestAttribute instanceof FileItem) {
+                FileItem fileItem = (FileItem) requestAttribute;
+                UploadFileHandle uploadFileRequest = new UploadFileHandle(fileItem, saveDirectory, isUUIDName);
+                UploadFile uploadFile = uploadFileRequest.getUploadFile();
+                if(ToolsKit.isNotEmpty(uploadFile)) {
+                    uploadFileList.add(uploadFile);
+                }
+            }
+        }
+        return uploadFileList;
+    }
 }

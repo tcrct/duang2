@@ -1,4 +1,4 @@
-package com.duangframework.mvc.http.upload;
+package com.duangframework.mvc.dto.upload;
 
 
 import com.alibaba.fastjson.annotation.JSONField;

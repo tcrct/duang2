@@ -2,7 +2,7 @@ package com.duangframework.server.netty.decoder;
 
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ToolsKit;
-import com.duangframework.mvc.http.upload.FileItem;
+import com.duangframework.mvc.dto.upload.FileItem;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.FullHttpRequest;

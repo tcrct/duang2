@@ -92,13 +92,25 @@ public interface IResponse {
 
     /**
      *  取需要下载的文件
-     * @return
+     * @return  File
      */
     File getFile();
 
     /**
      * 是否下载文件返回
-     * @return
+     * @return 如果是File则返回true
      */
     boolean isFile();
+
+    /**
+     * 下载完成后，是否物理删除服务器上的文件
+     * @return  是删除返回true
+     */
+    boolean isDeleteFile();
+
+    /**
+     * 是否删除下载文件
+     * @param isDelete 是否删除
+     */
+    void setDeleteFile(boolean isDelete);
 }

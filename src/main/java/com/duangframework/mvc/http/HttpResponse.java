@@ -23,6 +23,8 @@ public class HttpResponse implements IResponse {
     private String contentType;
     private String charset;
     private Object returnObj = null;
+    //下载完成后是否删除文件, 默认删除，以释放空间
+    private boolean isDelete = true;
 
     private HttpResponse(IRequest iRequest){
         request = iRequest;
@@ -138,4 +140,13 @@ public class HttpResponse implements IResponse {
         return returnObj instanceof File;
     }
 
+    @Override
+    public boolean isDeleteFile() {
+        return isDelete;
+    }
+
+    @Override
+    public void setDeleteFile(boolean isDelete) {
+        this.isDelete = isDelete;
+    }
 }

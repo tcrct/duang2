@@ -132,6 +132,9 @@ public enum ConstEnums {
         CORS_ORIGINS("cors.origins", "允许跨域的域名，如有多个以小写,号分隔"),
         CORS_ALLOW_HEADERS("cors.allow.headers", "允许跨域的header头信息，如有多个以小写,号分隔"),
 
+        /**uploadfile*/
+        UPLOADFILE_DIRECTORY ("uploadfile.directory", "上传文件存放目录，相对于根路径"),
+
         ;
 
         private final String value;
