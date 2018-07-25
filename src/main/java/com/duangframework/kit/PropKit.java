@@ -207,7 +207,7 @@ public class PropKit {
     public static List<String> getList(String key) {
         String value = get(key);
         if(ToolsKit.isEmpty(value)) {
-            return null;
+            return new ArrayList<>();
         }
         String[] arrayValue = value.split(",");
         // 如果直接返回Arrays.asList的话，则不支持add,remove等操作，会抛出java.lang.UnsupportedOperationException

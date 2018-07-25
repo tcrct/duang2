@@ -61,6 +61,7 @@ public class CorsHandler extends ChannelDuplexHandler {
         if(msg instanceof FullHttpRequest) {
             this.request = (FullHttpRequest) msg;
             // 如果请求地址里带有.的，则视为静态文件请求，退出
+            System.out.println(request.uri());
             if(request.uri().contains(".")) {
                 DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
                 respond(ctx, request, response);

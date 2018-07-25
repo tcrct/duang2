@@ -16,6 +16,8 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
 import io.netty.handler.codec.http.multipart.DiskFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,6 +32,8 @@ import java.util.function.Consumer;
  * Created by laotang on 2018/6/9.
  */
 public class HttpRequest implements IRequest{
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     static {
         DiskFileUpload.deleteOnExitTemporaryFile = true;

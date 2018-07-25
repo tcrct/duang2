@@ -27,6 +27,7 @@ public enum ConstEnums {
     DEFAULT_DATE_FORMAT_VALUE("yyyy-MM-dd HH:mm:ss", "默认的时间格式"),
     HTTP_SCHEME_FIELD("http://", "请求协议"),
     HTTPS_SCHEME_FIELD("https://", "请求协议"),
+    DEFAULT_CHAR_ENCODE("UTF-8", "编码格式"),
 
     ;
 

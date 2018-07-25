@@ -11,15 +11,13 @@ import com.duangframework.exception.IException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
-import com.duangframework.utils.DuangId;
 import com.duangframework.utils.DataType;
+import com.duangframework.utils.DuangId;
 import com.duangframework.utils.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -365,6 +363,15 @@ public final class ToolsKit {
         return parameterType.isAnnotationPresent(Bean.class)
                 || DataType.isIdEntityType(parameterType)
                 || ObjectKit.newInstance(parameterType) instanceof Serializable;
+    }
+
+    public static InputStream string2InputStream(String str, String encoding) {
+        try {
+            return new ByteArrayInputStream(str.getBytes(encoding));
+        } catch (UnsupportedEncodingException e) {
+            logger.warn("ToolsKit str2InputStream fail: " + e.getMessage());
+            return null;
+        }
     }
 
 }

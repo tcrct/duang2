@@ -25,20 +25,22 @@ public class DecoderFactory {
         if(ToolsKit.isEmpty(method)) {
             throw new DecoderException("request method is null");
         }
-
         AbstractDecoder decoder = null;
         if(HttpMethod.GET.name().equalsIgnoreCase(method)) {
             decoder = new GetDecoder(request);
         }
         else if(HttpMethod.POST.name().equalsIgnoreCase(method)) {
-            if(contentType.contains(ContentTypeEnums.JSON.getValue())) {
-                decoder = new JsonDecoder(request);
-            } else if(contentType.contains(ContentTypeEnums.XML.getValue())) {
-                decoder = new XmlDecoder(request);
-            } else if (contentType.contains(ContentTypeEnums.MULTIPART.getValue())) {
-                decoder = new MultiPartPostDecoder(request.copy());
-            } else {
-                // 都不符合以上的默认为post form表单提交
+            if(ToolsKit.isNotEmpty(contentType)) {
+                if(contentType.contains(ContentTypeEnums.JSON.getValue())) {
+                    decoder = new JsonDecoder(request);
+                } else if(contentType.contains(ContentTypeEnums.XML.getValue())) {
+                    decoder = new XmlDecoder(request);
+                } else if (contentType.contains(ContentTypeEnums.MULTIPART.getValue())) {
+                    decoder = new MultiPartPostDecoder(request.copy());
+                }
+            }
+            // 都不符合以上的默认为post form表单提交
+            if(ToolsKit.isEmpty(decoder)) {
                 decoder = new PostDecoder(request.copy());
             }
         } else if (HttpMethod.OPTIONS.name().equalsIgnoreCase(method)) {

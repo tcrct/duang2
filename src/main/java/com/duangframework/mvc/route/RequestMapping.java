@@ -1,7 +1,5 @@
 package com.duangframework.mvc.route;
 
-import java.util.List;
-
 /**
  * @author Created by laotang
  * @date createed in 2018/6/12.
@@ -18,20 +16,18 @@ public class RequestMapping {
     private String desc;        // action的简要说明
     private int order;            // 排序
     private long timeout = 0L; //请求过期时间
-    private List<ValidationParam> paramList;  // 验证的参数集合
     private String method;  // 请求方式
 
     public RequestMapping() {
 
     }
 
-    public RequestMapping(String value, String desc, int order, long timeout, String method, List<ValidationParam> paramList) {
+    public RequestMapping(String value, String desc, int order, long timeout, String method) {
         this.value = value;
         this.desc = desc;
         this.order = order;
         this.timeout = timeout;
         this.method = method;
-        this.paramList = paramList;
     }
 
     public String getValue() {
@@ -50,10 +46,6 @@ public class RequestMapping {
         return timeout;
     }
 
-    public List<ValidationParam> getParamList() {
-        return paramList;
-    }
-
     public void setValue(String value) {
         this.value = value;
     }
@@ -68,10 +60,6 @@ public class RequestMapping {
 
     public void setTimeout(long timeout) {
         this.timeout = timeout;
-    }
-
-    public void setParamList(List<ValidationParam> paramList) {
-        this.paramList = paramList;
     }
 
     public String getMethod() {
