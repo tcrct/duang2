@@ -25,6 +25,9 @@ public class RedisPlugin implements IPlugin {
 
     public RedisPlugin(RedisAdapter cacheSource) {
         RedisClient redisClient = new RedisClient(cacheSource);
+        if(ToolsKit.isEmpty(defaultRedisClientId)) {
+            CacheManager.setDefaultRedis(redisClient.getId());
+        }
         this.cacheClientList.add(redisClient);
     }
 

@@ -51,7 +51,7 @@ public class WebKit {
             // 构建请求返回对象，并设置返回主体内容结果
             HttpResponseStatus status = response.getStatus() == HttpResponseStatus.OK.code() ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
             FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(response.toString(), HttpConstants.DEFAULT_CHARSET));
-            builderResponseHeader(fullHttpResponse, response);
+            builderResponseHeader(fullHttpRequest, fullHttpResponse, response);
             ChannelFuture channelFutureListener = ctx.channel().writeAndFlush(fullHttpResponse);
             //如果不支持keep-Alive，服务器端主动关闭请求
             if (!isKeepAlive) {
@@ -65,7 +65,7 @@ public class WebKit {
      * @param fullHttpResponse
      * @param response
      */
-    private static void builderResponseHeader(FullHttpResponse fullHttpResponse, IResponse response) {
+    private static void builderResponseHeader(FullHttpRequest fullHttpRequest, FullHttpResponse fullHttpResponse, IResponse response) {
         HttpHeaders responseHeaders = fullHttpResponse.headers();
 
         for(Iterator<Map.Entry<String, String>> iterator = response.getHeaders().entrySet().iterator(); iterator.hasNext();) {
@@ -79,8 +79,9 @@ public class WebKit {
             readableBytesLength = fullHttpResponse.content().readableBytes();
         } catch (Exception e) {logger.warn(e.getMessage(), e);}
         responseHeaders.set(HttpHeaderNames.CONTENT_LENGTH.toString(), readableBytesLength);
-        // 如果Content-Type不存在，则设置默认的form
-        if(ToolsKit.isEmpty(responseHeaders.get(HttpHeaderNames.CONTENT_TYPE.toString()))) {
+        // 如果不是GET请求且Content-Type不存在，则设置默认的form
+        if(!HttpMethod.GET.name().equalsIgnoreCase(fullHttpRequest.method().name()) &&
+                ToolsKit.isEmpty(responseHeaders.get(HttpHeaderNames.CONTENT_TYPE.toString()))) {
             responseHeaders.set(HttpHeaderNames.CONTENT_TYPE.toString(), ContentTypeEnums.FORM.getValue());
         }
     }
