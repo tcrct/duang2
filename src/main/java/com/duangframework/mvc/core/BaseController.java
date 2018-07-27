@@ -90,9 +90,9 @@ public abstract class BaseController {
      * @return
      */
     private Map<String, Object> getAllParams() {
-        Map<String, Object> requestParams = request.getParameterMap();
+        Map<String, Object> requestParams = new HashMap<>(request.getParameterMap());
         if(ToolsKit.isNotEmpty(requestParams)) {
-            requestParams.remove(ConstEnums.INPUTSTREAM_STR_NAME.toString());
+            requestParams.remove(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         }
         return requestParams;
     }

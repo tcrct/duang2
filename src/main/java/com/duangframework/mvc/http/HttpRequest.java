@@ -57,9 +57,13 @@ public class HttpRequest implements IRequest{
     private String clientIp = "127.0.0.1";
     private static List<String> headerHostNameList = new ArrayList<String>() {
         {
-            this.add(HttpHeaderNames.ORIGIN.toString());
             this.add(HttpHeaderNames.HOST.toString());
+            this.add(HttpHeaderNames.ORIGIN.toString());
             this.add(HttpHeaderNames.REFERER.toString());
+        }
+    };
+    private static List<String> headerIpNameList = new ArrayList<String>() {
+        {
             this.add(ServerConfig.X_FORWARDED_FOR.toString());
             this.add(ServerConfig.X_REAL_IP.toString());
         }
@@ -217,16 +221,17 @@ public class HttpRequest implements IRequest{
     @Override
     public String getRemoteHost() {
 //        return remoteAddress.getHostString();
+        String remoteHost = "";
         for (String headerName : headerHostNameList) {
             String host = getHeader(headerName);
             if (ToolsKit.isNotEmpty(host)) {
-             return host;
+                remoteHost =  host;
+                break;
             }
         }
-        return "";
+        return (remoteHost.startsWith(ConstEnums.HTTP_SCHEME_FIELD.getValue()) ||
+                        remoteHost.startsWith(ConstEnums.HTTPS_SCHEME_FIELD.getValue()) ) ? remoteHost : getProtocol()+"//:"+remoteHost;
     }
-
-
 
     /**
      * 取客户端IP地址
@@ -234,7 +239,7 @@ public class HttpRequest implements IRequest{
     @Override
     public String getRemoteIp() {
         if(ToolsKit.isEmpty(clientIp)) {
-            for (String headerName : headerHostNameList) {
+            for (String headerName : headerIpNameList) {
                 clientIp = getHeader(headerName);
                 if (ToolsKit.isNotEmpty(clientIp)) {
                     clientIp = clientIp.split(",")[0];

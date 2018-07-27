@@ -9,10 +9,10 @@ import io.netty.util.CharsetUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Get请求解码
@@ -46,7 +46,7 @@ public class GetDecoder extends AbstractDecoder<Map<String, Object>> {
         }
 
         if(ToolsKit.isNotEmpty(requestParamsMap)) {
-            Map<String,Object> tmpMap = new HashMap<>(requestParamsMap);
+            Map<String,Object> tmpMap = new ConcurrentHashMap<>(requestParamsMap);
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
         }
         return requestParamsMap;

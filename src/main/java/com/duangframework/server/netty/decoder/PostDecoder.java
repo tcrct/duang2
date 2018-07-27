@@ -8,9 +8,9 @@ import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *POST请求，内容格式为表单(application/x-www-form-urlencoded)的解码类
@@ -44,7 +44,7 @@ public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
         }
 
         if(ToolsKit.isNotEmpty(requestParamsMap)) {
-            Map<String,Object> tmpMap = new HashMap<>(requestParamsMap);
+            Map<String,Object> tmpMap = new ConcurrentHashMap<>(requestParamsMap);
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
         }
         return requestParamsMap;

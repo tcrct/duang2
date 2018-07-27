@@ -12,10 +12,10 @@ import io.netty.handler.codec.http.multipart.HttpPostMultipartRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.MixedAttribute;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * POST请求，内容格式为文件表单(multipart/form-data)的解码类
@@ -59,7 +59,7 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
             }
         }
         if(ToolsKit.isNotEmpty(requestParamsMap)) {
-            Map<String,Object> tmpMap = new HashMap<>(requestParamsMap.size());
+            Map<String,Object> tmpMap = new ConcurrentHashMap<>(requestParamsMap.size());
             for(Iterator<Map.Entry<String,Object>> iterator = requestParamsMap.entrySet().iterator(); iterator.hasNext();) {
                 Map.Entry<String,Object> entry = iterator.next();
                 Object value = entry.getValue();
