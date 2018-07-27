@@ -1,9 +1,9 @@
 package com.duangframework.mvc.core;
 
-import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.DataType;
@@ -132,11 +132,10 @@ public class ParameterInvokeMethod {
      */
     private static Object invokeBean(IRequest request, Class<?> parameterType, Annotation[] annotation, int index) {
         // 如果是继承了IdEntity或对象有设置Bean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
-
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         Object entity = ToolsKit.jsonParseObject(json, parameterType);
         if(ToolsKit.isEmpty(entity)) {
-            logger.warn("json字符串转换为Object时出错，返回null退出...");
+            logger.warn("invokeBean: json字符串转换为Object时出错，json字符串可能是空，所以返回null退出...");
             return null;
         }
         boolean isBean = DataType.isIdEntityType(parameterType)

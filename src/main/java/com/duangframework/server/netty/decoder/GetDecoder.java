@@ -1,6 +1,7 @@
 package com.duangframework.server.netty.decoder;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -8,6 +9,7 @@ import io.netty.util.CharsetUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,11 @@ public class GetDecoder extends AbstractDecoder<Map<String, Object>> {
                     requestParamsMap.put(key, entry.getValue().get(0));
                 }
             }
+        }
+
+        if(ToolsKit.isNotEmpty(requestParamsMap)) {
+            Map<String,Object> tmpMap = new HashMap<>(requestParamsMap);
+            requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
         }
         return requestParamsMap;
     }

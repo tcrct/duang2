@@ -1,12 +1,14 @@
 package com.duangframework.server.netty.decoder;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,11 @@ public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
                     requestParamsMap.put(key, value);
                 }
             }
+        }
+
+        if(ToolsKit.isNotEmpty(requestParamsMap)) {
+            Map<String,Object> tmpMap = new HashMap<>(requestParamsMap);
+            requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
         }
         return requestParamsMap;
     }

@@ -3,6 +3,7 @@ package com.duangframework.server.netty.decoder;
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.upload.FileItem;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -11,6 +12,8 @@ import io.netty.handler.codec.http.multipart.HttpPostMultipartRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.MixedAttribute;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +57,18 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
                     }
                 }
             }
+        }
+        if(ToolsKit.isNotEmpty(requestParamsMap)) {
+            Map<String,Object> tmpMap = new HashMap<>(requestParamsMap.size());
+            for(Iterator<Map.Entry<String,Object>> iterator = requestParamsMap.entrySet().iterator(); iterator.hasNext();) {
+                Map.Entry<String,Object> entry = iterator.next();
+                Object value = entry.getValue();
+                if(value instanceof FileItem) {
+                    continue;
+                }
+                tmpMap.put(entry.getKey(), value);
+            }
+            requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
         }
         return requestParamsMap;
     }
