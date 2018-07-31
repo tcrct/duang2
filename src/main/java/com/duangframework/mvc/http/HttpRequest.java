@@ -230,7 +230,7 @@ public class HttpRequest implements IRequest{
             }
         }
         return (remoteHost.startsWith(ConstEnums.HTTP_SCHEME_FIELD.getValue()) ||
-                        remoteHost.startsWith(ConstEnums.HTTPS_SCHEME_FIELD.getValue()) ) ? remoteHost : getProtocol()+"//:"+remoteHost;
+                        remoteHost.startsWith(ConstEnums.HTTPS_SCHEME_FIELD.getValue()) ) ? remoteHost : getProtocol()+"://"+remoteHost;
     }
 
     /**
