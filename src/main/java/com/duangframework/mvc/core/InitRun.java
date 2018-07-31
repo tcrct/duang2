@@ -10,7 +10,7 @@ public interface InitRun {
 	 * 框架启动前执行
 	 * @throws Exception
 	 */
-//	void before() throws Exception;
+	void before() throws Exception;
 
 
 	/**

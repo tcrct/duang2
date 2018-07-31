@@ -48,7 +48,6 @@ public class StartContextListener {
      */
     public void start() {
         try {
-//            before();
             for(Iterator<Class<?>> it = APP_CONTEXT_LISTENER.iterator(); it.hasNext();) {
                 Class<?> clazz = it.next();
                 if(PluginHelper.class.equals(clazz)) {
@@ -64,21 +63,11 @@ public class StartContextListener {
     }
 
     /**
-     * 框架启动 【前 】执行自定义的初始化代码
-     * @throws Exception
-     */
-//    private void before() throws Exception {
-//        CustomInitRun.getInstance().before();
-//        logger.warn("run before code success");
-//    }
-
-    /**
-     * 框架启动 【后 】执行自定义的初始化代码
+     * 框架启动 【完成后 】执行自定义的初始化代码
      * @throws Exception
      */
     private void after() throws Exception {
         CustomInitRun.getInstance().after();
-        logger.warn("run run code success");
     }
 
 }

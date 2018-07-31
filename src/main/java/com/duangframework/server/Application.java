@@ -15,6 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 应用程序启动类
+ * 注意每个方法的执行顺序，由上至下，正确的顺序应为：
+ * duang()->host()->port()->add()->plugins()->handles()->run()
+ *
+ * 因为在init方法里，有可能会修改了properties配置文件的参数值，
+ * 如接入了apollo配置中心后，要先取配置中心的配置信息再提供给插件或处理器类使用
+ * 所以顺序要注意。
  * Created by laotang on 2018/6/12.
  */
 public class Application {
@@ -29,10 +36,6 @@ public class Application {
         if(application == null) {
             application = new Application();
         }
-        return application;
-    }
-
-    public Application config() {
         return application;
     }
 
@@ -66,7 +69,7 @@ public class Application {
     }
 
     public Application init(InitRun initRunObj) {
-        CustomInitRun.getInstance().addRun(initRunObj);
+        CustomInitRun.getInstance().add(initRunObj);
         return application;
     }
 

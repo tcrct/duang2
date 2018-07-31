@@ -45,7 +45,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
 
 
     public MongoBaseDao(Class<T> cls){
-//        init(MongoClientKit.duangframework().getDefaultDB(),
+//        add(MongoClientKit.duangframework().getDefaultDB(),
 //                MongoClientKit.duangframework().getDefaultMongoDatabase(),cls);
     }
 
