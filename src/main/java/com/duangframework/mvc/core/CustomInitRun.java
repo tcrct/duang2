@@ -29,7 +29,7 @@ public class CustomInitRun {
         if(ToolsKit.isEmpty(customInitRun)) {
             return;
         }
-        customInitRun.before();
+//        customInitRun.before();
     }
 
     public void after() throws Exception {

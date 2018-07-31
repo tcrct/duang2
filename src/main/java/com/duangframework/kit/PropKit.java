@@ -161,6 +161,7 @@ public class PropKit {
     public static Prop getProp() {
         if (prop == null) {
             prop = PropKit.use(ConstEnums.PROPERTIES.FILE_NAME.getValue());
+
             if (prop == null) {
                 throw new IllegalStateException("Load propties file by invoking PropKit.use(String fileName) method first.");
             }
