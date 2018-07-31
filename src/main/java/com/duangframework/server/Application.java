@@ -32,7 +32,7 @@ public class Application {
         return application;
     }
 
-    public Application dev() {
+    public Application config() {
         return application;
     }
 

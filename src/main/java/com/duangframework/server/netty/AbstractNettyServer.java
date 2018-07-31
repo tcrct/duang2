@@ -187,7 +187,7 @@ public abstract class AbstractNettyServer implements IServer {
             FileUtils.writeStringToFile(new File(pidFile), pid, Charset.forName("UTF-8"));
 //            Runtime.getRuntime().addShutdownHook(new Thread() {
 //                @Override
-//                public void run() {
+//                public void after() {
 //                    clearPidFile();
 //                }
 //            });

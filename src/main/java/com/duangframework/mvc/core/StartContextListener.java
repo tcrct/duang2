@@ -48,6 +48,7 @@ public class StartContextListener {
      */
     public void start() {
         try {
+            before();
             for(Iterator<Class<?>> it = APP_CONTEXT_LISTENER.iterator(); it.hasNext();) {
                 Class<?> clazz = it.next();
                 if(PluginHelper.class.equals(clazz)) {
@@ -56,19 +57,28 @@ public class StartContextListener {
                     ClassKit.loadClass(clazz);
                 }
             }
-            initCode();
+            after();
         } catch (Exception e) {
             throw new MvcException(e.getMessage(), e);
         }
     }
 
     /**
-     * 执行自定义的初始化代码
+     * 框架启动 【前 】执行自定义的初始化代码
      * @throws Exception
      */
-    private void initCode() throws Exception {
-        CustomInitRun.getInstance().start();
-        logger.warn("init code success");
+    private void before() throws Exception {
+        CustomInitRun.getInstance().before();
+        logger.warn("run before code success");
+    }
+
+    /**
+     * 框架启动 【后 】执行自定义的初始化代码
+     * @throws Exception
+     */
+    private void after() throws Exception {
+        CustomInitRun.getInstance().after();
+        logger.warn("run after code success");
     }
 
 }

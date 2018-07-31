@@ -24,11 +24,19 @@ public class CustomInitRun {
         this.customInitRun = run;
     }
 
-    public void start() throws Exception {
+
+    public void before() throws Exception {
         if(ToolsKit.isEmpty(customInitRun)) {
             return;
         }
-        customInitRun.run();
+        customInitRun.before();
+    }
+
+    public void after() throws Exception {
+        if(ToolsKit.isEmpty(customInitRun)) {
+            return;
+        }
+        customInitRun.after();
     }
 
 

@@ -170,7 +170,7 @@ public class HttpRequest implements IRequest{
     @Override
     public String getParameter(String name) {
         Object paramObj = params.get(name);
-        return ToolsKit.isEmpty(paramObj) ? null : (String)paramObj;
+        return ToolsKit.isEmpty(paramObj) ? "" : (String)paramObj;
     }
 
     @Override
@@ -182,13 +182,13 @@ public class HttpRequest implements IRequest{
     public String[] getParameterValues(String name) {
         Object valueObj = params.get(name);
         return (ToolsKit.isNotEmpty(valueObj) && valueObj instanceof List) ?
-                        ((List<String>) valueObj).toArray(EMPTY_ARRAYS) : null;
+                        ((List<String>) valueObj).toArray(EMPTY_ARRAYS) : new String[1];
     }
 
     @Override
     public Map<String, Object> getParameterMap() {
         if(ToolsKit.isEmpty(params)) {
-            return null;
+            return new HashMap<>(1);
         }
         return params;
     }

@@ -110,6 +110,14 @@ public class Prop {
         }
     }
 
+    public Prop append(String key, Object value) {
+        if (ToolsKit.isEmpty(key) && ToolsKit.isEmpty(value)) {
+            throw new IllegalArgumentException("prop can not be null");
+        }
+        properties.put(key, value);
+        return this;
+    }
+
     public Prop append(Prop prop) {
         if (prop == null) {
             throw new IllegalArgumentException("prop can not be null");
