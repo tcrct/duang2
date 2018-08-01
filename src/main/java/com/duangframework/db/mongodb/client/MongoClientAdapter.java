@@ -180,7 +180,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
         }
 
         public MongoClientAdapter build() {
-            MongoClientAdapter adapter =  new MongoClientAdapter(new MongoConnect(host, port, database, username, password, url));
+            MongoClientAdapter adapter =  ToolsKit.isEmpty(url) ? new MongoClientAdapter(new MongoConnect(host, port, database, username, password)) : new MongoClientAdapter(new MongoConnect(url));
             adapter.setDefaultClient(isDefault);
             return adapter;
         }

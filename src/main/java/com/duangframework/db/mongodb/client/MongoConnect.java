@@ -18,12 +18,9 @@ public class MongoConnect extends DBConnect {
     }
 
     public MongoConnect(String host, int port, String database, String username, String password) {
-        this(host, port, database, username, password, null);
-    }
-
-    protected MongoConnect(String host, int port, String database, String username, String password, String url) {
         super(host, port, database, username, password, null);
     }
+
 
     public MongoConnect(String url) {
         super(null, 0, null, null, null, url);

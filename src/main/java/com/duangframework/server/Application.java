@@ -82,11 +82,7 @@ public class Application {
             if(ToolsKit.isNotEmpty(serverHost)) {
                 host = serverHost;
             }
-        } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
-        }
 
-        try {
             String serverPort = System.getProperty(ConstEnums.PROPERTIES.SERVER_PORT.getValue());
             if(ToolsKit.isEmpty(serverPort)) {
                 serverPort = PropKit.get(ConstEnums.PROPERTIES.SERVER_PORT.getValue());
