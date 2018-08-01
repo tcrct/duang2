@@ -20,7 +20,7 @@ public enum ConstEnums {
     CLASS_URL_PROTOCOL_FILE_FIELD("file", "calss类文件URL对象的类型"),
     CLASS_URL_PROTOCOL_JAR_FIELD("jar", "calss类文件URL对象的类型"),
     FRAMEWORK_OWNER_FILED("framework-x-owenr", "laotang"),
-    FRAMEWORK_MAPPING_KEY("/duang", "以框架名称作前缀的映射路径不在控制台打印，一般都是作特殊用途"),
+    FRAMEWORK_MAPPING_KEY("/duangframework", "以框架名称作前缀的映射路径不在控制台打印，一般都是作特殊用途"),
     FRAMEWORK_OWNER("duang", "框架名称"),
     FRAMEWORK_BASE_PACKAGE_PATH("com.duangframework", "框架包路径前缀"),
     RESPONSE_STATUS("status", "返回结果状态码"),

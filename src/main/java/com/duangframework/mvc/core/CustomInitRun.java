@@ -49,7 +49,7 @@ public class CustomInitRun {
             return;
         }
         customInitRun.before();
-        logger.warn("run after code success");
+        logger.warn("run before code success");
     }
 
     /**

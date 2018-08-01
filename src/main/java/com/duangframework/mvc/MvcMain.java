@@ -7,6 +7,7 @@ import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.core.helper.RouteHelper;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.WebKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +48,11 @@ public class MvcMain {
             target = target.substring(0, target.length()-1);
         }
 
-        // 验证该请求URI是否存在
-        if( !RouteHelper.getRouteMap().containsKey(target)) {
-            throw new MvcException("request uri["+target+"] is not exist!");
-        }
+//        // 验证该请求URI是否存在
+//        if( !RouteHelper.getRouteMap().containsKey(target) &&
+//                !target.startsWith(ConstEnums.FRAMEWORK_MAPPING_KEY.getValue())) {
+//            throw new MvcException("request uri["+target+"] is not exist!");
+//        }
 
         return target;
     }

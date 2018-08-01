@@ -1,5 +1,6 @@
 package com.duangframework.mvc.route;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.duangframework.kit.PathKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
@@ -20,6 +21,7 @@ public class Route {
 
     private RequestMapping requestMapping;//mapping注解对象类
     private Class<?> controllerClass;  //执行的控制器类
+    @JSONField(serialize=false, deserialize = false)
     private Method actionMethod;       // 执行的方法
     private HttpMethod[] httpMethod;  //请求类型
     private Interceptor[] interceptors;   // 拦截器，用于Controller
@@ -48,12 +50,24 @@ public class Route {
     }
 
     public void builderMapping(String controllerKey, Method actionMethod) {
+        // 方法参数null里，用于框架信息报告
+        if(ToolsKit.isEmpty(actionMethod)) {
+            Mapping controllerMapping = getControllerClass().getAnnotation(Mapping.class);
+            if(ToolsKit.isNotEmpty(controllerMapping)) {
+                this.requestMapping = new RequestMapping(controllerKey,
+                        controllerMapping.desc(),
+                        controllerMapping.order(),
+                        controllerMapping.timeout(),
+                        "");
+            }
+            return;
+        }
+        // Controller没有写Mapping注解
         Mapping methodMapping = actionMethod.getAnnotation(Mapping.class);
         String httpMethodString = getHttpMethodString(methodMapping);
         if(ToolsKit.isEmpty(methodMapping)) {
             if(ToolsKit.isEmpty(controllerKey)) {
-                String productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
-                controllerKey = "/"+productCode + (controllerKey.startsWith("/") ? controllerKey : "/" + controllerKey);
+                controllerKey = getControllerMapperKey();
             }
             this.requestMapping = new RequestMapping(controllerKey+"/"+actionMethod.getName().toLowerCase(),
                     actionMethod.getName(),
@@ -109,5 +123,30 @@ public class Route {
         }
         return httpMethod.toString();
     }
+
+    @JSONField(serialize = false, deserialize = false)
+    public Route getControllerRoute() {
+        String controllerKey = "/"+getControllerClass().getSimpleName().replace(Controller.class.getSimpleName(), "").toLowerCase();
+        Mapping controllerMapping = getControllerClass().getAnnotation(Mapping.class);
+        if(ToolsKit.isNotEmpty(controllerMapping)) {
+            controllerKey = ToolsKit.isEmpty(controllerMapping.value()) ? controllerKey : controllerMapping.value().toLowerCase();
+        }
+        return new Route(controllerClass, null, controllerKey, null);
+    }
+
+    @JSONField(serialize=false, deserialize = false)
+    public String getControllerMapperKey() {
+        String controllerKey = "";
+        Mapping controllerMapping = getControllerClass().getAnnotation(Mapping.class);
+        if(ToolsKit.isNotEmpty(controllerMapping)) {
+            controllerKey = controllerMapping.value();
+            if(ToolsKit.isEmpty(controllerKey)) {
+                String productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+                controllerKey = "/"+productCode + (controllerKey.startsWith("/") ? controllerKey : "/" + controllerKey);
+            }
+        }
+        return controllerKey.toLowerCase();
+    }
+
 }
 

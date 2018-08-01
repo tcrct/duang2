@@ -45,6 +45,9 @@ public class RouteHelper {
                 String controllerKey = buildMappingKey(controllerMapping, controllerClass.getSimpleName());
                 // 遍历Controller类所有的方法
                 Method[] actionMethods = controllerClass.getDeclaredMethods();
+                if(ToolsKit.isEmpty(actionMethods)) {
+                    continue;
+                }
                 for (Method actionMethod : actionMethods) {
                     //如果是Object, Controller公用方法名并且没有参数的方法, 则退出本次循环
                     if(ObjectKit.isExcludeMethod(actionMethod, excludedMethodName)) {
