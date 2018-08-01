@@ -121,10 +121,10 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
         // 创建连接池
         try{
             database = ToolsKit.isEmpty(database) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_DATABASE.getValue(),0) : database;
-            host = ToolsKit.isEmpty(database) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_HOST.getValue(),"127.0.0.1") : host;
-            password =ToolsKit.isEmpty(database) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_PWD.getValue(),"") : password;
-            port = ToolsKit.isEmpty(database) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_PORT.getValue(),6371) : port;
-            timeout = ToolsKit.isEmpty(database) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_PORT.getValue(),2000) : timeout;
+            host = ToolsKit.isEmpty(host) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_HOST.getValue(),"127.0.0.1") : host;
+            password =ToolsKit.isEmpty(password) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_PASSWORD.getValue(),"") : password;
+            port = ToolsKit.isEmpty(port) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_PORT.getValue(),6371) : port;
+            timeout = ToolsKit.isEmpty(timeout) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_PORT.getValue(),2000) : timeout;
             if(ToolsKit.isEmpty(password)) {
                 if(host.contains(":")) {
                     String[] hostArray = host.split(":");

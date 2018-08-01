@@ -2,6 +2,7 @@ package com.duangframework.mvc.http.enums;
 
 
 import com.duangframework.db.annotation.Entity;
+import com.duangframework.kit.PropKit;
 import com.duangframework.mvc.annotation.Controller;
 import com.duangframework.mvc.annotation.Handler;
 import com.duangframework.mvc.annotation.Plugin;
@@ -117,10 +118,29 @@ public enum ConstEnums {
         SERVER_HOST("server.host", "服务器地址"),
         SERVER_PORT("server.port", "服务器端口"),
 
+        /**mongodb*/
+        MONGODB_USERNAME("mongodb.username", "用户名"),
+        MONGODB_PASSWORD("mongodb.password", "密码"),
+        MONGODB_URL("mongodb.url","url链接字符串"),
+        MONGODB_HOST("mongodb.host", "host地址"),
+        MONGODB_PORT("mongodb.port", "端口"),
+        MONGODB_DATABASE("mongodb.database", "链接的数据库名称"),
+
+        /**mysql*/
+        MYSQL_USERNAME("mysql.username", "用户名"),
+        MYSQL_PASSWORD("mysql.password", "密码"),
+        MYSQL_URL("mysql.jdbc.url","url链接字符串"),
+        MYSQL_HOST("mysql.host", "host地址"),
+        MYSQL_PORT("mysql.port", "端口"),
+        MYSQL_DATABASE("mysql.database", "链接的数据库名称"),
+        MYSQL_DATASOURCE("mysql.datasource", "数据库链接池类名称"),
+
+
         /**redis*/
         REDIS_DATABASE("redis.database", "redis默认数据库"),
         REDIS_HOST("redis.host", "redis地址"),
-        REDIS_PWD("redis.password", "redis密码"),
+        REDIS_USERNAME("redis.username", "redis用户名"),
+        REDIS_PASSWORD("redis.password", "redis密码"),
         REDIS_PORT("redis.port", "redis端口"),
         REDIS_TIMEOUT("redis.timeout", "redis超时时间，秒作单位"),
 
