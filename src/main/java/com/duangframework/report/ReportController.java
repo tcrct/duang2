@@ -11,7 +11,7 @@ import com.duangframework.mvc.core.BaseController;
  * @date createed in 2018/2/6.
  */
 @Controller
-@Mapping(value = "/duangframework/{flag}/report", desc = "框架信息报告")
+@Mapping(value = "/{flag}/duangframework/report", desc = "框架信息报告")
 public class ReportController extends BaseController {
 
     @Import

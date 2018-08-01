@@ -14,7 +14,7 @@ import com.duangframework.vtor.annotation.NotEmpty;
  * @date createed in 2018/7/9.
  */
 @Controller
-@Mapping(value = "/duangframework/{flag}/api", desc="api接口")
+@Mapping(value = "/{flag}/duangframework/api", desc="api接口")
 @Before(LocalRequestInterceptor.class)
 public class ApiController extends BaseController {
 
