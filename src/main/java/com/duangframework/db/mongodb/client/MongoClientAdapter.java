@@ -130,12 +130,14 @@ public class MongoClientAdapter implements IClient<MongoClient> {
 
 
     public MongoClient createMongoDBClientWithURI() {
-        MongoClientURI connectionString = new MongoClientURI(mongoConnect.getUrl());
-//        logger.warn("mongodb connection url: " + connectionString);
-        MongoClient mongoClient = new MongoClient(connectionString);
+        MongoClientURI mongoClientURI = new MongoClientURI(mongoConnect.getUrl());
+        //        logger.warn("mongodb connection url: " + connectionString);
+        MongoClient mongoClient = new MongoClient(mongoClientURI);
         if(null == mongoClient){
             throw new MongodbException("can't connect mongodb database! crate client fail");
         }
+        // 设置链接的数据库
+        mongoConnect.setDatabase(mongoClientURI.getDatabase());
         return mongoClient;
     }
 

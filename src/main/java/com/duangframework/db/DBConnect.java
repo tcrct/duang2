@@ -16,6 +16,9 @@ public abstract class DBConnect {
 
     protected String host;
     protected int port;
+
+
+
     protected String database;
     protected String username;
     protected String password;
@@ -38,6 +41,9 @@ public abstract class DBConnect {
         return port;
     }
 
+    public void setDatabase(String database) {
+        this.database = database;
+    }
     public String getDatabase() {
         return database;
     }
