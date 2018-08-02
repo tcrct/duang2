@@ -75,7 +75,7 @@ public class RouteHelper {
             mappingKey = mapping.value();
         } else {
             if(mappingKey.toLowerCase().endsWith("controller")) {
-                mappingKey = mappingKey.substring(0, mappingKey.length() - "controller".length());
+                mappingKey = "/"+mappingKey.substring(0, mappingKey.length() - "controller".length());
             }
         }
         return mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1).toLowerCase() : mappingKey.toLowerCase();

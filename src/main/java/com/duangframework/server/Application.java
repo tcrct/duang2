@@ -31,6 +31,7 @@ public class Application {
     private String host;
     private int port;
     private static Application application;
+    private static NettyServer nettyServer;
 
     public static Application duang() {
         if(application == null) {
@@ -94,8 +95,12 @@ public class Application {
             logger.warn(e.getMessage(), e);
         }
         BootStrap bootStrap = new BootStrap(host, port);
-        new NettyServer(bootStrap).start();
+        nettyServer = new NettyServer(bootStrap);
+        nettyServer.start();
     }
 
+    public static void stop() {
+        nettyServer.shutdown();
+    }
 
 }

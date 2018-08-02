@@ -19,19 +19,25 @@ public class HandlerHelper {
     /**
      * 前置处理器集合
      */
-    public static List<IHandler> beforeHandlerList = new ArrayList<>();
+    private static final List<IHandler> beforeHandlerList = new ArrayList<>();
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList .addAll(beforeHandlerList);
+    }
+
+    public static List<IHandler> getBeforeHandlerList() {
+        return beforeHandlerList;
     }
 
     /**
      * 后置处理器集合
      */
-    public static List<IHandler> afterHandlerList = new ArrayList<>();
+    private static final List<IHandler> afterHandlerList = new ArrayList<>();
     public static void setAfters(List<IHandler> afterHandlerList) {
         HandlerHelper.afterHandlerList .addAll(afterHandlerList);
     }
-
+    public static List<IHandler> getAfterHandlerList() {
+        return afterHandlerList;
+    }
 
     /**
      * 执行前置(请求到达Controller前)的所有请求处理器
