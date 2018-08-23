@@ -32,6 +32,12 @@ public class HttpKit {
     private static void clear() {
         _headerMap.clear();
         _paramMap.clear();
+
+        init();
+    }
+
+    private static void init() {
+        _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, HttpRequest.CONTENT_TYPE_FORM);
     }
 
     /**
@@ -64,8 +70,29 @@ public class HttpKit {
         return this;
     }
 
-    public HttpKit body(String body) {
-
+    /**
+     *
+     * @param body
+     * @param charset
+     * @return
+     */
+    public HttpKit body(String body, String... charset) {
+        String contentType = "";
+        if(body.startsWith("{") && body.endsWith("}")) {
+            contentType = HttpRequest.CONTENT_TYPE_JSON;
+        }
+        else if(body.startsWith("<") && body.endsWith(">")) {
+            contentType = HttpRequest.CONTENT_TYPE_XML;
+        }
+        if(ToolsKit.isNotEmpty(contentType)) {
+            _headerMap.put(HttpRequest.HEADER_ACCEPT, contentType);
+            _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, contentType);
+            if(ToolsKit.isEmpty(charset)) {
+                charset = new String[] {HttpRequest.CHARSET_UTF8};
+            }
+            _headerMap.put(HttpRequest.HEADER_ACCEPT_CHARSET, charset[0]);
+            _headerMap.put(HttpRequest.HEADER_ACCEPT_ENCODING, charset[0]);
+        }
         return this;
     }
 
