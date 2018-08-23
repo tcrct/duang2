@@ -1,13 +1,13 @@
-package com.duangframework.rpc.annotation;
+package com.duangframework.net.rpc.annotation;
 
 import java.lang.annotation.*;
 
 /**
  * Created by laotang on 2017/11/16.
  */
-@Target({ElementType.FIELD,ElementType.METHOD})
+@Target({ElementType.PACKAGE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ImportRpc {
+public @interface RpcPackage {
     String value() default "";
 }

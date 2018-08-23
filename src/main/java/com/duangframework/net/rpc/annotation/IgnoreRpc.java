@@ -1,4 +1,4 @@
-package com.duangframework.rpc.annotation;
+package com.duangframework.net.rpc.annotation;
 
 import java.lang.annotation.Target;
 

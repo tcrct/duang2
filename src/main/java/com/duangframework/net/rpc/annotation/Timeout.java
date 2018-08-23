@@ -1,4 +1,4 @@
-package com.duangframework.rpc.annotation;
+package com.duangframework.net.rpc.annotation;
 
 /**
  * Created by laotang on 2017/11/5.

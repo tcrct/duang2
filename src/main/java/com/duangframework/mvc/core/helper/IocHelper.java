@@ -3,7 +3,7 @@ package com.duangframework.mvc.core.helper;
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Import;
-import com.duangframework.rpc.annotation.ImportRpc;
+import com.duangframework.net.rpc.annotation.ImportRpc;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
