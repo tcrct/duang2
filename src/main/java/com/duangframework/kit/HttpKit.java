@@ -1,9 +1,8 @@
 package com.duangframework.kit;
 
-import com.duangframework.mvc.http.HttpResponse;
 import com.duangframework.net.http.HttpRequest;
+import com.duangframework.net.http.HttpResult;
 
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +27,7 @@ public class HttpKit {
     private static Map<String, String> _headerMap = new HashMap<>();
     private static Map<String, Object> _paramMap = new HashMap<>();
     private static String _url;
+    private static boolean _encode;
 
     private static void clear() {
         _headerMap.clear();
@@ -38,6 +38,7 @@ public class HttpKit {
 
     private static void init() {
         _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, HttpRequest.CONTENT_TYPE_FORM);
+        _encode = false;
     }
 
     /**
@@ -71,7 +72,7 @@ public class HttpKit {
     }
 
     /**
-     *
+     * 请求体为json或xml等字符串时，使用该方法
      * @param body
      * @param charset
      * @return
@@ -96,15 +97,45 @@ public class HttpKit {
         return this;
     }
 
+    /**
+     * 请求URL地址
+     * @param url
+     * @return
+     */
     public HttpKit url(String url) {
         _url = url;
         return this;
     }
 
-    public int post() {
-        HttpRequest httpRequest = HttpRequest.post(_url).form(_paramMap).headers(_headerMap);
-        httpRequest.code();
-        httpRequest.message();
-        return 0;
+    /**
+     * 请求URL地址
+     * @param url
+     * @param encode       是否对url进行URL.ENCODE编码
+     * @return
+     */
+    public HttpKit url(String url, boolean encode) {
+        _encode = encode;
+        return this;
     }
+
+
+    /**
+     * GET请求
+     * @return
+     */
+    public HttpResult get() {
+        HttpRequest httpRequest = HttpRequest.get(_url, _paramMap, _encode).headers(_headerMap);
+        return new HttpResult(httpRequest);
+    }
+
+    /**
+     * POST请求
+     * @return
+     */
+    public HttpResult post() {
+        HttpRequest httpRequest = HttpRequest.post(_url, _paramMap, _encode).headers(_headerMap);
+        return new HttpResult(httpRequest);
+    }
+
+
 }
