@@ -28,17 +28,14 @@ public class HttpKit {
     private static Map<String, Object> _paramMap = new HashMap<>();
     private static String _url;
     private static boolean _encode;
+    private static String _body;
 
     private static void clear() {
         _headerMap.clear();
         _paramMap.clear();
-
-        init();
-    }
-
-    private static void init() {
         _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, HttpRequest.CONTENT_TYPE_FORM);
         _encode = false;
+        _body = "";
     }
 
     /**
@@ -71,13 +68,17 @@ public class HttpKit {
         return this;
     }
 
+    public HttpKit body(String body) {
+        body(body, null);
+        return this;
+    }
     /**
      * 请求体为json或xml等字符串时，使用该方法
      * @param body
      * @param charset
      * @return
      */
-    public HttpKit body(String body, String... charset) {
+    public HttpKit body(String body, String charset) {
         String contentType = "";
         if(body.startsWith("{") && body.endsWith("}")) {
             contentType = HttpRequest.CONTENT_TYPE_JSON;
@@ -85,15 +86,16 @@ public class HttpKit {
         else if(body.startsWith("<") && body.endsWith(">")) {
             contentType = HttpRequest.CONTENT_TYPE_XML;
         }
-        if(ToolsKit.isNotEmpty(contentType)) {
+        if(contentType.length() > 0) {
             _headerMap.put(HttpRequest.HEADER_ACCEPT, contentType);
             _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, contentType);
-            if(ToolsKit.isEmpty(charset)) {
-                charset = new String[] {HttpRequest.CHARSET_UTF8};
+            if(null == charset) {
+                charset = HttpRequest.CHARSET_UTF8;
             }
-            _headerMap.put(HttpRequest.HEADER_ACCEPT_CHARSET, charset[0]);
-            _headerMap.put(HttpRequest.HEADER_ACCEPT_ENCODING, charset[0]);
+            _headerMap.put(HttpRequest.HEADER_ACCEPT_CHARSET, charset);
+            _headerMap.put(HttpRequest.HEADER_ACCEPT_ENCODING, charset);
         }
+        _body = body;
         return this;
     }
 
@@ -133,9 +135,8 @@ public class HttpKit {
      * @return
      */
     public HttpResult post() {
-        HttpRequest httpRequest = HttpRequest.post(_url, _paramMap, _encode).headers(_headerMap);
+        HttpRequest httpRequest = _body.length() == 0 ? HttpRequest.post(_url, _paramMap, _encode).headers(_headerMap)
+                : HttpRequest.post(_url,  _encode).headers(_headerMap).send(_body);
         return new HttpResult(httpRequest);
     }
-
-
 }

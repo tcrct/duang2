@@ -77,7 +77,7 @@ public class HttpResult implements Serializable {
      */
     public String getResult() {
         try {
-            return httpRequest.message();
+            return httpRequest.body();
         } catch (Exception e) {
             return e.getMessage();
         }
