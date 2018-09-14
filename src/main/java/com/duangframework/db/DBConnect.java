@@ -24,6 +24,7 @@ public abstract class DBConnect {
     protected String password;
     protected String url;
 
+
     public DBConnect(String host, int port, String database, String username, String password, String url) {
         this.host = host;
         this.port = port;

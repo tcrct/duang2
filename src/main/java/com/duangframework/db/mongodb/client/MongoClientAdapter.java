@@ -28,8 +28,8 @@ public class MongoClientAdapter implements IClient<MongoClient> {
      */
     private String id;
 
-    public MongoClientAdapter(MongoConnect mongoConnect){
-        this.mongoConnect = mongoConnect;
+    public MongoClientAdapter(MongoConnect mongodbConnect){
+        mongoConnect = mongodbConnect;
     }
 
     public void setId(String id) {
