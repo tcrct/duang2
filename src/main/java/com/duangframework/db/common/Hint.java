@@ -1,7 +1,6 @@
-package com.duangframework.db.mongodb.common;
+package com.duangframework.db.common;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import java.util.LinkedHashMap;
 
 /**
  *  Hint对象, 强制Mongodb使用指定的索引进行查询
@@ -28,7 +27,9 @@ public class Hint {
 		return this;
 	}
 
-	public DBObject getDBObject() {
-		return new BasicDBObject(key, type);
+	public LinkedHashMap getObject() {
+		return new LinkedHashMap(1){{
+			this.put(key, type);
+		}};
 	}
 }

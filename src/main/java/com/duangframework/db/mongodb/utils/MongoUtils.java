@@ -19,10 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -87,6 +84,18 @@ public class MongoUtils {
         }
         return fieldsObj;
     }
+
+
+    	public static DBObject convert2DBOrder(Map orderLinkedMap) {
+            DBObject orderObj = new BasicDBObject();
+            if (ToolsKit.isNotEmpty(orderLinkedMap)) {
+                for (Iterator<Map.Entry<String, String>> it = orderLinkedMap.entrySet().iterator(); it.hasNext(); ) {
+                    Map.Entry<String, String> entry = it.next();
+                    orderObj.putAll(MongoUtils.builderOrder(entry.getKey(), entry.getValue()));
+                }
+            }
+            return orderObj;
+        }
 
     public static <T> T toBson(Object obj) {
         if(null == obj) {

@@ -1,9 +1,4 @@
-package com.duangframework.db.mongodb.common;
-
-import com.duangframework.db.mongodb.utils.MongoUtils;
-import com.duangframework.kit.ToolsKit;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+package com.duangframework.db.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,10 +26,10 @@ public class Field {
 		return this;
 	}
 	
-	public DBObject getDBFields() {
-		DBObject fieldObj = MongoUtils.convert2DBFields(fields);
-		return ToolsKit.isEmpty(fieldObj) ? new BasicDBObject() : fieldObj;
-	}
+//	public DBObject getDBFields() {
+//		DBObject fieldObj = MongoUtils.convert2DBFields(fields);
+//		return ToolsKit.isEmpty(fieldObj) ? new BasicDBObject() : fieldObj;
+//	}
 	
 	public Collection<String> getFields(){
 		return fields;

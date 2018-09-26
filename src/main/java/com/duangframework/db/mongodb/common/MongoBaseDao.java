@@ -1,6 +1,9 @@
 package com.duangframework.db.mongodb.common;
 
+import com.duangframework.db.IDao;
 import com.duangframework.db.IdEntity;
+import com.duangframework.db.common.Query;
+import com.duangframework.db.common.Update;
 import com.duangframework.db.mongodb.enums.MongodbDataTypeEnum;
 import com.duangframework.db.mongodb.utils.MongoIndexUtils;
 import com.duangframework.db.mongodb.utils.MongoUtils;
@@ -32,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @author Created by laotang
  * @date createed in 2018/6/25.
  */
-public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
+public class MongoBaseDao<T> implements IDao<Query, Update> {
 
     private final static Logger logger = LoggerFactory.getLogger(MongoBaseDao.class);
 
@@ -128,7 +131,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @throws Exception
      */
     @Override
-    public T findOne(MongoQuery mongoQuery) throws Exception {
+    public T findOne(Query mongoQuery) throws Exception {
         if(ToolsKit.isEmpty(mongoQuery)) {
             throw new MongodbException("Mongodb findOne is Fail: mongoQuery is null");
         }
@@ -146,7 +149,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @throws Exception
      */
     @Override
-    public <T> T findList(MongoQuery mongoQuery) throws Exception {
+    public <T> T findList(Query mongoQuery) throws Exception {
         if(ToolsKit.isEmpty(mongoQuery)) {
             throw new MongodbException("Mongodb findList is Fail: mongoQuery is null");
         }
@@ -159,7 +162,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @throws Exception
      */
     public List<T> findAll() throws Exception {
-        MongoQuery mongoQuery = new MongoQuery();
+        Query mongoQuery = new Query();
         return findAll(mongoQuery);
     }
 
@@ -169,11 +172,11 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return 结果集合，元素为指定的泛型
      * @throws Exception
      */
-    private List<T> findAll(MongoQuery mongoQuery) throws Exception {
+    private List<T> findAll(Query mongoQuery) throws Exception {
         if(null == mongoQuery) {
             throw new MongodbException("Mongodb findList is Fail: mongoQuery is null");
         }
-        Bson queryDoc = mongoQuery.getQueryBson();
+        Bson queryDoc = new BasicDBObject(mongoQuery.getQuery());
         FindIterable<Document> documents = collection.find(queryDoc);
         documents = builderQueryDoc(documents, mongoQuery);
         final List<T> resultList = new ArrayList();
@@ -186,15 +189,15 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
         return resultList;
     }
 
-    private FindIterable<Document> builderQueryDoc(FindIterable<Document> documents, MongoQuery mongoQuery) {
-        PageDto<T> page = mongoQuery.getPage();
+    private FindIterable<Document> builderQueryDoc(FindIterable<Document> documents, Query mongoQuery) {
+        PageDto<T> page = mongoQuery.getPageObj();
         int pageNo = page.getPageNo();
         int pageSize = page.getPageSize();
-        BasicDBObject fieldDbo = (BasicDBObject)mongoQuery.getDBFields();
+        BasicDBObject fieldDbo = (BasicDBObject)MongoUtils.convert2DBFields(mongoQuery.getFields());
         if(ToolsKit.isNotEmpty(fieldDbo) && !fieldDbo.isEmpty()) {
             documents.projection(fieldDbo);
         }
-        BasicDBObject orderDbo = (BasicDBObject)mongoQuery.getDBOrder();
+        BasicDBObject orderDbo =  (BasicDBObject)MongoUtils.convert2DBOrder(mongoQuery.getOrderObj());
         if(ToolsKit.isNotEmpty(orderDbo) && !orderDbo.isEmpty()) {
             documents.sort(orderDbo);
         }
@@ -202,7 +205,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
             documents.skip( (pageNo-1) * pageSize );
             documents.limit(pageSize);
         }
-        BasicDBObject hintDbo = (BasicDBObject)mongoQuery.getHintDBObject();
+        BasicDBObject hintDbo = new BasicDBObject(mongoQuery.getHint());
         if(ToolsKit.isNotEmpty(hintDbo) && !hintDbo.isEmpty()) {
             documents.hint(hintDbo);
         }
@@ -218,21 +221,21 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return	分页DTO对象
      * @throws Exception
      */
-    public PageDto<T> findPage(MongoQuery mongoQuery) throws Exception {
+    public PageDto<T> findPage(Query mongoQuery) throws Exception {
         if(ToolsKit.isEmpty(mongoQuery)) {
             throw new MongodbException("Mongodb findPage is Fail: mongoQuery is null");
         }
-        Bson queryDoc = mongoQuery.getQueryBson();
-        PageDto<T> page = mongoQuery.getPage();
+        Bson queryDoc = new BasicDBObject(mongoQuery.getQuery());
+        PageDto<T> page = mongoQuery.getPageObj();
         int pageNo = page.getPageNo();
         int pageSize = page.getPageSize();
         final List<T> resultList = new ArrayList<T>();
         collection.find(queryDoc)
-                .projection((BasicDBObject)mongoQuery.getDBFields())
-                .sort((BasicDBObject)mongoQuery.getDBOrder())
+                .projection((BasicDBObject)MongoUtils.convert2DBFields(mongoQuery.getFields()))
+                .sort((BasicDBObject)MongoUtils.convert2DBOrder(mongoQuery.getOrderObj()))
                 .skip( (pageNo>0 ? (pageNo-1) : pageNo)*pageSize)
                 .limit(pageSize)
-                .hint((BasicDBObject)mongoQuery.getHintDBObject())
+                .hint(new BasicDBObject(mongoQuery.getHint()))
                 .forEach(new Block<Document>() {
                     @Override
                     public void apply(Document document) {
@@ -251,12 +254,12 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @param query		查询条件
      * @return  记录数
      */
-    public long count(MongoQuery query){
+    public long count(Query query){
         CountOptions options = new CountOptions();
-        if(ToolsKit.isNotEmpty(query.getHintDBObject())) {
-            options.hint((BasicDBObject) query.getHintDBObject());
+        if(ToolsKit.isNotEmpty(query.getHint())) {
+            options.hint(new BasicDBObject(query.getHint()));
         }
-        return collection.count(query.getQueryBson(), options);
+        return collection.count(new BasicDBObject(query.getQuery()), options);
     }
 
     /**
@@ -315,9 +318,9 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @throws Exception
      */
     @Override
-    public long update(MongoQuery mongoQuery, MongoUpdate mongoUpdate) throws Exception {
-        Bson queryBson = mongoQuery.getQueryBson();
-        Bson updateBson = mongoUpdate.getUpdateBson();
+    public long update(Query mongoQuery, Update mongoUpdate) throws Exception {
+        Bson queryBson = new BasicDBObject(mongoQuery.getQuery());
+        Bson updateBson =  new BasicDBObject(mongoUpdate.getUpdate());
         if(ToolsKit.isEmpty(queryBson) || ToolsKit.isEmpty(updateBson)) {
             throw new MongodbException("Mongodb Update is Fail: queryBson or updateBson is null");
         }
@@ -337,9 +340,10 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return 最大值
      */
     @SuppressWarnings("static-access")
-    public double max(String key, MongoQuery query) {
+    public double max(String key, Query query) {
         List<Bson> pipeline = new ArrayList<>();
-        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, query.getDBOrder());		//查询条件
+        BasicDBObject orderObj = (BasicDBObject)MongoUtils.convert2DBOrder(query.getOrderObj());
+        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, orderObj);		//查询条件
         BasicDBObject maxTmp = new BasicDBObject();
         maxTmp.put("_id", null);
         DBObject max = new BasicDBObject();
@@ -368,10 +372,11 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return	最小值
      */
     @SuppressWarnings("static-access")
-    public double min(String key, MongoQuery query) {
+    public double min(String key, Query query) {
         List<BasicDBObject> pipeline = new ArrayList<>();
         //查询条件
-        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, query.getDBOrder());
+        BasicDBObject orderObj = (BasicDBObject)MongoUtils.convert2DBOrder(query.getOrderObj());
+        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, orderObj);
         BasicDBObject minTmp = new BasicDBObject();
         minTmp.put("_id", null);
         DBObject min = new BasicDBObject();
@@ -396,7 +401,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @param query		查询条件
      * @return
      */
-    public List<Map>  group(String key, MongoQuery query){
+    public List<Map>  group(String key, Query query){
         return group(key, query, "message");
     }
     /**
@@ -406,7 +411,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @param sort		结果集排序方向
      * @return  分组查询集合
      */
-    public List<Map>  group(String key, MongoQuery query, final String sort){
+    public List<Map>  group(String key, Query query, final String sort){
         List<String> keys = new ArrayList<String>();
         keys.add(key);
         return group(keys, query, sort);
@@ -419,13 +424,13 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @param sort		结果集排序方向
      * @return
      */
-    public List<Map> group(List<String> keys, MongoQuery query, final String sort){
+    public List<Map> group(List<String> keys, Query query, final String sort){
         DBObject groupFields = new BasicDBObject();
         for(String key : keys){groupFields.put(key, true);}
         String reduce = "function(doc, aggr){aggr.count += 1;}";
         DBObject dbo = null;
         try{
-            dbo = coll.group(groupFields, query.getQueryObj(), new BasicDBObject("count", 0), reduce, "", coll.getReadPreference());
+            dbo = coll.group(groupFields, new BasicDBObject(query.getQuery()), new BasicDBObject("count", 0), reduce, "", coll.getReadPreference());
         }catch (Exception ex){
             logger.error(ex.getMessage(), ex);
         }
@@ -468,9 +473,9 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @param query		查询条件
      * @return			去重关键字的集合
      */
-    public List<String> distinct(String key, MongoQuery query) {
+    public List<String> distinct(String key, Query query) {
         final List<String> distinctList = new ArrayList<>();
-        collection.distinct(key, query.getQueryBson(), String.class).forEach(new Block<String>() {
+        collection.distinct(key, new BasicDBObject(query.getQuery()), String.class).forEach(new Block<String>() {
             @Override
             public void apply(String s) {
                 distinctList.add(s);
@@ -485,8 +490,8 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @param update  更新对象
      * @return 返回操作受影响数
      */
-    public int set(MongoQuery query, MongoUpdate update) {
-        WriteResult result = coll.updateMulti(query.getQueryObj(), update.getUpdateObj());
+    public int set(Query query, Update update) {
+        WriteResult result = coll.updateMulti(new BasicDBObject(query.getQuery()),  new BasicDBObject(update.getUpdate()));
         return result.getN();
     }
 
@@ -497,8 +502,8 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      *@return 返回操作受影响数
      */
     @Deprecated
-    public int push(MongoQuery query, MongoUpdate update) {
-        WriteResult result = coll.updateMulti(query.getQueryObj(), update.getUpdateObj());
+    public int push(Query query, Update update) {
+        WriteResult result = coll.updateMulti(new BasicDBObject(query.getQuery()),  new BasicDBObject(update.getUpdate()));
         return result.getN();
     }
 
@@ -509,8 +514,8 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return 返回操作受影响数
      */
     @Deprecated
-    public int pull(MongoQuery query, MongoUpdate update) {
-        WriteResult result = coll.updateMulti(query.getQueryObj(), update.getUpdateObj());
+    public int pull(Query query, Update update) {
+        WriteResult result = coll.updateMulti(new BasicDBObject(query.getQuery()),  new BasicDBObject(update.getUpdate()));
         return result.getN();
     }
 
@@ -521,13 +526,13 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return		分组统计后的值
      */
     @SuppressWarnings("static-access")
-    public int groupBySize(String key, MongoQuery query){
+    public int groupBySize(String key, Query query){
         DBObject groupFields = new BasicDBObject();
         groupFields.put(key, true);
         String reduce = "function(doc, aggr){aggr.count += 1;}";
         DBObject dbo = null;
         try{
-            dbo = coll.group(groupFields, query.getQueryObj(), new BasicDBObject("count", 0), reduce, "", coll.getReadPreference());
+            dbo = coll.group(groupFields,new BasicDBObject(query.getQuery()), new BasicDBObject("count", 0), reduce, "", coll.getReadPreference());
         }catch (Exception ex){
             logger.error(ex.getMessage(), ex);
         }
@@ -586,12 +591,12 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
     public int unset(String id, String... keys){
         if(ToolsKit.isEmpty(id)){throw new MongodbException("id is null"); }
         if(ToolsKit.isEmpty(keys)){ throw new MongodbException("keys is null");}
-        MongoQuery query = new MongoQuery();
+        Query query = new Query();
         query.eq(IdEntity.ID_FIELD, id);
         DBObject dbo = new BasicDBObject();
         for(String key : keys){ dbo.put(key, 1);}
         DBObject update = new BasicDBObject(Operator.UNSET, dbo);
-        WriteResult result = coll.updateMulti(query.getQueryObj(), update);
+        WriteResult result = coll.updateMulti(new BasicDBObject(query.getQuery()), update);
         return result.getN();
     }
     /**
@@ -602,12 +607,12 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
     public int unset(Set<String> ids, String... keys){
         if(ToolsKit.isEmpty(ids)){ throw new MongodbException("ids is null");}
         if(ToolsKit.isEmpty(keys)){ throw new MongodbException("keys is null");}
-        MongoQuery query = new MongoQuery();
+        Query query = new Query();
         query.in(IdEntity.ID_FIELD, ids.toArray());
         DBObject dbo = new BasicDBObject();
         for(String key : keys){ dbo.put(key, 1);}
         DBObject update = new BasicDBObject(Operator.UNSET, dbo);
-        WriteResult  result = coll.updateMulti(query.getQueryObj(), update);
+        WriteResult  result = coll.updateMulti(new BasicDBObject(query.getQuery()), update);
         return result.getN();
     }
 }

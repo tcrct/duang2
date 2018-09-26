@@ -1,4 +1,4 @@
-package com.duangframework.db.mongodb.enums;
+package com.duangframework.db.common;
 
 /**
  * 排序字段值定义

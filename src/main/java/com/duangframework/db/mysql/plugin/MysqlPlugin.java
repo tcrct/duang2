@@ -2,6 +2,7 @@ package com.duangframework.db.mysql.plugin;
 
 import com.duangframework.db.DbClientFactory;
 import com.duangframework.db.mysql.MysqlBaseDao;
+import com.duangframework.db.mysql.MysqlDao;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
 import com.duangframework.db.mysql.utils.MysqlUtils;
 import com.duangframework.kit.ClassKit;
@@ -92,7 +93,7 @@ public class MysqlPlugin implements IPlugin {
         Field[] fields = serviceClass.getDeclaredFields();
             for(Field field : fields) {
                 Import importAnnot = field.getAnnotation(Import.class);
-                if (ToolsKit.isNotEmpty(importAnnot) && MysqlBaseDao.class.equals(field.getType())) {
+                if (ToolsKit.isNotEmpty(importAnnot) && MysqlDao.class.equals(field.getType())) {
                     ParameterizedType paramType = (ParameterizedType) field.getGenericType();
                     Type[] types = paramType.getActualTypeArguments();
                     if(ToolsKit.isNotEmpty(types)) {
