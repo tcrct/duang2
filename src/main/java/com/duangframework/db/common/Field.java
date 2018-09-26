@@ -6,7 +6,6 @@ import java.util.Collection;
 /**
  * 字段对象
  * @author laotang
- *
  */
 public class Field {
 
