@@ -10,11 +10,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 定义 WSController 类注解
+ * 定义 WebSocket 类注解
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WSController {
+public @interface WebSocket {
     // 设置Controller是单例还是多例模式, singleton: 单例  prototype: 多例
     String scope() default "singleton";
     // 是否自动注入

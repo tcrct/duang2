@@ -1,10 +1,10 @@
 package com.duangframework.server.netty;
 
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.server.common.BootStrap;
-import com.duangframework.server.netty.handler.BaseHandler;
 import com.duangframework.server.netty.handler.CorsHandler;
 import com.duangframework.server.netty.handler.HttpBaseHandler;
-import com.duangframework.server.netty.handler.HttpFilterRuleHandler;
+import com.duangframework.server.netty.handler.WebSocketBaseHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -62,15 +62,13 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             channelPipeline.addLast(new CorsHandler());
         }
 //        channelPipeline.addLast(new HttpFilterRuleHandler());
-
-//        channelPipeline.addLast(new WebSocketBaseHandler(bootStrap));
-//        channelPipeline.addLast(new SocketBaseHandler(bootStrap));
-//        if (null != bootStrap.getWebSocketPath()) {
-//            channelPipeline.addLast(new WebSocketServerProtocolHandler(bootStrap.getWebSocketPath(), null, true));
-//            channelPipeline.addLast(new WebSocketHandler(blade));
-//        }
+        // 如果有设置了WebSocket的路径，则将请求按ws协调来处理
+        if (ToolsKit.isNotEmpty(bootStrap.getWebSocketPath())) {
+            channelPipeline.addLast(new WebSocketServerProtocolHandler(bootStrap.getWebSocketPath(), null, true));
+            channelPipeline.addLast(new WebSocketBaseHandler(bootStrap));
+        }
         // 真正处理HTTP业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
-        channelPipeline.addLast(new BaseHandler(bootStrap));
+        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
     }
 
     @Override

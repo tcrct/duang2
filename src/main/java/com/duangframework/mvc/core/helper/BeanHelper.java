@@ -91,6 +91,10 @@ public class BeanHelper {
         return beanMap.get(ConstEnums.ANNOTATION_CLASS.ENTITY_ANNOTATION.getName());
     }
 
+    public static List<Object> getWebSocketBeanList() {
+        return beanMap.get(ConstEnums.ANNOTATION_CLASS.WEBSOCKET_ANNOTATION.getName());
+    }
+
     /**
      *  根据Class取出对应的Ioc Bean
      */
@@ -129,6 +133,7 @@ public class BeanHelper {
                 {
                     this.addAll(getControllerBeanList());
                     this.addAll(getServiceBeanList());
+                    this.addAll(getWebSocketBeanList());
                 }
             };
 

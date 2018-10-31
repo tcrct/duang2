@@ -16,7 +16,7 @@ import java.util.Date;
 public class NettyServer extends AbstractNettyServer {
 
     public NettyServer(BootStrap bootStrap) {
-        super(bootStrap.getHost(), bootStrap.getPort(), bootStrap.isDevModel());
+        super(bootStrap);
     }
 
     @Override

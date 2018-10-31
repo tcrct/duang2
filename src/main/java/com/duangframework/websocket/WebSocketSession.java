@@ -10,12 +10,18 @@ import io.netty.channel.Channel;
  */
 public class WebSocketSession {
 
+    /**
+     * netty的channel对象
+     */
     private Channel channel;
+    /**
+     * 自定义的WebSocketSession id, 格式为DuangId
+     */
     private String id;
 
     public WebSocketSession(Channel channel) {
         this.channel = channel;
-        this.id = channel.id().toString();
+        this.id = new DuangId().toString();
     }
 
     public Channel getChannel() {

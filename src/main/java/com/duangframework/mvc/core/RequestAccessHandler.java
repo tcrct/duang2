@@ -114,17 +114,4 @@ final public class RequestAccessHandler{
         }
         return route;
     }
-
-    /**
-     *
-     * @param ctx
-     * @throws Exception
-     */
-    public static void doWsHandler(WebSocketContext ctx) throws Exception {
-        Route route = RouteHelper.getRouteMap().get(ctx.getTarget());
-        Object controller =  BeanHelper.getBean(route.getControllerClass());
-        Method method = route.getActionMethod();
-        method.setAccessible(true);
-        method.invoke(controller, ctx);
-    }
 }

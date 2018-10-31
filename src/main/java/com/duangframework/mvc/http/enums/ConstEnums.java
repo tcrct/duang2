@@ -3,10 +3,7 @@ package com.duangframework.mvc.http.enums;
 
 import com.duangframework.db.annotation.Entity;
 import com.duangframework.kit.PropKit;
-import com.duangframework.mvc.annotation.Controller;
-import com.duangframework.mvc.annotation.Handler;
-import com.duangframework.mvc.annotation.Plugin;
-import com.duangframework.mvc.annotation.Service;
+import com.duangframework.mvc.annotation.*;
 import io.netty.util.AttributeKey;
 
 import java.lang.annotation.Annotation;
@@ -64,6 +61,7 @@ public enum ConstEnums {
         CONTROLLER_ANNOTATION(Controller.class, true,"所有Controller类的注解，必须在类添加该注解否则框架忽略扫描"),
         SERVICE_ANNOTATION(Service.class, true,"所有Service类的注解，必须在类添加该注解否则框架忽略扫描"),
         ENTITY_ANNOTATION(Entity.class, true,"所有Entity类的注解，必须在类添加该注解否则框架忽略扫描"),
+        WEBSOCKET_ANNOTATION(WebSocket.class, true,"所有WebSocket类的注解，必须在类添加该注解否则框架忽略扫描"),
         PLUGIN_ANNOTATION(Plugin.class, false, "所有Plugin类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
         HANDLER_ANNOTATION(Handler.class, false, "所有Handler类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
         ;
@@ -185,7 +183,6 @@ public enum ConstEnums {
     public enum SOCKET {
         CLIENT_IS_NOT_EXTIS("500", "客户端不存在"),
         SOCKET_SCHEME_FIELD("ws://", "WebSocket请求协议"),
-        SOCKET_ROUTE_FIELD("duang.websocket.route", "websocket路由字段名"),
         ;
 
         private final String value;

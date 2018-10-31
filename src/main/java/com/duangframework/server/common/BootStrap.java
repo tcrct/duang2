@@ -1,8 +1,11 @@
 package com.duangframework.server.common;
 
 import com.duangframework.exception.NettyStartUpException;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.websocket.IWebSocket;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
@@ -268,15 +271,8 @@ public class BootStrap implements Closeable {
 
 
     /** WebSocket **/
-    private WebSocketServerHandshaker handshaker;
     private String  webSocketPath;
-
-    public WebSocketServerHandshaker getHandshaker() {
-        return handshaker;
-    }
-    public void setHandshaker(WebSocketServerHandshaker handshaker) {
-        this.handshaker = handshaker;
-    }
+    private Class<? extends IWebSocket> webSocketClass;
 
     public String getWebSocketPath() {
         return webSocketPath;
@@ -284,5 +280,13 @@ public class BootStrap implements Closeable {
 
     public void setWebSocketPath(String webSocketPath) {
         this.webSocketPath = webSocketPath;
+    }
+
+    public Class<? extends IWebSocket> getWebSocketClass() {
+        return webSocketClass;
+    }
+
+    public void setWebSocketClass(Class<? extends IWebSocket> webSocketClass) {
+        this.webSocketClass = webSocketClass;
     }
 }

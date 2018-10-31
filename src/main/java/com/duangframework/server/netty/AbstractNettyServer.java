@@ -38,12 +38,12 @@ public abstract class AbstractNettyServer implements IServer {
     protected ServerBootstrap nettyBootstrap;
     protected BootStrap bootStrap;
 
-    public AbstractNettyServer(String host, int port) {
-        this(host, port, false);
+    public AbstractNettyServer(BootStrap bootStrap) {
+        this( bootStrap, false);
     }
 
-    public AbstractNettyServer(String host, int port, boolean devModel) {
-        bootStrap = new BootStrap(host, port);
+    public AbstractNettyServer(BootStrap bs, boolean devModel) {
+        bootStrap = bs;
         bootStrap.setDevModel(devModel);
         init();//初始化
     }

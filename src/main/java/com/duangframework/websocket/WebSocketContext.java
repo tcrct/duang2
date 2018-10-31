@@ -4,23 +4,31 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 /**
+ * 自定义的WebSocketContext对象，用来封装ctx, session及message等对象
  * @author laotang
  * @date 2018/10/30
  */
 public class WebSocketContext {
 
+    /**
+     * netty自带的ChannelHandlerContext
+     */
     private ChannelHandlerContext ctx;
+    /**
+     * 自定义的WebSocketSession
+     */
     private WebSocketSession      session;
-    private String target;
+    /**
+     * 客户端发送过来的字符串内容，可根据业务自行定制字符串内容格式
+     */
     private String message;
 
-    public WebSocketContext(ChannelHandlerContext ctx, String target) {
+    public WebSocketContext(ChannelHandlerContext ctx) {
         this.ctx = ctx;
         this.session = new WebSocketSession(ctx.channel());
-        this.target = target;
     }
 
-    public void message(String value) {
+    public void push(String value) {
         ctx.writeAndFlush(new TextWebSocketFrame(value));
     }
 
@@ -40,7 +48,4 @@ public class WebSocketContext {
         this.message = message;
     }
 
-    public String getTarget() {
-        return target;
-    }
 }

@@ -84,17 +84,4 @@ public class MvcMain {
         }
     }
 
-    /**
-     * 执行WebSocket请求任务
-     * @param webSocketContex   websocket对象
-     * @throws IOException
-     * @throws MvcException
-     */
-    public static void doWebSocketTask(WebSocketContext webSocketContex) throws MvcException {
-        try {
-            RequestAccessHandler.doWsHandler(webSocketContex);
-        } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
-        }
-    }
 }

@@ -30,19 +30,17 @@ import java.util.concurrent.TimeoutException;
  * @author laotang
  * @date 2017/10/30
  */
-public class HttpBaseHandler {
+public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static Logger logger = LoggerFactory.getLogger(HttpBaseHandler.class);
-    private static BootStrap bootStrap;
+    private BootStrap bootStrap;
 
-    private HttpBaseHandler() {
-
+    public HttpBaseHandler(BootStrap bs) {
+        bootStrap = bs;
     }
 
-    public static void channelRead(final BootStrap bs, final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        if(ToolsKit.isEmpty(bootStrap)) {
-            bootStrap = bs;
-        }
+    @Override
+    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;
@@ -81,7 +79,7 @@ public class HttpBaseHandler {
      * 验证请求是否正确
      * @return
      */
-    private static void verificationRequest(FullHttpRequest request) {
+    private void verificationRequest(FullHttpRequest request) {
 
         // 保证解析结果正确,否则直接退出
         if (!request.decoderResult().isSuccess()) {
@@ -111,7 +109,7 @@ public class HttpBaseHandler {
         }
     }
 
-    private static long getTimeout(String target) {
+    private long getTimeout(String target) {
         Route route = RouteHelper.getRouteMap().get(target);
         if(ToolsKit.isEmpty(route)) {
             // TODO... restful风格的URI确定不了，暂不能支持timeout设置，按默认值3秒
@@ -121,7 +119,7 @@ public class HttpBaseHandler {
     }
 
 
-    private static IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
+    private IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
         IResponse httpResponse = ToolsKit.isEmpty(requestTask) ? HttpResponse.build() : requestTask.getResponse();
         int code = duangException.getCode();
         String message = duangException.getMessage();

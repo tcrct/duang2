@@ -11,6 +11,7 @@ import com.duangframework.mvc.http.handler.HandlerChain;
 import com.duangframework.mvc.plugin.PluginChain;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.server.netty.NettyServer;
+import com.duangframework.websocket.IWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ public class Application {
 
     private String host;
     private int port;
+    private String webSocketPath;
+    private Class<? extends IWebSocket> webSocketClass;
     private static Application application;
     private static NettyServer nettyServer;
 
@@ -74,6 +77,12 @@ public class Application {
         return application;
     }
 
+    public Application websocket(String path, Class<? extends IWebSocket> webSocketClass) {
+        this.webSocketPath = path;
+        this.webSocketClass = webSocketClass;
+        return application;
+    }
+
     public void run() {
         try {
             String serverHost = System.getProperty(ConstEnums.PROPERTIES.SERVER_HOST.getValue());
@@ -95,6 +104,10 @@ public class Application {
             logger.warn(e.getMessage(), e);
         }
         BootStrap bootStrap = new BootStrap(host, port);
+        if(ToolsKit.isNotEmpty(webSocketPath) && ToolsKit.isNotEmpty(webSocketClass)) {
+            bootStrap.setWebSocketPath(webSocketPath);
+            bootStrap.setWebSocketClass(webSocketClass);
+        }
         nettyServer = new NettyServer(bootStrap);
         nettyServer.start();
     }
