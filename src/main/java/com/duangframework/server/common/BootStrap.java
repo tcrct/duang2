@@ -1,5 +1,6 @@
 package com.duangframework.server.common;
 
+import com.duangframework.exception.MvcException;
 import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ThreadPoolKit;
@@ -279,6 +280,9 @@ public class BootStrap implements Closeable {
     }
 
     public void setWebSocketPath(String webSocketPath) {
+        if (null != this.webSocketPath) {
+            throw new NettyStartUpException("There is already a WebSocket Path.");
+        }
         this.webSocketPath = webSocketPath;
     }
 
@@ -287,6 +291,9 @@ public class BootStrap implements Closeable {
     }
 
     public void setWebSocketClass(Class<? extends IWebSocket> webSocketClass) {
+        if (null != this.webSocketClass) {
+            throw new NettyStartUpException("There is already a WebSocket Class.");
+        }
         this.webSocketClass = webSocketClass;
     }
 }

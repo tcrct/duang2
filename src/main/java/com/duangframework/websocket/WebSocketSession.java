@@ -15,7 +15,7 @@ public class WebSocketSession {
      */
     private Channel channel;
     /**
-     * 自定义的WebSocketSession id, 格式为DuangId
+     * 自定义的WebSocketSession id, 格式为DuangId，作用与requestId一样，每次请求都会发生改变
      */
     private String id;
 
