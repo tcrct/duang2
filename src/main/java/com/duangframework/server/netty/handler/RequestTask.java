@@ -36,7 +36,7 @@ public class RequestTask implements Callable<IResponse> {
             throw new NettyStartUpException("build duangframework request or response fail");
         }
         // 执行请求任务
-        MvcMain.doTask(iRequest, iResponse);
+        MvcMain.doHttpTask(iRequest, iResponse);
         return iResponse;
     }
 

@@ -7,6 +7,7 @@ import com.duangframework.mvc.annotation.Controller;
 import com.duangframework.mvc.annotation.Handler;
 import com.duangframework.mvc.annotation.Plugin;
 import com.duangframework.mvc.annotation.Service;
+import io.netty.util.AttributeKey;
 
 import java.lang.annotation.Annotation;
 
@@ -180,5 +181,34 @@ public enum ConstEnums {
         }
     }
 
+
+    public enum SOCKET {
+        CLIENT_IS_NOT_EXTIS("500", "客户端不存在"),
+        SOCKET_SCHEME_FIELD("ws://", "WebSocket请求协议"),
+        SOCKET_ROUTE_FIELD("duang.websocket.route", "websocket路由字段名"),
+        ;
+
+        private final String value;
+        private final String desc;
+        /**
+         * Constructor.
+         */
+        private SOCKET(String value, String desc) {
+            this.value = value;
+            this.desc = desc;
+        }
+
+        /**
+         * Get the value.
+         * @return the value
+         */
+        public String getValue() {
+            return value;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
 
 }

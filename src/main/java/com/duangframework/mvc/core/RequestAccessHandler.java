@@ -10,6 +10,7 @@ import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.route.RequestMapping;
 import com.duangframework.mvc.route.Route;
+import com.duangframework.websocket.WebSocketContext;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -112,5 +113,18 @@ final public class RequestAccessHandler{
             }
         }
         return route;
+    }
+
+    /**
+     *
+     * @param ctx
+     * @throws Exception
+     */
+    public static void doWsHandler(WebSocketContext ctx) throws Exception {
+        Route route = RouteHelper.getRouteMap().get(ctx.getTarget());
+        Object controller =  BeanHelper.getBean(route.getControllerClass());
+        Method method = route.getActionMethod();
+        method.setAccessible(true);
+        method.invoke(controller, ctx);
     }
 }

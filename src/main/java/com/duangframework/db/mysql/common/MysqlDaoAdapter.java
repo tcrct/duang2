@@ -1,8 +1,6 @@
 package com.duangframework.db.mysql.common;
 
 import com.duangframework.db.IDao;
-import com.duangframework.db.mongodb.common.MongoQuery;
-import com.duangframework.db.mongodb.common.MongoUpdate;
 
 /**
  * @author Created by laotang

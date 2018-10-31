@@ -8,6 +8,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.ServerChannel;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
@@ -261,5 +262,27 @@ public class BootStrap implements Closeable {
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+
+
+
+    /** WebSocket **/
+    private WebSocketServerHandshaker handshaker;
+    private String  webSocketPath;
+
+    public WebSocketServerHandshaker getHandshaker() {
+        return handshaker;
+    }
+    public void setHandshaker(WebSocketServerHandshaker handshaker) {
+        this.handshaker = handshaker;
+    }
+
+    public String getWebSocketPath() {
+        return webSocketPath;
+    }
+
+    public void setWebSocketPath(String webSocketPath) {
+        this.webSocketPath = webSocketPath;
     }
 }

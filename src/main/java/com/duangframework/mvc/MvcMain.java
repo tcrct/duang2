@@ -9,6 +9,7 @@ import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.WebKit;
+import com.duangframework.websocket.WebSocketContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,13 +60,13 @@ public class MvcMain {
 
 
     /**
-     * 执行请求任务
+     * 执行Http请求任务
      * @param request   请求对象
      * @param response 响应对象
      * @throws IOException
      * @throws MvcException
      */
-    public static void doTask(IRequest request, IResponse response) throws MvcException {
+    public static void doHttpTask(IRequest request, IResponse response) throws MvcException {
         try {
             String target = getResourcePath(request);
             // 请求访问处理器前的处理器链，可以对请求进行过滤
@@ -83,5 +84,17 @@ public class MvcMain {
         }
     }
 
-
+    /**
+     * 执行WebSocket请求任务
+     * @param webSocketContex   websocket对象
+     * @throws IOException
+     * @throws MvcException
+     */
+    public static void doWebSocketTask(WebSocketContext webSocketContex) throws MvcException {
+        try {
+            RequestAccessHandler.doWsHandler(webSocketContex);
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+        }
+    }
 }

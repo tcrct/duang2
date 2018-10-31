@@ -53,12 +53,18 @@ public class ParameterInvokeMethod {
             Class<?> parameterType = methodParams[i].getType();
             Annotation[] annotations = methodParams[i].getAnnotations();
             String paramValue = request.getParameter(paramNameArray[i]);
+            // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
+            if(ToolsKit.isEmpty(paramValue)) {
+                requestParamValueObj[i]  = getDefualtValueOnType(parameterType);
+                continue;
+            }
+
             if (DataType.isString(parameterType)) {
                 requestParamValueObj[i] = paramValue;
             } else if (DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
                 requestParamValueObj[i] = Integer.parseInt(paramValue);
             } else if (DataType.isLong(parameterType) || DataType.isLongObject(parameterType)) {
-                requestParamValueObj[i] = Long.parseLong(paramValue);
+                requestParamValueObj[i] =Long.parseLong(paramValue);
             } else if (DataType.isDouble(parameterType) || DataType.isDoubleObject(parameterType)) {
                 requestParamValueObj[i] = Double.parseDouble(paramValue);
             } else if (DataType.isDate(parameterType)) {
@@ -156,4 +162,13 @@ public class ParameterInvokeMethod {
         return entity;
     }
 
+    private static Object getDefualtValueOnType(Class<?> paramType) {
+        if(DataType.isString(paramType)) {
+            return "";
+        } else if(DataType.isInteger(paramType) || DataType.isIntegerObject(paramType)) {
+            return 0;
+        } else {
+            return null;
+        }
+    }
 }

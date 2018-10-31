@@ -1,8 +1,10 @@
 package com.duangframework.server.netty;
 
 import com.duangframework.server.common.BootStrap;
+import com.duangframework.server.netty.handler.BaseHandler;
 import com.duangframework.server.netty.handler.CorsHandler;
 import com.duangframework.server.netty.handler.HttpBaseHandler;
+import com.duangframework.server.netty.handler.HttpFilterRuleHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -11,6 +13,7 @@ import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
@@ -59,8 +62,15 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             channelPipeline.addLast(new CorsHandler());
         }
 //        channelPipeline.addLast(new HttpFilterRuleHandler());
+
+//        channelPipeline.addLast(new WebSocketBaseHandler(bootStrap));
+//        channelPipeline.addLast(new SocketBaseHandler(bootStrap));
+//        if (null != bootStrap.getWebSocketPath()) {
+//            channelPipeline.addLast(new WebSocketServerProtocolHandler(bootStrap.getWebSocketPath(), null, true));
+//            channelPipeline.addLast(new WebSocketHandler(blade));
+//        }
         // 真正处理HTTP业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
-        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
+        channelPipeline.addLast(new BaseHandler(bootStrap));
     }
 
     @Override
