@@ -25,4 +25,10 @@ public interface IWebSocket {
      */
     void disConnect(WebSocketContext ctx);
 
+    /**
+     * 抛出异常
+     * @param ctx
+     */
+    void error(WebSocketContext ctx);
+
 }

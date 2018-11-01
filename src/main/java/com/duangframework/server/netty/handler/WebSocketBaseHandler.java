@@ -1,6 +1,5 @@
 package com.duangframework.server.netty.handler;
 
-import com.duangframework.kit.ObjectKit;
 import com.duangframework.mvc.core.helper.BeanHelper;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.websocket.IWebSocket;
@@ -66,5 +65,18 @@ public class WebSocketBaseHandler extends SimpleChannelInboundHandler<WebSocketF
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         webSocket.disConnect(new WebSocketContext(ctx));//实现类执行
+    }
+
+    /**
+     * 抛出异常时触发
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        WebSocketContext context = new WebSocketContext(ctx);
+        context.setCause(cause);
+        webSocket.error(context);//实现类执行
     }
 }

@@ -23,6 +23,11 @@ public class WebSocketContext {
      */
     private String message;
 
+    /**
+     * 异常
+     */
+    private Throwable cause;
+
     public WebSocketContext(ChannelHandlerContext ctx) {
         this.ctx = ctx;
         this.session = new WebSocketSession(ctx.channel());
@@ -48,4 +53,11 @@ public class WebSocketContext {
         this.message = message;
     }
 
+    public Throwable getCause() {
+        return cause;
+    }
+
+    public void setCause(Throwable cause) {
+        this.cause = cause;
+    }
 }
