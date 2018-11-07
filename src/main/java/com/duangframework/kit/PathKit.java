@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 /**
- * 1： getPath() 获取相对路径，例如   ..\path\abc.txt
+ * 1： getUri() 获取相对路径，例如   ..\path\abc.txt
  * 2： getAbsolutePath() 获取绝对路径，但可能包含 ".." 或 "." 字符，例如  D:\otherPath\..\path\abc.txt
  * 3： getCanonicalPath() 获取绝对路径，但不包含 ".." 或 "." 字符，例如  D:\path\abc.txt
  *

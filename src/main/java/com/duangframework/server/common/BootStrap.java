@@ -7,6 +7,7 @@ import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.websocket.IWebSocket;
+import com.duangframework.websocket.WebSocketHandlerHelper;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
@@ -272,28 +273,7 @@ public class BootStrap implements Closeable {
 
 
     /** WebSocket **/
-    private String  webSocketPath;
-    private Class<? extends IWebSocket> webSocketClass;
-
-    public String getWebSocketPath() {
-        return webSocketPath;
-    }
-
-    public void setWebSocketPath(String webSocketPath) {
-        if (null != this.webSocketPath) {
-            throw new NettyStartUpException("There is already a WebSocket Path.");
-        }
-        this.webSocketPath = webSocketPath;
-    }
-
-    public Class<? extends IWebSocket> getWebSocketClass() {
-        return webSocketClass;
-    }
-
-    public void setWebSocketClass(Class<? extends IWebSocket> webSocketClass) {
-        if (null != this.webSocketClass) {
-            throw new NettyStartUpException("There is already a WebSocket Class.");
-        }
-        this.webSocketClass = webSocketClass;
+    public boolean isEnableWebSocket() {
+        return !WebSocketHandlerHelper.getWebSocketHandlerMap().isEmpty();
     }
 }

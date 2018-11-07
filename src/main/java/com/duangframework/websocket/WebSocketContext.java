@@ -1,7 +1,13 @@
 package com.duangframework.websocket;
 
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.core.helper.BeanHelper;
+import com.duangframework.utils.DuangId;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 /**
  * 自定义的WebSocketContext对象，用来封装ctx, session及message等对象
@@ -10,54 +16,36 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
  */
 public class WebSocketContext {
 
+
     /**
      * netty自带的ChannelHandlerContext
      */
     private ChannelHandlerContext ctx;
-    /**
-     * 自定义的WebSocketSession
-     */
-    private WebSocketSession      session;
-    /**
-     * 客户端发送过来的字符串内容，可根据业务自行定制字符串内容格式
-     */
-    private String message;
+    private WebSocketServerHandshaker handshaker;
+    private WebSocketSession webSocketSession;
 
-    /**
-     * 异常
-     */
-    private Throwable cause;
 
-    public WebSocketContext(ChannelHandlerContext ctx) {
+    public WebSocketContext(ChannelHandlerContext ctx, WebSocketServerHandshaker handshaker, String uri) {
         this.ctx = ctx;
-        this.session = new WebSocketSession(ctx.channel());
+        this.handshaker = handshaker;
+        this.webSocketSession = new WebSocketSession(uri);
     }
 
     public void push(String value) {
         ctx.writeAndFlush(new TextWebSocketFrame(value));
     }
 
-    public WebSocketSession getSession() {
-        return session;
+
+    public WebSocketServerHandshaker getHandshaker() {
+        return handshaker;
     }
 
-    public ChannelHandlerContext getChannelHandlerContext() {
-        return ctx;
+    public WebSocketSession getWebSocketSession() {
+        return webSocketSession;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Throwable getCause() {
-        return cause;
-    }
-
-    public void setCause(Throwable cause) {
-        this.cause = cause;
+    public IWebSocket getWebSocketObj() {
+        Class<? extends IWebSocket> webSocketClass = WebSocketHandlerHelper.getWebSocketHandlerMap().get(getWebSocketSession().getUri());
+        return ToolsKit.isEmpty(webSocketClass) ? null : (IWebSocket) BeanHelper.getBean(webSocketClass);
     }
 }

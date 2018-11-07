@@ -182,7 +182,8 @@ public enum ConstEnums {
 
     public enum SOCKET {
         CLIENT_IS_NOT_EXTIS("500", "客户端不存在"),
-        SOCKET_SCHEME_FIELD("ws://", "WebSocket请求协议"),
+        WEBSOCKET_CONTEXT_FIELD("duang_websocket_context", ""),
+        WEBSOCKET_SCHEME_FIELD("ws://", "WebSocket请求协议"),
         ;
 
         private final String value;

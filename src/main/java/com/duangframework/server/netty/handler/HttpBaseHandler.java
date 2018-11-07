@@ -14,6 +14,7 @@ import com.duangframework.mvc.route.Route;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.utils.IpUtils;
 import com.duangframework.utils.WebKit;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -30,17 +31,17 @@ import java.util.concurrent.TimeoutException;
  * @author laotang
  * @date 2017/10/30
  */
-public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static Logger logger = LoggerFactory.getLogger(HttpBaseHandler.class);
-    private BootStrap bootStrap;
+    private static BootStrap bootStrap;
 
     public HttpBaseHandler(BootStrap bs) {
         bootStrap = bs;
     }
 
-    @Override
-    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+    public static void channelRead(BootStrap bs, final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+        if(ToolsKit.isEmpty(bootStrap)) bootStrap = bs;
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;
@@ -79,7 +80,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
      * 验证请求是否正确
      * @return
      */
-    private void verificationRequest(FullHttpRequest request) {
+    private static void verificationRequest(FullHttpRequest request) {
 
         // 保证解析结果正确,否则直接退出
         if (!request.decoderResult().isSuccess()) {
@@ -109,7 +110,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
         }
     }
 
-    private long getTimeout(String target) {
+    private static long getTimeout(String target) {
         Route route = RouteHelper.getRouteMap().get(target);
         if(ToolsKit.isEmpty(route)) {
             // TODO... restful风格的URI确定不了，暂不能支持timeout设置，按默认值3秒
@@ -119,7 +120,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
     }
 
 
-    private IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
+    private static IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
         IResponse httpResponse = ToolsKit.isEmpty(requestTask) ? HttpResponse.build() : requestTask.getResponse();
         int code = duangException.getCode();
         String message = duangException.getMessage();

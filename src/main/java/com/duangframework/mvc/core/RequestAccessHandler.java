@@ -10,7 +10,6 @@ import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.route.RequestMapping;
 import com.duangframework.mvc.route.Route;
-import com.duangframework.websocket.WebSocketContext;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

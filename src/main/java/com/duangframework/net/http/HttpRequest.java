@@ -564,7 +564,7 @@ public class HttpRequest {
      *          Offset in array where conversion should begin
      * @param len
      *          Length of data to convert
-     * @return The Base64-encoded data as a String if there is an error
+     * @return The Base64-encoded data as a String if there is an onError
      * @throws NullPointerException
      *           if source array is null
      * @throws IllegalArgumentException

@@ -1,82 +1,114 @@
 package com.duangframework.server.netty.handler;
 
-import com.duangframework.mvc.core.helper.BeanHelper;
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.dto.ReturnDto;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.websocket.IWebSocket;
 import com.duangframework.websocket.WebSocketContext;
-import io.netty.channel.ChannelHandler;
+import com.duangframework.websocket.WebSocketSession;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.websocketx.*;
+import io.netty.util.AttributeKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Created by laotang on 2018/10/31.
+ *
+ * @author laotang
+ * @date 2017/10/30
  */
-@ChannelHandler.Sharable
-public class WebSocketBaseHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class WebSocketBaseHandler {
 
-    private IWebSocket webSocket;       // 接口类，调用接口方法
+    private static Logger logger = LoggerFactory.getLogger(WebSocketBaseHandler.class);
+    private static BootStrap bootStrap;
+    // 一个 ChannelGroup 代表一个直播频道
+//    private static Map<Integer, ChannelGroup> channelGroupMap = new ConcurrentHashMap<>();
 
-    public WebSocketBaseHandler(BootStrap bs) {
-        webSocket = BeanHelper.getBean(bs.getWebSocketClass());
+    private WebSocketBaseHandler() {
+
     }
 
-    /**
-     * 接收到消息后触发
-     * @param ctx
-     * @param frame
-     * @throws Exception
-     */
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
-        if (frame instanceof TextWebSocketFrame) {
-            String message = ((TextWebSocketFrame) frame).text();
-            WebSocketContext webSocketContext = new WebSocketContext(ctx);
-            webSocketContext.setMessage(message);  //请求内容
-            webSocket.doTask(webSocketContext);      // 实现类执行任务
-        } else {
+    public static void channelRead(final BootStrap bs, final ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
+        if (ToolsKit.isEmpty(bootStrap)) {
+            bootStrap = bs;
+        }
+
+        WebSocketContext webSocketContext = (WebSocketContext) ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).get();
+        if(ToolsKit.isEmpty(webSocketContext)) {
+            throw new NullPointerException("webSocketContext is null");
+        }
+        WebSocketSession socketSession = webSocketContext.getWebSocketSession();
+        String target = socketSession.getUri();
+        IWebSocket webSocket = webSocketContext.getWebSocketObj();
+        // 判断是否关闭链路的指令
+        if (frame instanceof CloseWebSocketFrame) {
+            webSocket.onClose(socketSession);
+            webSocketContext.getHandshaker().close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
+            logger.warn("websocket["+target+"] close is success");
+            return;
+        }
+        // 判断是否ping消息
+        if (frame instanceof PingWebSocketFrame) {
+            ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
+            return;
+        }
+        // 目前仅支持文本消息传递
+        if (!(frame instanceof TextWebSocketFrame)) {
             throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass().getName()));
         }
+
+        String requestMessage = ((TextWebSocketFrame) frame).text();
+        if(ToolsKit.isEmpty(requestMessage)) {
+            throw new NullPointerException("request message is empty");
+        }
+        socketSession.setMessage(requestMessage);
+        ReturnDto returnDto = webSocket.onReceive(socketSession);
+        webSocketContext.push(ToolsKit.toJsonString(returnDto)); //推送到客户端
     }
 
     /**
-     * 读取完成执行
+     * 如果是第一次websocket连接，则将http转换为websocket，俗称为握手
      * @param ctx
+     * @param request
      */
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        if (ctx.channel().isOpen() && ctx.channel().isActive() && ctx.channel().isWritable()) {
-            ctx.flush();
+    protected static void conversion2WebSocketProtocol(BootStrap bs, ChannelHandlerContext ctx, FullHttpRequest request) {
+        if (ToolsKit.isEmpty(bootStrap)) {
+            bootStrap = bs;
+        }
+        String target  = request.uri();
+        String location = ConstEnums.SOCKET.WEBSOCKET_SCHEME_FIELD.getValue() + request.headers().get(HttpHeaderNames.HOST.toString()) + target;
+        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(location, null, true);
+        WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(request);
+        if (handshaker == null) {
+            WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
+        } else {
+            ChannelFuture channelFuture = handshaker.handshake(ctx.channel(), request);
+            // 握手成功之后,业务逻辑
+            if (channelFuture.isSuccess()) {
+                System.out.println(handshaker.uri());
+                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, target);
+                ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).set(webSocketContext);// 路由设置
+                webSocketContext.getWebSocketObj().onConnect(webSocketContext.getWebSocketSession());       // 链接成功，调用业务方法
+                logger.warn("websocket connect["+target+"] is success");
+                return;
+            }
         }
     }
 
-    /**
-     *  握手成功，建立链接触发
-     */
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        webSocket.onConnect(new WebSocketContext(ctx));//实现类执行
+    public static void onError(BootStrap bootStrap, ChannelHandlerContext ctx, Throwable cause) {
+        if(bootStrap.isEnableWebSocket()) {
+            WebSocketContext webSocketContext = (WebSocketContext) ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).get();
+            if(ToolsKit.isEmpty(webSocketContext)) {
+                throw new NullPointerException("webSocketContext is null");
+            }
+            WebSocketSession socketSession = webSocketContext.getWebSocketSession();
+            socketSession.setCause(cause);
+            webSocketContext.getWebSocketObj().onError(socketSession);
+        }
     }
 
-    /**
-     * 断开链接时触发
-     */
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        webSocket.disConnect(new WebSocketContext(ctx));//实现类执行
-    }
-
-    /**
-     * 抛出异常时触发
-     * @param ctx
-     * @param cause
-     * @throws Exception
-     */
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        WebSocketContext context = new WebSocketContext(ctx);
-        context.setCause(cause);
-        webSocket.error(context);//实现类执行
-    }
 }

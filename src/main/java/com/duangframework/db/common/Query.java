@@ -357,7 +357,7 @@ public class Query<T> {
     	try {
     		checkSingle(orderDbo, pageObj);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			logger.onError(e.getMessage(), e);
 			return null;
 		}
     	DBObject fieldsDbo = getDBFields();

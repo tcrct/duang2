@@ -2,7 +2,6 @@ package com.duangframework.websocket;
 
 
 import com.duangframework.utils.DuangId;
-import io.netty.channel.Channel;
 
 /**
  * @author laotang
@@ -11,21 +10,46 @@ import io.netty.channel.Channel;
 public class WebSocketSession {
 
     /**
-     * netty的channel对象
+     * 客户端发送过来的字符串内容，可根据业务自行定制字符串内容格式
      */
-    private Channel channel;
+    private String message;
+    /**
+     * 异常
+     */
+    private Throwable cause;
+
+    /**
+     * URI路径
+     */
+    private String uri;
     /**
      * 自定义的WebSocketSession id, 格式为DuangId，作用与requestId一样，每次请求都会发生改变
      */
     private String id;
 
-    public WebSocketSession(Channel channel) {
-        this.channel = channel;
+
+
+    public WebSocketSession(String uri) {
+        this.uri = uri;
         this.id = new DuangId().toString();
     }
 
-    public Channel getChannel() {
-        return channel;
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    public String getMessage() {
+        return message;
+    }
+
+    public void setCause(Throwable cause) {
+        this.cause = cause;
+    }
+    public Throwable getCause() {
+        return cause;
+    }
+
+    public String getUri() {
+        return uri;
     }
 
     public String getId() {
@@ -35,7 +59,9 @@ public class WebSocketSession {
     @Override
     public String toString() {
         return "WebSocketSession{" +
-                "channel=" + channel +
+                "message='" + message + '\'' +
+                ", cause=" + cause.getMessage() +
+                ", uri='" + uri + '\'' +
                 ", id='" + id + '\'' +
                 '}';
     }

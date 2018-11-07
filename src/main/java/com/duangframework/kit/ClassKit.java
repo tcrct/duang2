@@ -70,10 +70,10 @@ public final class ClassKit {
                 clazz = Class.forName(clazz.getName(), isInit, ClassKit.getClassLoader());
             }
         } catch (ClassNotFoundException e) {
-            logger.warn("Load class is error:" + clazz.getName(), e);
+            logger.warn("Load class is onError:" + clazz.getName(), e);
             throw new MvcException(e.getMessage(), e);
         } catch (Exception e) {
-            logger.warn("Load class is error:" + clazz.getName(), e);
+            logger.warn("Load class is onError:" + clazz.getName(), e);
             throw new MvcException(e.getMessage(), e);
         }
         return clazz;

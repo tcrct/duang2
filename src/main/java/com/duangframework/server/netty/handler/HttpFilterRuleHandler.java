@@ -1,5 +1,6 @@
 package com.duangframework.server.netty.handler;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
@@ -7,6 +8,7 @@ import io.netty.handler.codec.http.HttpRequest;
 /**
  * Created by laotang on 2018/6/23.
  */
+@ChannelHandler.Sharable
 public class HttpFilterRuleHandler extends ChannelInboundHandlerAdapter {
 
     @Override

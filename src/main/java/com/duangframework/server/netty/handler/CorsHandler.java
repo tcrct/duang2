@@ -3,10 +3,7 @@ package com.duangframework.server.netty.handler;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
@@ -21,6 +18,7 @@ import java.util.Set;
  * @author Created by laotang
  * @date createed in 2018/7/19.
  */
+@ChannelHandler.Sharable
 public class CorsHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CorsHandler.class);
