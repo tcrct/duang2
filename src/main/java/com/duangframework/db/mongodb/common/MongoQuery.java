@@ -335,7 +335,7 @@
 //    private void checkSingle(DBObject orderDbo, PageDto<T> page ) {
 //
 //        if(ToolsKit.isNotEmpty(orderDbo) || page.getPageNo()!=0 || page.getPageSize()!=0){
-//        	logger.onError("orderBy: " + orderDbo.toString() +"       pageNo: "+ page.getPageNo() + "          pageSize: "+page.getPageSize());
+//        	logger.onException("orderBy: " + orderDbo.toString() +"       pageNo: "+ page.getPageNo() + "          pageSize: "+page.getPageSize());
 //            throw new MongodbException("findOne时, orderBy或pageNo或pageSize参数不能有值");
 //        }
 //    }
@@ -346,7 +346,7 @@
 //    	try {
 //    		checkSingle(orderDbo, page);
 //		} catch (Exception e) {
-//			logger.onError(e.getMessage(), e);
+//			logger.onException(e.getMessage(), e);
 //			return null;
 //		}
 //    	DBObject fieldsDbo = getDBFields();

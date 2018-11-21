@@ -17,12 +17,12 @@ import org.slf4j.LoggerFactory;
  */
 // 标注一个channel handler可以被多个channel安全地共享
 @ChannelHandler.Sharable
-public class BaseHandler extends SimpleChannelInboundHandler<Object> {
+public class ChannelBaseHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static Logger logger = LoggerFactory.getLogger(BaseHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(ChannelBaseHandler.class);
     private BootStrap bootStrap;
 
-    public BaseHandler(BootStrap bootStrap) {
+    public ChannelBaseHandler(BootStrap bootStrap) {
         this.bootStrap = bootStrap;
     }
 
@@ -62,6 +62,6 @@ public class BaseHandler extends SimpleChannelInboundHandler<Object> {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        WebSocketBaseHandler.onError(bootStrap, ctx, cause);
+        WebSocketBaseHandler.onException(bootStrap, ctx, cause);
     }
 }

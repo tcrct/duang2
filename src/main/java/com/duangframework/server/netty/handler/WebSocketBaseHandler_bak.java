@@ -83,6 +83,6 @@
 //    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 //        WebSocketContext context = new WebSocketContext(ctx, webSocketPath);
 //        context.setCause(cause);
-//        webSocket.onError(context);//实现类执行
+//        webSocket.onException(context);//实现类执行
 //    }
 //}

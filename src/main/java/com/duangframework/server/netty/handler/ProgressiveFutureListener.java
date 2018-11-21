@@ -52,7 +52,7 @@ public class ProgressiveFutureListener implements ChannelProgressiveFutureListen
                 logger.debug("{} Transfer complete.", future.channel());
             }
         } catch (Exception e) {
-            logger.error("RandomAccessFile close onError", e);
+            logger.error("RandomAccessFile close onException", e);
         }
     }
 

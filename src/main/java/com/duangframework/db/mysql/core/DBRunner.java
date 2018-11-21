@@ -81,7 +81,7 @@ public final class DBRunner {
 	            }
             }
         } catch(SQLException e){
-			logger.warn("query "+sql+" onError: " + e.getMessage(), e);
+			logger.warn("query "+sql+" onException: " + e.getMessage(), e);
 		} finally{
 			DBSession.close(stmt);
 			DBSession.close(connection);
@@ -126,7 +126,7 @@ public final class DBRunner {
                 }
             }
         } catch(SQLException e){
-			logger.warn("execute "+sql+" onError: " + e.getMessage(), e);
+			logger.warn("execute "+sql+" onException: " + e.getMessage(), e);
 		} finally{
 			DBSession.close(stmt);
 			DBSession.close(connection);

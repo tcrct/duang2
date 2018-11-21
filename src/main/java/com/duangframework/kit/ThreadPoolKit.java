@@ -40,7 +40,7 @@ public class ThreadPoolKit {
 		try{
 			es.execute(thread);
 		} catch( Exception e ) {
-			logger.warn("ThreadPoolKit execute is onError: "+ e.getMessage(), e);
+			logger.warn("ThreadPoolKit execute is onException: "+ e.getMessage(), e);
 		}
 	}
 
@@ -52,7 +52,7 @@ public class ThreadPoolKit {
 		try{
 			es.execute(runnable);
 		} catch( Exception e ) {
-			logger.warn("ThreadPoolKit execute is onError: "+ e.getMessage(), e);
+			logger.warn("ThreadPoolKit execute is onException: "+ e.getMessage(), e);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class ThreadPoolKit {
 		try{
 			return (FutureTask)es.submit(futureTask);
 		} catch (Exception e) {
-			logger.warn("ThreadPoolKit execute is onError: "+ e.getMessage(), e);
+			logger.warn("ThreadPoolKit execute is onException: "+ e.getMessage(), e);
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
@@ -85,7 +85,7 @@ public class ThreadPoolKit {
 		try{
 			return (FutureTask)es.submit(thread);
 		} catch (Exception e) {
-			logger.warn("ThreadPoolKit execute is onError: "+ e.getMessage(), e);
+			logger.warn("ThreadPoolKit execute is onException: "+ e.getMessage(), e);
 			return null;
 		}
 	}

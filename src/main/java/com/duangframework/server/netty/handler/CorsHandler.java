@@ -140,4 +140,9 @@ public class CorsHandler extends ChannelDuplexHandler {
             future.addListener(ChannelFutureListener.CLOSE);
         }
     }
+
+//    @Override
+//    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+//        super.write(ctx, msg, promise);
+//    }
 }

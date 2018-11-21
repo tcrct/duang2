@@ -89,17 +89,24 @@ public class WebSocketBaseHandler {
             ChannelFuture channelFuture = handshaker.handshake(ctx.channel(), request);
             // 握手成功之后,业务逻辑
             if (channelFuture.isSuccess()) {
-                System.out.println(handshaker.uri());
-                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, target);
+                boolean isQueryParams = target.contains("?");
+                String uri =isQueryParams ? target.substring(0, target.indexOf("?")) : target;
+                System.out.println(uri + "###############: " + handshaker.uri());
+                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, uri);
                 ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).set(webSocketContext);// 路由设置
-                webSocketContext.getWebSocketObj().onConnect(webSocketContext.getWebSocketSession());       // 链接成功，调用业务方法
+                WebSocketSession socketSession = webSocketContext.getWebSocketSession();
+                String queryString = isQueryParams ? target.substring(target.indexOf("?")+1, target.length()) : "";
+                socketSession.setMessage(queryString);
+                webSocketContext.getWebSocketObj().onConnect(socketSession);       // 链接成功，调用业务方法
                 logger.warn("websocket connect["+target+"] is success");
+
+//                handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
                 return;
             }
         }
     }
 
-    public static void onError(BootStrap bootStrap, ChannelHandlerContext ctx, Throwable cause) {
+    public static void onException(BootStrap bootStrap, ChannelHandlerContext ctx, Throwable cause) {
         if(bootStrap.isEnableWebSocket()) {
             WebSocketContext webSocketContext = (WebSocketContext) ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).get();
             if(ToolsKit.isEmpty(webSocketContext)) {
@@ -107,7 +114,13 @@ public class WebSocketBaseHandler {
             }
             WebSocketSession socketSession = webSocketContext.getWebSocketSession();
             socketSession.setCause(cause);
-            webSocketContext.getWebSocketObj().onError(socketSession);
+            try {
+                webSocketContext.getWebSocketObj().onException(socketSession);
+                ctx.channel().close();
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+            }
+            logger.warn("websocket["+webSocketContext.getWebSocketSession().getUri()+"] close is success");
         }
     }
 

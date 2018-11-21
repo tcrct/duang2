@@ -31,6 +31,6 @@ public interface IWebSocket<T> {
      * 抛出异常
      * @param cause
      */
-    void onError(WebSocketSession session);
+    void onException(WebSocketSession session);
 
 }
