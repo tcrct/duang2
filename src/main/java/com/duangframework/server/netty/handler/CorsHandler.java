@@ -5,6 +5,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
+import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,9 @@ public class CorsHandler extends ChannelDuplexHandler {
                 allowOrigin(this.request, origin);
             }
         }
-        ctx.fireChannelRead(msg);
+
+        ctx.channel().attr(AttributeKey.valueOf("duangtype")).set("laotang_"+System.currentTimeMillis());
+        ctx.fireChannelRead(msg);  //调用下一个handle
     }
 
     private boolean isOptionsRequest(FullHttpRequest request) {

@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,10 @@ public class BaseHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, Object object) throws Exception {
+
+        String str = (String)ctx.channel().attr(AttributeKey.valueOf("duangtype")).get();
+        System.out.println("attributeKey: " + str);
+
         //如果是HTTP请求，进行HTTP操作
         if (object instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) object;
