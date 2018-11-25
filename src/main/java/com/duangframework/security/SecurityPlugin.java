@@ -15,6 +15,7 @@ import java.util.Set;
 public class SecurityPlugin implements IPlugin {
 
     private Set<String> uriPrefixSet;
+    private ISecurity authObj;
 
     public SecurityPlugin(Set<String> uriPrefixSet){
         this.uriPrefixSet = uriPrefixSet;

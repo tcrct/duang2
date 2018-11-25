@@ -32,7 +32,7 @@ public class SecurityHandler implements IHandler {
     @Override
     public void doHandler(String target, IRequest request, IResponse response) throws MvcException {
 
-        String key = request.getHeader("");
+        String key = request.getHeader(""); //访问权限对应的用户标识
         DuangSecurity duangSecurity = DuangSecurity.getDuangSecurityMap().get(key);
         if (ToolsKit.isEmpty(duangSecurity)){
             throw new MvcException("请先登录！");

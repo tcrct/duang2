@@ -209,4 +209,48 @@ public enum ConstEnums {
         }
     }
 
+
+    public enum REGEXP {
+        USERNAME ("^[a-zA-Z0-9]\\w{3,19}$","4-20位的数字字母下划线组合,且不能以下划线开头"),
+        MD5PADDWD("^[a-zA-Z0-9]{32}$", "MD5加密后的密码格式"),
+        CAPTCHA("^[a-zA-Z0-9]{4}$", "四位字母数字组合验证码"),
+        SOURCENAME("^[\\u4E00-\\u9FA5A-Za-z0-9_]{3,17}$", "4--18位字母数字汉字下划线组合"),
+        ROLENAME ("^[\\u4E00-\\u9FA5A-Za-z0-9_]{3,17}$", "4--18位字母数字汉字下划线组合"),
+        ORDERCOLUMN("^[a-zA-Z0-9_]{0,19}$", "1--20位数字字母下划线组合"),
+        ORDERDIR ("^[a-zA-Z0-9_]{0,19}$", "1--20位数字字母下划线组合"),
+        PAGE("^[1-9]\\d*$", "正整数"),
+        LIMIT("^[1-9]\\d*$", "正整数"),
+        ID("^[1-9]\\d*$", "正整数"),
+        NUM("^[0-9]*$", "数字"),
+        ROUTER("^[A-Za-z0-9/._-]+$", "路由"),
+        FUNNAME("^[A-Za-z0-9/._-]+$", "路由"),
+        ICONFONT("^[A-Za-z0-9-]+$", "icon"),
+        ROLERESOURCE("^(\\d+,)*\\d+$", "1,2,3,4"),
+        NICKNAME("^[\\u4E00-\\u9FA5A-Za-z0-9_]{1,11}$", "2--12位字母数字汉字下划线组合"),
+        SEARCH("^[\\u4E00-\\u9FA5A-Za-z0-9_]+$", "2--12位字母数字汉字下划线组合"),
+        ;
+
+        private final String value;
+        private final String desc;
+        /**
+         * Constructor.
+         */
+        private REGEXP(String value, String desc) {
+            this.value = value;
+            this.desc = desc;
+        }
+
+        /**
+         * Get the value.
+         * @return the value
+         */
+        public String getValue() {
+            return value;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
+
 }
