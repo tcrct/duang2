@@ -1,5 +1,7 @@
 package com.duangframework.security;
 
+import com.duangframework.exception.SecurityException;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -15,20 +17,20 @@ public interface ISecurity {
      * @param LoginDto
      * @return
      */
-    SecurityUser getSecurityUser(LoginDto loginDto);
+    SecurityUser getSecurityUser(LoginDto loginDto) throws SecurityException;
 
     /**
      * 取出指定用户的所有角色
      * @return
      */
-    Set<String> getRoles();
+    Set<String> getRoles() throws SecurityException;
 
     /**
      * 取出指定用户的所有资源
      * key为权限代号，value为URI
      * @return
      */
-    Map<String, String> getResources();
+    Map<String, String> getResources() throws SecurityException;
 
 
 

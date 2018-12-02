@@ -1,5 +1,6 @@
 package com.duangframework.server;
 
+import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.CustomInitRun;
@@ -35,6 +36,11 @@ public class Application {
     private static Application application;
     private static NettyServer nettyServer;
 
+    // ----- ssl
+    private String certFilePath;
+    private String privateKeyPath;
+    private String privateKeyPassword;
+
     public static Application duang() {
         if(application == null) {
             application = new Application();
@@ -67,6 +73,13 @@ public class Application {
         return application;
     }
 
+    public Application ssl(String certFilePath, String privateKeyPath, String privateKeyPassword) {
+        this.certFilePath = certFilePath;
+        this.privateKeyPath = privateKeyPath;
+        this.privateKeyPassword = privateKeyPassword;
+        return application;
+    }
+
     public Application security(PluginChain pluginChain) {
         return application;
     }
@@ -81,8 +94,13 @@ public class Application {
         return application;
     }
 
+    /**
+     * host，port 以启动脚本 -D 方式注入的优先级最高(注意变量命名)，配置文件次之，代码里指定的优先级最低
+     */
     public void run() {
+        BootStrap bootStrap = null;
         try {
+            // host
             String serverHost = System.getProperty(ConstEnums.PROPERTIES.SERVER_HOST.getValue());
             if(ToolsKit.isEmpty(serverHost)) {
                 serverHost = PropKit.get(ConstEnums.PROPERTIES.SERVER_HOST.getValue());
@@ -90,7 +108,7 @@ public class Application {
             if(ToolsKit.isNotEmpty(serverHost)) {
                 host = serverHost;
             }
-
+            // port
             String serverPort = System.getProperty(ConstEnums.PROPERTIES.SERVER_PORT.getValue());
             if(ToolsKit.isEmpty(serverPort)) {
                 serverPort = PropKit.get(ConstEnums.PROPERTIES.SERVER_PORT.getValue());
@@ -98,16 +116,27 @@ public class Application {
             if(ToolsKit.isNotEmpty(serverPort)) {
                 port = Integer.parseInt(serverPort);
             }
+
+            bootStrap = new BootStrap(host, port);
+            // ssl
+            if(ToolsKit.isNotEmpty(certFilePath) && ToolsKit.isNotEmpty(privateKeyPath) && ToolsKit.isNotEmpty(privateKeyPassword)) {
+                bootStrap.builderSslContext(certFilePath, privateKeyPath, privateKeyPassword);
+            }
+            // start
+            nettyServer = new NettyServer(bootStrap);
+            nettyServer.start();
         } catch (Exception e) {
+            stop();
             logger.warn(e.getMessage(), e);
         }
-        BootStrap bootStrap = new BootStrap(host, port);
-        nettyServer = new NettyServer(bootStrap);
-        nettyServer.start();
+
     }
 
     public static void stop() {
-        nettyServer.shutdown();
+        if(ToolsKit.isNotEmpty(nettyServer)) {
+            nettyServer.shutdown();
+            logger.warn("server shutdown success");
+        }
     }
 
 }

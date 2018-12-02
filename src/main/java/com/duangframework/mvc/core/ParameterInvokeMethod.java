@@ -53,13 +53,14 @@ public class ParameterInvokeMethod {
             Class<?> parameterType = methodParams[i].getType();
             Annotation[] annotations = methodParams[i].getAnnotations();
             String paramValue = request.getParameter(paramNameArray[i]);
-            // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
-            if(ToolsKit.isEmpty(paramValue)) {
+            boolean isBean = DataType.isBeanType(parameterType);
+            if(isBean) {
+                requestParamValueObj[i] = invokeBean(request, parameterType, annotations, i);
+                continue;
+            } else if(ToolsKit.isEmpty(paramValue)) { // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
                 requestParamValueObj[i]  = getDefualtValueOnType(parameterType);
                 continue;
-            }
-
-            if (DataType.isString(parameterType)) {
+            } else if (DataType.isString(parameterType)) {
                 requestParamValueObj[i] = paramValue;
             } else if (DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
                 requestParamValueObj[i] = Integer.parseInt(paramValue);
@@ -75,8 +76,6 @@ public class ParameterInvokeMethod {
                 requestParamValueObj[i] = invokeCollention(request, parameterType);
             } else if(DataType.isMapType(parameterType) ) {
                 requestParamValueObj[i] = invokeMap(request);
-            } else{
-                requestParamValueObj[i] = invokeBean(request, parameterType, annotations, i);
             }
 
             //返回前，根据验证注解，进行参数数据验证
@@ -144,9 +143,8 @@ public class ParameterInvokeMethod {
             logger.warn("invokeBean: json字符串转换为Object时出错，json字符串可能是空，所以返回null退出...");
             return null;
         }
-        boolean isBean = DataType.isIdEntityType(parameterType)
+        boolean isBean = DataType.isBeanType(parameterType)
                 || entity instanceof Serializable
-                ||  parameterType.isAnnotationPresent(Bean.class)
                 || (ToolsKit.isNotEmpty(annotation) && Bean.class.equals(annotation[index].annotationType()));
         if(!isBean) {
             logger.warn("请注意对象或集合元素是否实现[ java.io.Serializable ]接口及设置了[ @Bean ]注解");

@@ -1,7 +1,10 @@
 package com.duangframework.utils;
 
 import com.duangframework.db.IdEntity;
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Bean;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -173,7 +176,12 @@ public final class DataType {
         }
         return isIdEntity;
     }
-    
+
+    public static boolean isBeanType(Class type){
+        return DataType.isIdEntityType(type)
+                ||  type.isAnnotationPresent(Bean.class);
+    }
+
     /**
      * 是否基础类型
      * @param type

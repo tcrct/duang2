@@ -1,5 +1,9 @@
 package com.duangframework.security;
 
+import com.duangframework.kit.PropKit;
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,19 +28,20 @@ public class DuangSecurity  {
      */
     public DuangSecurity(String key, boolean isNeedSecurityVerification, Set<String> securityUriSet) {
         this.key = key;
-        this.isNeedSecurityVerification = isNeedSecurityVerification;
+        this.isNeedSecurityVerification = getNeedSecurityVerification();
         this.securitySet = securityUriSet;
         duangSecurityHashMap.put(key, this);
     }
 
-//    private void setNeedSecurityVerification() {
-//        String envKey = ConstEnums.PROPERTIES.USE_ENV.getValue();
-//        String env = System.getProperty(envKey);
-//        if(ToolsKit.isEmpty(env)) {
-//            env = PropKit.get(envKey);
-//        }
-//        isNeedSecurityVerification =  "dev".equalsIgnoreCase(env);
-//    }
+    private boolean getNeedSecurityVerification() {
+        String envKey = ConstEnums.PROPERTIES.USE_ENV.getValue();
+        String env = System.getProperty(envKey);
+        if(ToolsKit.isEmpty(env)) {
+            env = PropKit.get(envKey);
+        }
+        isNeedSecurityVerification =  "dev".equalsIgnoreCase(env);
+        return isNeedSecurityVerification;
+    }
 
     public boolean isNeedSecurityVerification() {
         return isNeedSecurityVerification;
@@ -49,4 +54,6 @@ public class DuangSecurity  {
     public static Map<String, DuangSecurity> getDuangSecurityMap() {
         return duangSecurityHashMap;
     }
+
+
 }

@@ -25,7 +25,10 @@ public enum ExceptionEnums implements IException {
     MONGODB_ERROR(18, "执行MongoDB时出错"),
     MVC_ERROR(19, "Mvc组件出错"),
     NETTY_STARTUP_ERROR(20, "启动netty服务出错"),
-    MYSQL_ERROR(21, "执行MySQLl时出错"),
+    MYSQL_ERROR(21, "执行MySQL时出错"),
+    SECURITY_ERROR(22, "权限验证时出错"),
+    SECURITY_ACCESS_DENIED(23, "没有权限访问该操作"),
+    PARAM_NULL(24, "参数对象为NULL"),
 
     ACCESS_DENIED(403, "拒绝访问"),
     DATABASE_ERROR(550,"数据库错误"),

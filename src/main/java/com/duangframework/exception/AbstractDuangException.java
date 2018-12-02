@@ -18,6 +18,12 @@ public abstract class AbstractDuangException extends RuntimeException implements
         setMessage(msg);
     }
 
+    AbstractDuangException(Integer code, String msg) {
+        super(msg);
+        setCode(code);
+        setMessage(msg);
+    }
+
     public AbstractDuangException(String msg , Throwable cause) {
         super(msg, cause);
         setMessage(msg);

@@ -146,6 +146,7 @@ public enum ConstEnums {
         /** security*/
         SECURITY_URI_PREFIX("security.uri.prefix", "安全验证的URI前缀，左匹配方式"),
         SECURITY_CENTER_URL("security.center.url", "安全中心，即权限系统请求地址"),
+        AUTHORIZATION_PREFIX("security.authorization.prefix", "header请求头authorization的内容前缀"),
 
         /** cors*/
         CORS_ORIGINS("cors.origins", "允许跨域的域名，如有多个以小写,号分隔"),

@@ -17,6 +17,10 @@ public class SecurityPlugin implements IPlugin {
     private Set<String> uriPrefixSet;
     private ISecurity authObj;
 
+    public SecurityPlugin(){
+
+    }
+
     public SecurityPlugin(Set<String> uriPrefixSet){
         this.uriPrefixSet = uriPrefixSet;
     }

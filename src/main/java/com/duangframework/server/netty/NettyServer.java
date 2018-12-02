@@ -32,9 +32,9 @@ public class NettyServer extends AbstractNettyServer {
                     if (future.isSuccess()) {
                         // 启动上下文监听器
                         StartContextListener.getInstance().start();
-                        System.out.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup in "+bootStrap.getStartTimeMillis()+" ms, God bless no bugs!");
+                        System.err.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup in "+bootStrap.getStartTimeMillis()+" ms, God bless no bugs!");
                     } else {
-                        System.out.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup failed");
+                        System.err.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup failed");
                     }
                 }
             });
@@ -52,7 +52,6 @@ public class NettyServer extends AbstractNettyServer {
             throw new NettyStartUpException("启动程序失败: " + e.getMessage(), e);
         } finally {
             clearPidFile();
-            shutdown();
         }
     }
 }

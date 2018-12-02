@@ -11,9 +11,7 @@ import com.duangframework.exception.IException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
-import com.duangframework.utils.DataType;
-import com.duangframework.utils.DuangId;
-import com.duangframework.utils.XmlHelper;
+import com.duangframework.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +29,10 @@ import java.util.*;
 public final class ToolsKit {
 
     private static Logger logger = LoggerFactory.getLogger(ToolsKit.class);
+
+    private static final String HASH_ALGORITHM = "SHA-1";
+    private static final int HASH_INTERATIONS = 1024;
+    private static final int SALT_SIZE = 8;
 
     private static SerializeConfig jsonConfig = new SerializeConfig();
 
@@ -210,7 +212,7 @@ public final class ToolsKit {
         return false;
     }
 
-    public static DuangId message2DaggerId(String id) {
+    public static DuangId message2DuangrId(String id) {
         boolean isObjectId = ToolsKit.isValidDuangId(id);
         if (isObjectId) {
             return new DuangId(id);
@@ -372,6 +374,67 @@ public final class ToolsKit {
             logger.warn("ToolsKit str2InputStream fail: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Hex编码.
+     */
+    public static String encodeHex(byte[] input) {
+        return new String(Hex.encodeHex(input)); // .encodeHexString(input);
+    }
+
+    /**
+     * Hex解码.
+     */
+    public static byte[] decodeHex(String input) {
+        try {
+            return Hex.decodeHex(input.toCharArray());
+        } catch (DecoderException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 根据codeid设定安全密码的Salt
+     */
+    public static byte[] buildEntryptSalt(int codeid) {
+        return Digests.generateSalt(SALT_SIZE);
+    }
+
+    /**
+     * 随机设定安全密码的Salt
+     */
+    public static byte[] buildEntryptSalt() {
+        return Digests.generateSalt(SALT_SIZE);
+    }
+
+    /**
+     * 设定安全的密码，生成随机的salt并经过1024次 sha-1 hash
+     */
+    public static String buildEntryptPassword(String password, byte[] salt) {
+        byte[] hashPassword = Digests.sha1(password.getBytes(), salt, HASH_INTERATIONS);
+        return Encodes.encodeHex(hashPassword);
+    }
+
+    /**
+     * 去掉不符合指定字符串里包含的字符
+     * @param password
+     * @return
+     */
+    private static String vaildPassword(String password){
+        char[] charArray = password.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<charArray.length; i++){
+            for(int j=0; j<Encodes.BASE62.length; j++){
+                if(charArray[i] == Encodes.BASE62[j]){
+                    sb.append(charArray[i]);
+                }
+            }
+        }
+        if(sb.length() > 0){
+            password = sb.toString();
+        }
+        return password;
     }
 
 }

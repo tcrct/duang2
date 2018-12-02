@@ -1,10 +1,13 @@
 package com.duangframework.security;
 
 import com.duangframework.exception.MvcException;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.handler.IHandler;
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,17 +23,28 @@ public class SecurityHandler implements IHandler {
 
     // 需要进行权限验证的URI地址前缀集合
     public static final HashSet<String> URI_PREFIX_LIST = new HashSet<>();
+    private static String AUTHORIZATION_HEADER_PREFIX;
+
+    public SecurityHandler() {
+        getAuthorizAtion();
+    }
 
     /**
      * 构造方法
      * @param uriPrefixList             URI地址前缀集合
      */
     public SecurityHandler(Set<String> uriPrefixList) {
+        getAuthorizAtion();
+        URI_PREFIX_LIST.clear();
         URI_PREFIX_LIST.addAll(uriPrefixList);
     }
 
     @Override
     public void doHandler(String target, IRequest request, IResponse response) throws MvcException {
+
+        if(!checkHeaderAuth(request)) {
+            throw new MvcException("authorization validation not passed");
+        }
 
         String key = request.getHeader(""); //访问权限对应的用户标识
         DuangSecurity duangSecurity = DuangSecurity.getDuangSecurityMap().get(key);
@@ -52,5 +66,18 @@ public class SecurityHandler implements IHandler {
                 throw new MvcException("该用户无权限访问[" + target + "]，请检查！");
             }
         }
+    }
+
+    private boolean checkHeaderAuth(IRequest request) {
+        String authorizationString = request.getHeader(HttpHeaderNames.AUTHORIZATION.toString());
+        if(authorizationString.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
+            return true;
+        }
+        return false;
+    }
+
+    private void getAuthorizAtion() {
+        String authorization = PropKit.get(ConstEnums.PROPERTIES.AUTHORIZATION_PREFIX.getValue());
+        AUTHORIZATION_HEADER_PREFIX = ToolsKit.isEmpty(authorization) ? ConstEnums.FRAMEWORK_OWNER.getValue() : authorization;
     }
 }

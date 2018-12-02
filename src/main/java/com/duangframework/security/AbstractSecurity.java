@@ -1,5 +1,7 @@
 package com.duangframework.security;
 
+import com.duangframework.exception.ExceptionEnums;
+import com.duangframework.exception.SecurityException;
 import com.duangframework.kit.ToolsKit;
 
 import java.util.HashMap;
@@ -15,11 +17,11 @@ public abstract class AbstractSecurity implements ISecurity {
     private SecurityUser securityUser = null;
 
     @Override
-    public SecurityUser getSecurityUser(LoginDto loginDto) {
+    public SecurityUser getSecurityUser(LoginDto loginDto)  throws SecurityException {
         if(ToolsKit.isEmpty(loginDto)) {
-            throw new NullPointerException("LoginDto is null");
+            throw new SecurityException(ExceptionEnums.PARAM_NULL.getCode(), "LoginDto is null");
         }
-        SecurityUser securityUser = null;
+        SecurityUser securityUser = realm(loginDto);
 
         if(ToolsKit.isNotEmpty(securityUser)) {
             this.securityUser = securityUser;
@@ -32,15 +34,19 @@ public abstract class AbstractSecurity implements ISecurity {
      * @param loginDto
     @return
      */
-    protected abstract  SecurityUser realm(LoginDto loginDto);
+    protected abstract  SecurityUser realm(LoginDto loginDto) throws SecurityException;
 
     @Override
-    public Set<String> getRoles() {
+    public Set<String> getRoles() throws SecurityException{
         return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(securityUser.getRoles())) ? securityUser.getRoles() : new HashSet<>();
     }
 
     @Override
-    public Map<String, String> getResources() {
+    public Map<String, String> getResources() throws SecurityException{
         return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(securityUser.getAuthoritys())) ? securityUser.getAuthoritys() : new HashMap<>();
+    }
+
+    public void logout() throws SecurityException{
+
     }
 }
