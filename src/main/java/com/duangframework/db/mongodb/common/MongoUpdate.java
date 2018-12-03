@@ -57,7 +57,7 @@
 //		if(null ==value) {
 //			throw new NullPointerException("value is null");
 //		}
-//		append(key, Operator.SET, MongoUtils.toBson(value));
+//		append(key, Operator.SET_FIELD, MongoUtils.toBson(value));
 //		return this;
 //	}
 //
@@ -105,7 +105,7 @@
 //			}
 //		}
 //		DBObject dbo = new BasicDBObject(values);
-//		updateObj = new BasicDBObject(Operator.SET, dbo);
+//		updateObj = new BasicDBObject(Operator.SET_FIELD, dbo);
 //		return this;
 //	}
 //

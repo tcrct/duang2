@@ -6,12 +6,21 @@ package com.duangframework.db.common;
 public enum  OperatorEnum {
 
     ID("_id", "id","主键ID字段名称"),
-    GT("$gt",">", "message"),
+    GT("$gt",">", "大于"),
     ;
 
 
+    /**
+     * mongodb的key
+     */
     private final String mkey;
+    /**
+     * mysql的key
+     */
     private final String skey;
+    /**
+     * 说明
+     */
     private final String desc;
 
     /**

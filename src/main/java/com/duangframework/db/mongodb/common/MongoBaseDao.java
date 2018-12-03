@@ -94,8 +94,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         if(ToolsKit.isEmpty(idEntity.getId())){
             idEntity.setId(null);
         }
-        doSaveOrUpdate(idEntity);
-        return entity;
+        return doSaveOrUpdate(idEntity) ? entity : null;
     }
 
     /**

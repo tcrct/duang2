@@ -3,7 +3,6 @@ package com.duangframework.db.mysql.utils;
 import com.duangframework.db.DbClientFactory;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.annotation.Index;
-import com.duangframework.db.mysql.MysqlBaseDao;
 import com.duangframework.db.mysql.MysqlDao;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
 import com.duangframework.db.mysql.core.DBSession;

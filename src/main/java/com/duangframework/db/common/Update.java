@@ -109,7 +109,7 @@ public class Update<T> {
 //		}
 //		DBObject dbo = new BasicDBObject(values);
 //		updateObj = new LinkedHashMap();
-//		updateObj.put(Operator.SET, dbo);
+//		updateObj.put(Operator.SET_FIELD, dbo);
 //		return this;
 //	}
 

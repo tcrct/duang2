@@ -1,6 +1,7 @@
 package com.duangframework.db.mysql;
 
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
+import com.duangframework.db.mysql.common.MysqlBaseDao;
 
 /**
  * Created by laotang on 2018/9/14.
