@@ -8,16 +8,24 @@ import com.duangframework.db.mysql.convert.template.CreateConvetorTemplate;
 import com.duangframework.db.mysql.convert.template.DeleteConvetorTemplate;
 import com.duangframework.db.mysql.convert.template.ReadConvetorTemplate;
 import com.duangframework.db.mysql.convert.template.UpdateConvetorTemplate;
+import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ToolsKit;
 import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by laotang on 2018/12/2.
  */
-public class DBCollection extends DBSession {
-    public static final String ID_FIELD_NAME = "id";
+public class DBCollection  {
+
+    private static final Logger logger = LoggerFactory.getLogger(DBCollection.class);
+
     private final String name;
     private final DB database;
 
@@ -64,10 +72,17 @@ public class DBCollection extends DBSession {
         return null;
     }
 
-    public void find(Document queryDoc) {
+    public List<Map<String,Object>> find(Document queryDoc) {
         ConvetorObject convetorObject = ConvetorFactory.convetor(new ReadConvetorTemplate(new ConvetorObject(name, queryDoc, null)));
         System.out.println(convetorObject.getStatement());
         System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
+        try {
+            List<Map<String,Object>> resultList = DBSession.query("", convetorObject.getStatement(), convetorObject.getParams());
+            return resultList;
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+            throw new MongodbException(e.getMessage(), e);
+        }
     }
 
 }

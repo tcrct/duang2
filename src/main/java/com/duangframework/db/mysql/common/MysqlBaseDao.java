@@ -9,6 +9,7 @@ import com.duangframework.db.mongodb.utils.MongoUtils;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
 import com.duangframework.db.mysql.core.DB;
 import com.duangframework.db.mysql.core.DBCollection;
+import com.duangframework.db.mysql.utils.MysqlUtils;
 import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
@@ -16,6 +17,9 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Created by laotang
@@ -62,6 +66,13 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
 //        MysqlIndexUtils.createIndex(collection, cls);
     }
 
+    /**
+     * 新增及修改均调用 save方式
+     * @param  entity		待保存的对象
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
     @Override
     public <T> T save(T entity) throws Exception {
         IdEntity idEntity = (IdEntity)entity;
@@ -117,32 +128,68 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
         }
     }
 
+    /**
+     *根据ID，更新记录
+     * @param id                ID
+     * @param document  需要更新的对象值
+     * @return
+     * @throws Exception
+     */
     public long update(String  id, Document document) throws Exception {
         Document query = new Document(IdEntity.ID_FIELD, new ObjectId(id));
         collection.updateOne(query, document);
         return 0;
     }
 
+    /**
+     *根据查询对象删除记录
+     * @param query 查询对象
+     * @return
+     */
     public long remove(Query query) {
         collection.remove(new Document(query.getQuery()));
         return 0;
     }
 
+    /**
+     *
+     * @param query			查询条件
+     * @param update		更新内容
+     * @return
+     * @throws Exception
+     */
     @Override
     public long update(Query query, Update update) throws Exception {
         collection.updateOne(new Document(query.getQuery()),  new Document(update.getUpdate()));
         return 0;
     }
 
+    /**
+     *
+     * @param query		查询对象
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
     @Override
     public <T> T findOne(Query query) throws Exception {
         query.getPageObj().pageNo(0).pageSize(1);
-        collection.find(new Document(query.getQuery()));
-        return null;
+        List<T> resultList = findList(query);
+        return ToolsKit.isEmpty(resultList) ? null :  resultList.get(0);
     }
 
+    /**
+     *
+     * @param query		查询对象
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
     @Override
     public <T> T findList(Query query) throws Exception {
-        return null;
+        List<Map<String,Object>> resultList = collection.find(new Document(query.getQuery()));
+        //将resultList转换为List<T>返回
+        List<T> resultListObj = ToolsKit.jsonParseArray(ToolsKit.toJsonString(resultList), (Class<T>) cls);
+        return (T)resultListObj;
     }
 }
