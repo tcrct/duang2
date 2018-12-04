@@ -26,6 +26,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.Doc;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -270,11 +271,11 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
      */
     public boolean insert(IdEntity idEntity) throws Exception {
         if(ToolsKit.isEmpty(idEntity.getId())) {
-            throw new MongodbException("index document is fail: id is null");
+            throw new MongodbException("insert document is fail: id is null");
         }
         Document document = MongoUtils.toBson(idEntity);
         if(ToolsKit.isEmpty(document) && ToolsKit.isEmpty(document.getObjectId(idEntity.getId()))) {
-            throw new MongodbException("index document is fail: document is null");
+            throw new MongodbException("insert document is fail: document is null");
         }
         try {
             collection.insertOne(document);

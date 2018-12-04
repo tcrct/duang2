@@ -1,4 +1,4 @@
-package com.duangframework.db.mysql.convert;
+package com.duangframework.db.convetor;
 
 /**
  * Created by laotang on 2018/12/3.

@@ -4,15 +4,16 @@ import com.duangframework.db.IDao;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.common.Query;
 import com.duangframework.db.common.Update;
+import com.duangframework.db.convetor.ConvetorObject;
 import com.duangframework.db.mongodb.utils.MongoUtils;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
-import com.duangframework.db.mysql.convert.CrudTypeEnums;
 import com.duangframework.db.mysql.core.DB;
 import com.duangframework.db.mysql.core.DBCollection;
-import com.duangframework.db.mysql.core.DBObject;
+import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
 
     public MysqlBaseDao(MysqlClientAdapter clientAdapter, Class<T> cls){
 //        clientAdapter.getClient()
+        this.cls = cls;
     }
 
     public MysqlBaseDao(DB db, Class<T> cls) {
@@ -65,57 +67,77 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
         IdEntity idEntity = (IdEntity)entity;
         if(ToolsKit.isEmpty(idEntity.getId())){
             idEntity.setId(null);
-            collection.insertOne(new DBObject(entity));
-        } else {
-//            collection.updateOne(entity);
         }
-        return entity;
-//        return doSaveOrUpdate(idEntity) ? entity : null;
+        return doSaveOrUpdate(idEntity) ? entity : null;
     }
 
-//    /**
-//     * 实际执行保存及更新的方法
-//     * @param entity        要操作的对象
-//     * @return  成功返回true
-//     * @throws Exception
-//     */
-//    private boolean doSaveOrUpdate(IdEntity entity) throws Exception {
-////        Document document = MongoUtils.toBson(entity);
-//        if(ToolsKit.isEmpty(entity)) {
-//            throw new NullPointerException("entity is null");
-//        }
-//        String id = entity.getId();
-//        try {
-//            if (ToolsKit.isEmpty(id)) {
-//                collection.insertOne(entity, null);
-////                entity.setId(document.get(IdEntity.ID_FIELD).toString());
-//            } else {
-//                update(id, document);
-//            }
-//            return true;
-//        }catch (Exception e) {
-//            logger.warn(e.getMessage(), e);
-//            return false;
-//        }
-//    }
+    /**
+     * 实际执行保存及更新的方法
+     * @param entity        要操作的对象
+     * @return  成功返回true
+     * @throws Exception
+     */
+    private boolean doSaveOrUpdate(IdEntity entity) throws Exception {
+        Document document = MongoUtils.toBson(entity);
+        if(ToolsKit.isEmpty(entity)) {
+            throw new NullPointerException("entity is null");
+        }
+        String id = entity.getId();
+        try {
+            if (ToolsKit.isEmpty(id)) {
+                insert(entity);
+//                entity.setId(document.get(IdEntity.ID_FIELD).toString());
+            } else {
+                update(id, document);
+            }
+            return true;
+        }catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+            return false;
+        }
+    }
 
-    public long update(String  id, DBObject dbObject) throws Exception {
-        collection.updateOne(new Document(IdEntity.ENTITY_ID_FIELD, id), dbObject);
+    /**
+     * 新增记录时，必须要保证有ID值
+     * 即由外部指定ObjectId值再新增
+     * @param idEntity
+     * @return 新增时是否成功
+     * @throws Exception
+     */
+    public boolean insert(IdEntity idEntity) throws Exception {
+        if(ToolsKit.isNotEmpty(idEntity.getId())) {
+            throw new MongodbException("insert document is fail: id is not null");
+        }
+        Document document = MongoUtils.toBson(idEntity);
+        try {
+            collection.insertOne(document);
+            return true;
+        } catch (Exception e) {
+            throw new MongodbException(e.getMessage(), e);
+        }
+    }
+
+    public long update(String  id, Document document) throws Exception {
+        Document query = new Document(IdEntity.ID_FIELD, new ObjectId(id));
+        collection.updateOne(query, document);
         return 0;
     }
 
     public long remove(Query query) {
-//        collection.remove(query.getQuery());
+        collection.remove(new Document(query.getQuery()));
         return 0;
     }
 
     @Override
     public long update(Query query, Update update) throws Exception {
+        collection.updateOne(new Document(query.getQuery()),  new Document(update.getUpdate()));
         return 0;
     }
 
     @Override
     public <T> T findOne(Query query) throws Exception {
+        query.getPageObj().pageNo(0).pageSize(1);
+        collection.find(new Document(query.getQuery()));
         return null;
     }
 
