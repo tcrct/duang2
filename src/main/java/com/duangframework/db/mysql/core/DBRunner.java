@@ -119,10 +119,12 @@ public final class DBRunner {
 			stmt = fillStatement(connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS), params);
 			rows = stmt.executeUpdate();
 			if (sql.toLowerCase().startsWith("insert")) {
-                ResultSet rs = stmt.getGeneratedKeys();
+                ResultSet rs = stmt.getGeneratedKeys();		// 获取自动递增主键值
                 if(rs.next() ) {
-                    Serializable ret = (Serializable) rs.getObject(1);
-                    rows = Integer.parseInt(ret.toString());
+//                    Serializable ret = (Serializable) rs.getObject(1);
+//					rows = Integer.parseInt(ret.toString());
+					rows = rs.getInt(1);
+					System.out.println(rows + "####################rs.getString" + rs.getString("_id"));
                 }
             }
         } catch(SQLException e){

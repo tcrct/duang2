@@ -168,7 +168,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
             return this;
         }
         public Builder password(String password) {
-            this.host = password;
+            this.password = password;
             return this;
         }
         public Builder url(String url) {

@@ -35,6 +35,10 @@ public class MysqlClientAdapter implements IClient<DataSource> {
      * 生成规则， MD5(this.toString())
      */
     private String id;
+    /**
+     * 数据库名称
+     */
+    private String dbName;
 
     public MysqlClientAdapter(MysqlConnect mysqlConnect) {
         this.mysqlConnect = mysqlConnect;
@@ -52,11 +56,18 @@ public class MysqlClientAdapter implements IClient<DataSource> {
         this.isDefaultClient = isDefaultClient;
     }
 
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
 
     @Override
     public String getId() {
         if (ToolsKit.isEmpty(id) && ToolsKit.isNotEmpty(mysqlConnect)) {
-            return MD5.MD5Encode(mysqlConnect.toString());
+            id = MD5.MD5Encode(mysqlConnect.toString());
         }
         return id;
     }
@@ -67,7 +78,7 @@ public class MysqlClientAdapter implements IClient<DataSource> {
     }
 
     @Override
-    public DataSource getClient() throws Exception {
+    public DataSource getClient() {
         if(null == dataSource) {
             IDataSourceFactory dsFactory = null;
             try {
@@ -80,7 +91,11 @@ public class MysqlClientAdapter implements IClient<DataSource> {
             } catch (Exception e) {
                 throw new MysqlException("Can't connect mysql: " + e.getMessage(), e);
             }
-            dataSource = dsFactory.getDataSource(mysqlConnect);
+            try {
+                dataSource = dsFactory.getDataSource(mysqlConnect);
+            } catch (Exception e) {
+                throw new  MongodbException(e.getMessage(), e);
+            }
         }
         return dataSource;
     }
@@ -99,7 +114,7 @@ public class MysqlClientAdapter implements IClient<DataSource> {
 
     public static class Builder {
         private String host = "127.0.0.1";
-        private int port = 27017;
+        private int port = 3306;
         private String database = "local";
         private String username;
         private String password;
@@ -127,7 +142,7 @@ public class MysqlClientAdapter implements IClient<DataSource> {
         }
 
         public Builder password(String password) {
-            this.host = password;
+            this.password = password;
             return this;
         }
 
@@ -143,6 +158,7 @@ public class MysqlClientAdapter implements IClient<DataSource> {
 
         public MysqlClientAdapter build() {
             MysqlClientAdapter adapter = ToolsKit.isEmpty(url) ? new MysqlClientAdapter(new MysqlConnect(host, port, database, username, password)) : new MysqlClientAdapter(new MysqlConnect(url));
+            adapter.setDbName(database);
             adapter.setDefaultClient(isDefault);
             return adapter;
         }

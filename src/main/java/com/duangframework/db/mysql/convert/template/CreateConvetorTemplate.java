@@ -5,6 +5,7 @@ import com.duangframework.db.convetor.ConvetorObject;
 import com.duangframework.db.convetor.KvItem;
 import com.duangframework.db.convetor.KvModle;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.utils.DuangId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ public class CreateConvetorTemplate extends AbstractConvetorTemplate {
             public void accept(Map.Entry<String, Object> entry) {
                 Object value = entry.getValue();
                 if(ToolsKit.isNotEmpty(value)) {
+                    if(value instanceof DuangId) {
+
+                    }
                     kvModle.addUpdateKvItem(new KvItem(entry.getKey(), value));
                 }
 
@@ -63,12 +67,7 @@ public class CreateConvetorTemplate extends AbstractConvetorTemplate {
     @Override
     protected Object[] params(KvModle kvModle) {
         List params = new ArrayList(kvModle.getUpdateKvItem().size());
-        kvModle.getUpdateKvItem().iterator().forEachRemaining(new Consumer<KvItem>() {
-            @Override
-            public void accept(KvItem kvItem) {
-                params.add(kvItem.getValue());
-            }
-        });
+        params.addAll(getParamsList(kvModle.getUpdateKvItem()));
         return params.toArray();
     }
 }

@@ -36,7 +36,16 @@ public class MysqlConnect extends DBConnect {
             String host = this.getHost().toLowerCase().replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace("*", "");
             int endIndex = host.indexOf(":");
             host = host.substring(0, endIndex > -1 ? endIndex : host.length());
-            return "jdbc:mysql://" + host + ":" + getPort() + "/" + getDatabase();
+            StringBuilder jdbc = new StringBuilder();
+            jdbc.append("jdbc:mysql://")
+                    .append(host).append(":").append(getPort()).append("/").append(getDatabase()).append("?")
+                    .append("?user=").append(getUsername())
+                    .append("&password=").append(getPassword())
+                    .append("&characterEncoding=").append(ConstEnums.DEFAULT_CHAR_ENCODE.getValue().toLowerCase().replace("-",""))
+                    .append("&useUnicode=true&autoReconnect=true&failOverReadOnly=false");
+//                    .append("&useSSL=true");
+//            return "jdbc:mysql://" + host + ":" + getPort() + "/" + getDatabase() +"?user="+getUsername()+"&password="+getPassword()+"&useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false";
+            url = jdbc.toString();
         }
         return url;
     }

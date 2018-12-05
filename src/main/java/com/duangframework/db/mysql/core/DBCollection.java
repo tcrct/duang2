@@ -40,15 +40,15 @@ public class DBCollection  {
      * @return
      */
     public WriteResult insertOne(Document document) {
-//        dbObject.setCurdTypeEnums(CrudTypeEnums.C);
-//        EncodeConvetor.convetor(null, dbObject);
-//        System.out.println(dbObject.getSql());
-//        System.out.println(ToolsKit.toJsonString(dbObject.getParams()));
         ConvetorObject convetorObject = ConvetorFactory.convetor(new CreateConvetorTemplate(new ConvetorObject(name, null, document)));
-        System.out.println(convetorObject.getStatement());
-        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
-//        DBSession.execute();
-        return null;
+        int row = 0;
+        try {
+            row = DBSession.execute(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
+            logger.info("insert "+row+" data to " + database.getName() + "."+name+" is success");
+        } catch (Exception e) {
+            throw  new MongodbException(e.getMessage(), e);
+        }
+        return new WriteResult(row, false, row);
     }
 
     /**
@@ -65,6 +65,11 @@ public class DBCollection  {
         return null;
     }
 
+    /**
+     * 删除
+     * @param queryDoc
+     * @return
+     */
     public WriteResult remove(Document queryDoc) {
         ConvetorObject convetorObject = ConvetorFactory.convetor(new DeleteConvetorTemplate(new ConvetorObject(name, queryDoc, null)));
         System.out.println(convetorObject.getStatement());
@@ -72,17 +77,44 @@ public class DBCollection  {
         return null;
     }
 
+    /**
+     * 查找
+     * @param queryDoc
+     * @return
+     */
     public List<Map<String,Object>> find(Document queryDoc) {
         ConvetorObject convetorObject = ConvetorFactory.convetor(new ReadConvetorTemplate(new ConvetorObject(name, queryDoc, null)));
         System.out.println(convetorObject.getStatement());
         System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
         try {
-            List<Map<String,Object>> resultList = DBSession.query("", convetorObject.getStatement(), convetorObject.getParams());
+            List<Map<String,Object>> resultList = DBSession.query(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
             return resultList;
         } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
             throw new MongodbException(e.getMessage(), e);
         }
     }
 
+    /**
+     * 直接执行SQL语句
+     * @param statement     SQL语句
+     * @param params          参数
+     * @param <T>
+     * @return
+     *      <p> select语句返回List<Map<String,Object> </p>
+     *      <p> update delete语句返回WriteResult </p>
+     *
+     */
+    public <T> T execute(String statement, Object[] params) {
+        int row = 0;
+        try {
+            if(statement.toLowerCase().trim().startsWith("select")) {
+                return (T)DBSession.query(database.getId(), statement, params);
+            } else {
+                row = DBSession.execute(database.getId(), statement, params);
+                return (T)new WriteResult(row, false, row);
+            }
+        } catch (Exception e) {
+            throw new MongodbException(e.getMessage(), e);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.duangframework.db.common;
 
 import com.duangframework.db.IdEntity;
+import com.duangframework.db.enums.OrderByEnum;
 import com.duangframework.db.mongodb.common.Operator;
 import com.duangframework.db.mongodb.utils.MongoUtils;
 import com.duangframework.exception.MongodbException;

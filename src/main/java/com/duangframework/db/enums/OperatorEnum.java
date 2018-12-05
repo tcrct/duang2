@@ -1,4 +1,4 @@
-package com.duangframework.db.common;
+package com.duangframework.db.enums;
 
 /**
  * Created by laotang on 2018/9/26.

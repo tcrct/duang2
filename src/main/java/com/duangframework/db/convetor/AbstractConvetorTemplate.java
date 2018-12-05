@@ -1,5 +1,6 @@
 package com.duangframework.db.convetor;
 
+import com.duangframework.utils.DuangId;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public abstract class AbstractConvetorTemplate {
             @Override
             public void accept(KvItem kvItem) {
                 Object value = kvItem.getValue();
-                if(value instanceof ObjectId) {
+                if(value instanceof DuangId || value instanceof ObjectId) {
                     value = value.toString();
                 }
                 params.add(value);

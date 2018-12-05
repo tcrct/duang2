@@ -4,7 +4,7 @@ import com.duangframework.db.IDao;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.common.Query;
 import com.duangframework.db.common.Update;
-import com.duangframework.db.convetor.ConvetorObject;
+import com.duangframework.db.mysql.common.options.CreateCollectionOptions;
 import com.duangframework.db.mongodb.utils.MongoUtils;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
 import com.duangframework.db.mysql.core.DB;
@@ -12,14 +12,21 @@ import com.duangframework.db.mysql.core.DBCollection;
 import com.duangframework.db.mysql.utils.MysqlUtils;
 import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ClassKit;
+import com.duangframework.kit.ObjectKit;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.utils.DuangId;
+import com.mongodb.WriteResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Created by laotang
@@ -33,14 +40,15 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
     private DB mysqlDB;
     private DBCollection collection;
     protected String myClientCode = "";
+    private Map<String, java.lang.reflect.Field> keys;
 
     public MysqlBaseDao(String clientId, Class<T> cls){
 //        clientAdapter.getClient()
     }
 
     public MysqlBaseDao(MysqlClientAdapter clientAdapter, Class<T> cls){
-//        clientAdapter.getClient()
-        this.cls = cls;
+        this.myClientCode = clientAdapter.getId();
+        init(new DB(clientAdapter), cls);
     }
 
     public MysqlBaseDao(DB db, Class<T> cls) {
@@ -61,9 +69,13 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
         this.cls = cls;
         mysqlDB = db;
         // 根据类名或指定的name创建表名
-        collection = mysqlDB.getCollection(ClassKit.getEntityName(cls));
-//        keys = MysqlUtils.convert2DBFields(ClassKit.getFields(cls));
+        String collectionName = ClassKit.getEntityName(cls);
+        if("dev".equalsIgnoreCase(PropKit.get(ConstEnums.PROPERTIES.USE_ENV.getValue()))) {
+            collection = db.createCollection(cls, new CreateCollectionOptions());
 //        MysqlIndexUtils.createIndex(collection, cls);
+        } else {
+            collection = mysqlDB.getCollection(collectionName);
+        }
     }
 
     /**
@@ -116,13 +128,14 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
      * @throws Exception
      */
     public boolean insert(IdEntity idEntity) throws Exception {
-        if(ToolsKit.isNotEmpty(idEntity.getId())) {
-            throw new MongodbException("insert document is fail: id is not null");
+        if(ToolsKit.isEmpty(idEntity.getId())) {
+            idEntity.setId(new DuangId().toString());
+            logger.info("execute insert data operations, id cannot to null, so set id["+idEntity.getId()+"] to IdEntity");
         }
         Document document = MongoUtils.toBson(idEntity);
         try {
-            collection.insertOne(document);
-            return true;
+            WriteResult writeResult = collection.insertOne(document);
+            return writeResult.getN() > 0 ? true : false;
         } catch (Exception e) {
             throw new MongodbException(e.getMessage(), e);
         }

@@ -1,5 +1,7 @@
 package com.duangframework.db.common;
 
+import com.duangframework.db.enums.OrderByEnum;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 

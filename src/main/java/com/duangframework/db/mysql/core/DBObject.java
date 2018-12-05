@@ -1,6 +1,6 @@
 package com.duangframework.db.mysql.core;
 
-import com.duangframework.db.convetor.CrudTypeEnums;
+import com.duangframework.db.enums.CrudTypeEnums;
 
 /**
  * Created by laotang on 2018/12/3.

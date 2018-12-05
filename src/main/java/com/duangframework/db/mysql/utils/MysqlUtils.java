@@ -62,7 +62,7 @@ public class MysqlUtils {
     }
 
     public static Connection getConnection(String key) throws Exception {
-        if(DbClientFactory.getMongoDbClients().isEmpty()) {
+        if(DbClientFactory.getMysqlDbClients().isEmpty()) {
           throw new MysqlException("请先启动MysqlPlugin插件");
         }
         MysqlClientAdapter clientAdapter = DbClientFactory.getMysqlDbClient(key);
