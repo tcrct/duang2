@@ -13,6 +13,10 @@ public class SecurityException extends AbstractDuangException implements IExcept
         super();
     }
 
+    public SecurityException( String message) {
+        super(ExceptionEnums.SECURITY_ERROR.getCode(), message);
+    }
+
     public SecurityException(Integer code, String message) {
         super(code, message);
     }

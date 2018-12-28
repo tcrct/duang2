@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
+ * 简单查询模板
  * Created by laotang on 2018/12/4.
  */
 public class ReadConvetorTemplate extends AbstractConvetorTemplate {

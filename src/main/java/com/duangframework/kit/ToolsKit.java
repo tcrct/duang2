@@ -8,10 +8,14 @@ import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.exception.IException;
+import com.duangframework.exception.SecurityException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
+import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.security.dto.EncryptDto;
 import com.duangframework.utils.*;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -24,6 +28,7 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by laotang on 2017/10/31.
@@ -360,7 +365,7 @@ public final class ToolsKit {
         return dto;
     }
 
-    public static boolean isDaggerBean(Class<?> parameterType) {
+    public static boolean isDuangBean(Class<?> parameterType) {
         if(DataType.isBaseType(parameterType)) {
             return false;
         }
@@ -437,6 +442,75 @@ public final class ToolsKit {
             password = sb.toString();
         }
         return password;
+    }
+
+    /**
+     * 按uri(\n)->header(\n)->params顺序合成一个字符串，每一个以换行符\n分隔
+     * @param encryptDto
+     * @return
+     */
+    public static String buildEncryptString(EncryptDto encryptDto) {
+        if(ToolsKit.isEmpty(encryptDto)) {
+            throw new SecurityException("encryptDto is null");
+        }
+        StringBuilder signStr = new StringBuilder();
+        String lb = ConstEnums.DEFAULT_LINEBREAK.getValue();
+        signStr.append(encryptDto.getUri()).append(lb);
+        Map<String,String> headerParams = encryptDto.getHeaders();
+        //如果有@"Accept"头，这个头需要参与签名
+        if (headerParams.containsKey(HttpHeaderNames.ACCEPT.toString())) {
+            signStr.append(headerParams.get(HttpHeaderNames.ACCEPT.toString())).append(lb);
+        }
+        //如果有@"Content-MD5"头，这个头需要参与签名
+        if (headerParams.containsKey(HttpHeaderNames.CONTENT_MD5.toString())) {
+            signStr.append(headerParams.get(HttpHeaderNames.CONTENT_MD5.toString())).append(lb);
+        }
+        //如果有@"Content-Type"头，这个头需要参与签名
+        if (headerParams.containsKey(HttpHeaderNames.CONTENT_TYPE.toString())) {
+            signStr.append(headerParams.get(HttpHeaderNames.CONTENT_TYPE.toString())).append(lb);
+        }
+        //签名优先读取HTTP_CA_HEADER_DATE，因为通过浏览器过来的请求不允许自定义Date（会被浏览器认为是篡改攻击）
+        if (headerParams.containsKey(HttpHeaderNames.DATE.toString())) {
+            signStr.append(headerParams.get(HttpHeaderNames.DATE.toString())).append(lb);
+        }
+
+        // Header部份
+        Map<String,String> headerParamItemMap = new TreeMap<>();
+        headerParams.keySet().iterator().forEachRemaining(new Consumer<String>() {
+            @Override
+            public void accept(String key) {
+                if(key.startsWith(ConstEnums.FRAMEWORK_OWNER.getValue())) {
+                    headerParamItemMap.put(key, headerParams.get(key));
+                }
+            }
+        });
+        if(ToolsKit.isNotEmpty(headerParamItemMap)) {
+            headerParamItemMap.entrySet().iterator().forEachRemaining(new Consumer<Map.Entry<String, String>>() {
+                @Override
+                public void accept(Map.Entry<String, String> entry) {
+                    signStr.append(entry.getValue()).append(lb);
+                }
+            });
+        }
+
+        // Param部份
+        Map<String, Object> paramsMap = encryptDto.getParams();
+        Map<String, Object> parameters = new TreeMap<>(paramsMap);
+        if(ToolsKit.isNotEmpty(parameters)) {
+            parameters.entrySet().iterator().forEachRemaining(new Consumer<Map.Entry<String, Object>>() {
+                @Override
+                public void accept(Map.Entry<String, Object> entry) {
+                    Object value = entry.getValue();
+                    if(ToolsKit.isNotEmpty(value)) {
+                        signStr.append(entry.getKey()).append("=").append(value).append("&");
+                    }
+                }
+            });
+        }
+        if(signStr.toString().endsWith("&")) {
+            signStr.deleteCharAt(signStr.length()-1);
+        }
+        return signStr.toString();
     }
 
 }

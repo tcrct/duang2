@@ -27,7 +27,7 @@ public enum ConstEnums {
     HTTP_SCHEME_FIELD("http://", "请求协议"),
     HTTPS_SCHEME_FIELD("https://", "请求协议"),
     DEFAULT_CHAR_ENCODE("UTF-8", "编码格式"),
-
+    DEFAULT_LINEBREAK("\n", "换行符"),
     ;
 
 
@@ -245,6 +245,37 @@ public enum ConstEnums {
          * Get the value.
          * @return the value
          */
+        public String getValue() {
+            return value;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
+
+
+    public enum JWT {
+
+        KEY_ID ("kid","kid"),
+        ISSUSR ("iss","iss"),
+        SUBJECT ("sub","sub"),
+        EXPIRES_AT("exp","exp"),
+        NOT_BEFORE ("nbf","nbf"),
+        ISSUED_AT ("iat","iat"),
+        JWT_ID ("jti","jti"),
+        AUDIENCE("aud","aud"),
+        RSA_PUBLICKEY("rsa.publickey", ""),
+        RSA_PRIVATEKEY("rsa.privatekey", ""),
+        ;
+
+        private final String value;
+        private final String desc;
+        private JWT(String value, String desc) {
+            this.value = value;
+            this.desc = desc;
+        }
+
         public String getValue() {
             return value;
         }

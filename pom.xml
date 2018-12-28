@@ -201,6 +201,13 @@
             <version>${ehcache.version}</version>
         </dependency>
 
+        <!--&lt;!&ndash; JWT &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>com.auth0</groupId>-->
+            <!--<artifactId>java-jwt</artifactId>-->
+            <!--<version>3.4.1</version>-->
+        <!--</dependency>-->
+
         <!--<dependency>-->
             <!--<groupId>org.apache.shiro</groupId>-->
             <!--<artifactId>shiro-all</artifactId>-->
@@ -223,10 +230,17 @@
             <!--<artifactId>javax.el-api</artifactId>-->
             <!--<version>3.0.0</version>-->
         <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>cn.hutool</groupId>-->
-            <!--<artifactId>hutool-all</artifactId>-->
-            <!--<version>4.1.1</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.59</version>
+        </dependency>
+
     </dependencies>
 </project>

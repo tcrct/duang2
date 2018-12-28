@@ -1,6 +1,7 @@
 package com.duangframework.security;
 
 import com.duangframework.exception.SecurityException;
+import com.duangframework.security.dto.LoginDto;
 
 import java.util.Map;
 import java.util.Set;

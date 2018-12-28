@@ -2,6 +2,7 @@ package com.duangframework.db.mysql.core;
 
 
 import com.duangframework.db.IdEntity;
+import com.duangframework.db.convetor.AbstractConvetorTemplate;
 import com.duangframework.db.convetor.ConvetorFactory;
 import com.duangframework.db.convetor.ConvetorObject;
 import com.duangframework.db.mysql.convert.template.CreateConvetorTemplate;
@@ -107,7 +108,7 @@ public class DBCollection  {
     public <T> T execute(String statement, Object[] params) {
         int row = 0;
         try {
-            if(statement.toLowerCase().trim().startsWith("select")) {
+            if(statement.toLowerCase().trim().startsWith(AbstractConvetorTemplate.SELECT_FIELD)) {
                 return (T)DBSession.query(database.getId(), statement, params);
             } else {
                 row = DBSession.execute(database.getId(), statement, params);

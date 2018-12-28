@@ -1,4 +1,4 @@
-package com.duangframework.security;
+package com.duangframework.security.dto;
 
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.vtor.annotation.Empty;

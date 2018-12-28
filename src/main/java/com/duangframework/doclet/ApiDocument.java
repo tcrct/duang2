@@ -173,7 +173,7 @@ public class ApiDocument {
                                     } else {
                                         parameterType = ClassKit.loadClass(type.toString());
                                     }
-                                    if(ToolsKit.isDaggerBean(parameterType)) {
+                                    if(ToolsKit.isDuangBean(parameterType)) {
                                         Field[] fields = parameterType.getDeclaredFields();
                                         for(Field field : fields) {
                                             parameterModle = builderParameterModle(field);
