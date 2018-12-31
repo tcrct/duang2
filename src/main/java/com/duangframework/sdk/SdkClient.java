@@ -2,6 +2,8 @@ package com.duangframework.sdk;
 
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
+import com.duangframework.sdk.common.ClientConfiguration;
+import com.duangframework.sdk.common.CredentialsProvider;
 
 import java.net.URI;
 import java.net.URISyntaxException;

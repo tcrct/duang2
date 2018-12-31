@@ -1,4 +1,4 @@
-package com.duangframework.sdk;
+package com.duangframework.sdk.common;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.duangframework.sdk;
+package com.duangframework.sdk.common;
 
 import java.io.InputStream;
 import java.util.Properties;
