@@ -52,7 +52,7 @@ public class Sha256Algorithm extends AbstractAlgorithm {
             Mac hmacSha256 = Mac.getInstance(SHA256_ALG);
             byte[] keyBytes = appSecret.getBytes(ConstEnums.DEFAULT_CHAR_ENCODE.getValue());
             hmacSha256.init(new SecretKeySpec(keyBytes, 0, keyBytes.length, SHA256_ALG));
-            String encryptContent = ToolsKit.buildEncryptString(dto);
+            String encryptContent = ToolsKit.buildSignString(dto);
             byte[] signResult = hmacSha256.doFinal(encryptContent.getBytes(ConstEnums.DEFAULT_CHAR_ENCODE.getValue()));
             return ToolsKit.isEmpty(signResult) ? null : signResult;
         } catch (Exception e) {

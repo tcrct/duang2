@@ -449,12 +449,12 @@ public final class ToolsKit {
      * @param encryptDto
      * @return
      */
-    public static String buildEncryptString(EncryptDto encryptDto) {
-        if(ToolsKit.isEmpty(encryptDto)) {
-            throw new SecurityException("encryptDto is null");
+    public static String buildSignString(EncryptDto encryptDto) {
+        if(null == encryptDto) {
+            throw new NullPointerException("encryptDto is null");
         }
         StringBuilder signStr = new StringBuilder();
-        String lb = ConstEnums.DEFAULT_LINEBREAK.getValue();
+        String lb = "\n";
         signStr.append(encryptDto.getUri()).append(lb);
         Map<String,String> headerParams = encryptDto.getHeaders();
         //如果有@"Accept"头，这个头需要参与签名
@@ -475,40 +475,28 @@ public final class ToolsKit {
         }
 
         // Header部份
-        Map<String,String> headerParamItemMap = new TreeMap<>();
-        headerParams.keySet().iterator().forEachRemaining(new Consumer<String>() {
-            @Override
-            public void accept(String key) {
-                if(key.startsWith(ConstEnums.FRAMEWORK_OWNER.getValue())) {
-                    headerParamItemMap.put(key, headerParams.get(key));
-                }
+        Map<String,String> headerParamItemMap = new TreeMap<>(headerParams);
+        for(Iterator<Map.Entry<String,String>> iterator = headerParamItemMap.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry<String,String> entry = iterator.next();
+            if(entry.getKey().startsWith(ConstEnums.FRAMEWORK_OWNER.getValue())) {
+                signStr.append(entry.getValue()).append(lb);
             }
-        });
-        if(ToolsKit.isNotEmpty(headerParamItemMap)) {
-            headerParamItemMap.entrySet().iterator().forEachRemaining(new Consumer<Map.Entry<String, String>>() {
-                @Override
-                public void accept(Map.Entry<String, String> entry) {
-                    signStr.append(entry.getValue()).append(lb);
-                }
-            });
         }
 
         // Param部份
         Map<String, Object> paramsMap = encryptDto.getParams();
-        Map<String, Object> parameters = new TreeMap<>(paramsMap);
-        if(ToolsKit.isNotEmpty(parameters)) {
-            parameters.entrySet().iterator().forEachRemaining(new Consumer<Map.Entry<String, Object>>() {
-                @Override
-                public void accept(Map.Entry<String, Object> entry) {
-                    Object value = entry.getValue();
-                    if(ToolsKit.isNotEmpty(value)) {
-                        signStr.append(entry.getKey()).append("=").append(value).append("&");
-                    }
+        if(null != paramsMap && paramsMap.isEmpty()) {
+            Map<String, Object> parameters = new TreeMap<>(paramsMap);
+            for(Iterator<Map.Entry<String,Object>> iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
+                Map.Entry<String,Object> entry = iterator.next();
+                Object value = entry.getValue();
+                if(null != value) {
+                    signStr.append(entry.getKey()).append("=").append(value).append("&");
                 }
-            });
-        }
-        if(signStr.toString().endsWith("&")) {
-            signStr.deleteCharAt(signStr.length()-1);
+            }
+            if (signStr.toString().endsWith("&")) {
+                signStr.deleteCharAt(signStr.length() - 1);
+            }
         }
         return signStr.toString();
     }

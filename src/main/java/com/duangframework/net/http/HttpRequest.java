@@ -45,6 +45,7 @@ import static java.net.HttpURLConnection.*;
 import static java.net.Proxy.Type.HTTP;
 
 /**
+ * https://github.com/kevinsawicki/http-request
  * A fluid interface for making HTTP requests using an underlying
  * {@link HttpURLConnection} (or sub-class).
  * <p>

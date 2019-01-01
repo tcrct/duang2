@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * MongoDB ObjectId
- * 成规则与原生的一致
+ * 生成规则与原生的一致
  *
  * @author  Created by laotang
  * @date  2017/11/21.

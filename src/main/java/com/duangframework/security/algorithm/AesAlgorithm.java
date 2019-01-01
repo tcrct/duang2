@@ -44,7 +44,7 @@ public class AesAlgorithm extends AbstractAlgorithm {
             IvParameterSpec iv = new IvParameterSpec(AES_IV);
             cipher.init(Cipher.ENCRYPT_MODE,
                     new SecretKeySpec(Base64.decodeBase64(appSecret.getBytes()), AES_ALG), iv);
-            String encryptContent = ToolsKit.buildEncryptString(dto);
+            String encryptContent = ToolsKit.buildSignString(dto);
             byte[] encryptBytes = cipher.doFinal(encryptContent.getBytes(ConstEnums.DEFAULT_CHAR_ENCODE.getValue()));
             return ToolsKit.isEmpty(encryptBytes) ? null : encryptBytes;
         } catch (Exception e) {
