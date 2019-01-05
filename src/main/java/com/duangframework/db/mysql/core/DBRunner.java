@@ -23,7 +23,7 @@ public final class DBRunner {
 	private static Logger logger = LoggerFactory.getLogger(DBRunner.class);
 	private Connection connection;
 	private final static StringBuilder loggerStr = new StringBuilder();
-	
+
 	public DBRunner(Connection connection) {
 		this.connection = connection;
 	}
@@ -31,13 +31,13 @@ public final class DBRunner {
 	public Connection getConnection() {
 		return connection;
 	}
-	
+
 	/**
 	 * 执行查询SQL语句
 	 * @param sql				查询SQL语句
 	 * @param columnList			返回指定的字段
 	 * @param params			查询参数
-	 * @return					结果集List<Map<String,Object>> 
+	 * @return					结果集List<Map<String,Object>>
 	 * 								每一个Map代表着一行数据，Map里的key<==>字段名，value<==>字段值
 	 * @throws SQLException
 	 */
@@ -50,7 +50,7 @@ public final class DBRunner {
 		loggerSql(sql, params);
 		boolean isFilerColumn = ToolsKit.isNotEmpty(columnList);
 		if(isFilerColumn){ logger.info("column: " +  ToolsKit.toJsonString(columnList));}
-		
+
 		List<Map<String,Object>> resultList = new ArrayList<>();
 		PreparedStatement stmt = null;
         try {
@@ -88,17 +88,17 @@ public final class DBRunner {
 		}
         return resultList;
 	}
-	
+
 	/**
 	 * 执行不带参数的SQL语句，如创建表及创建表索引时用
 	 * @param sql
 	 * @return
 	 * @throws SQLException
 	 */
-	public int execute(String sql) throws SQLException{
+	public int execute(String sql) throws Exception{
 		return execute(sql, DBSession.NULL_OBJECT);
 	}
-	
+
 	/**
 	 * 执行SQL语句，用于insert, update, delete等
 	 * @param sql						sql语句
@@ -106,7 +106,7 @@ public final class DBRunner {
 	 * @return								受影响的行数
 	 * @throws SQLException
 	 */
-	public int execute(String sql, Object... params) throws SQLException{
+	public int execute(String sql, Object... params) throws Exception{
 		if(ToolsKit.isEmpty(connection)){  throw new SQLException("Null connection");}
 		if(ToolsKit.isEmpty(sql)) {
 			if(ToolsKit.isNotEmpty(connection)){ connection.close();}
@@ -127,19 +127,20 @@ public final class DBRunner {
 					System.out.println(rows + "####################rs.getString" + rs.getString("_id"));
                 }
             }
-        } catch(SQLException e){
+        } catch(Exception e){
 			logger.warn("execute "+sql+" onException: " + e.getMessage(), e);
+			throw new SQLException(e);
 		} finally{
 			DBSession.close(stmt);
 			DBSession.close(connection);
 		}
 		return rows;
 	}
-	
+
 	private void loggerSql(String sql, Object... params) {
 //		loggerStr.delete(0, loggerStr.length()); //时间长了会出现length()为负数的可能性
 		loggerStr.setLength(0);
-		loggerStr.append(sql);		
+		loggerStr.append(sql);
 		if(ToolsKit.isNotEmpty(params)){ loggerStr.append("             ").append(ToolsKit.toJsonString(params));}
 		logger.info(loggerStr.toString());
 	}
@@ -153,7 +154,7 @@ public final class DBRunner {
 	 */
 	private PreparedStatement fillStatement (PreparedStatement stmt, Object... params) throws SQLException{
 		if(ToolsKit.isNotEmpty(params)){
-			
+
 			ParameterMetaData pmd = stmt.getParameterMetaData();
             int stmtCount = pmd.getParameterCount();
             int paramsCount = null == params ? 0 : params.length;
@@ -162,12 +163,12 @@ public final class DBRunner {
                 throw new SQLException("Wrong number of parameters: expected "
                         + stmtCount + ", was given " + paramsCount);
             }
-			
+
 			for(int i =0; i<paramsCount; i++){
 				stmt.setObject(i+1, params[i]);
 			}
 		}
 		return stmt;
 	}
-	
+
 }

@@ -116,6 +116,7 @@ public class HttpKit {
      * @return
      */
     public HttpKit url(String url, boolean encode) {
+        _url = url;
         _encode = encode;
         return this;
     }
@@ -135,8 +136,18 @@ public class HttpKit {
      * @return
      */
     public HttpResult post() {
-        HttpRequest httpRequest = _body.length() == 0 ? HttpRequest.post(_url, _paramMap, _encode).headers(_headerMap)
-                : HttpRequest.post(_url,  _encode).headers(_headerMap).send(_body);
+        HttpRequest httpRequest = _body.isEmpty() ? HttpRequest.post(_url, _paramMap, _encode).headers(_headerMap)
+                : HttpRequest.post(_url,  _encode).headers(_headerMap).send(_body.getBytes());
         return new HttpResult(httpRequest);
     }
+
+    /**
+     * OPTIONS 请求
+     * @return
+     */
+    public HttpResult options() {
+        HttpRequest httpRequest = HttpRequest.options(_url);
+        return new HttpResult(httpRequest);
+    }
+
 }

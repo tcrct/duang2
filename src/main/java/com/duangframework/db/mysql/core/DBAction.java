@@ -13,7 +13,7 @@ public interface DBAction<T> {
 	 * @return
 	 * @throws SQLException
 	 */
-	T execute(DBRunner dbRunner) throws SQLException;
+	T execute(DBRunner dbRunner) throws Exception;
 
 	/**
 	 *

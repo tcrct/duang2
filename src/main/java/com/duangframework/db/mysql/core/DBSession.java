@@ -118,7 +118,7 @@ public class DBSession {
     public static int execute(final String exampleCode, final String sql, final Object... params)  throws Exception {
         return call(new DBAction<Integer>(){
             @Override
-            public Integer execute(DBRunner dbRunner) throws SQLException {
+            public Integer execute(DBRunner dbRunner) throws Exception {
                 return dbRunner.execute(sql, params);
             }
 

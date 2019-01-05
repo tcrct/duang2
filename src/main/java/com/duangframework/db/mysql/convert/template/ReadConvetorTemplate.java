@@ -41,7 +41,8 @@ public class ReadConvetorTemplate extends AbstractConvetorTemplate {
     protected String statement(KvModle kvModle) {
         StringBuilder selectSql = new StringBuilder();
         selectSql.append(SELECT_FIELD).append(EMPTY_SPACE).append("*").append(EMPTY_SPACE)
-                .append(FROM_FILED).append(kvModle.getCollectionName()).append(EMPTY_SPACE).
+                .append(FROM_FILED).append(EMPTY_SPACE).
+                append(kvModle.getCollectionName()).append(EMPTY_SPACE).
                 append(WHERE_FIELD).append(EMPTY_SPACE);
         kvModle.getQueryKvItem().iterator().forEachRemaining(new Consumer<KvItem>() {
             @Override

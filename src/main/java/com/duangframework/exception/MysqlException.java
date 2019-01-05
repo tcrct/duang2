@@ -31,7 +31,7 @@ public class MysqlException extends AbstractDuangException implements IException
         if(ToolsKit.isEmpty(super.getMessage())) {
             return ExceptionEnums.MYSQL_ERROR.getMessage();
         } else {
-            return ExceptionEnums.MYSQL_ERROR.getMessage() + ": " + super.getMessage();
+            return super.getMessage();
         }
     }
 

@@ -82,17 +82,23 @@ public class BeanHelper {
     }
 
     public static List<Object> getControllerBeanList() {
-        return beanMap.get(ConstEnums.ANNOTATION_CLASS.CONTROLLER_ANNOTATION.getName());
+        return returnBeanList(beanMap.get(ConstEnums.ANNOTATION_CLASS.CONTROLLER_ANNOTATION.getName()));
     }
+
     public static List<Object> getServiceBeanList() {
-        return beanMap.get(ConstEnums.ANNOTATION_CLASS.SERVICE_ANNOTATION.getName());
+        return returnBeanList(beanMap.get(ConstEnums.ANNOTATION_CLASS.SERVICE_ANNOTATION.getName()));
     }
     public static List<Object> getEntityBeanList() {
-        return beanMap.get(ConstEnums.ANNOTATION_CLASS.ENTITY_ANNOTATION.getName());
+        return returnBeanList(beanMap.get(ConstEnums.ANNOTATION_CLASS.ENTITY_ANNOTATION.getName()));
     }
 
     public static List<Object> getWebSocketBeanList() {
-        return beanMap.get(ConstEnums.ANNOTATION_CLASS.WEBSOCKET_ANNOTATION.getName());
+        return returnBeanList(beanMap.get(ConstEnums.ANNOTATION_CLASS.WEBSOCKET_ANNOTATION.getName()));
+
+    }
+
+    private static List<Object> returnBeanList(List<Object> objectList) {
+        return ToolsKit.isEmpty(objectList) ? new ArrayList<>(1) : objectList;
     }
 
     /**

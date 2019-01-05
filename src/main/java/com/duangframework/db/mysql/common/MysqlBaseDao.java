@@ -11,6 +11,7 @@ import com.duangframework.db.mysql.core.DB;
 import com.duangframework.db.mysql.core.DBCollection;
 import com.duangframework.db.mysql.utils.MysqlUtils;
 import com.duangframework.exception.MongodbException;
+import com.duangframework.exception.MysqlException;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.PropKit;
@@ -137,7 +138,7 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
             WriteResult writeResult = collection.insertOne(document);
             return writeResult.getN() > 0 ? true : false;
         } catch (Exception e) {
-            throw new MongodbException(e.getMessage(), e);
+            throw new MysqlException(e.getMessage(), e);
         }
     }
 

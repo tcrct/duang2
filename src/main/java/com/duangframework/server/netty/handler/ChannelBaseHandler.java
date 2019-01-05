@@ -29,8 +29,8 @@ public class ChannelBaseHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, Object object) throws Exception {
 
-        String str = (String)ctx.channel().attr(AttributeKey.valueOf("duangtype")).get();
-        System.out.println("attributeKey: " + str);
+//        String str = (String)ctx.channel().attr(AttributeKey.valueOf("duangtype")).get();
+//        System.out.println("attributeKey: " + str);
 
         //如果是HTTP请求，进行HTTP操作
         if (object instanceof FullHttpRequest) {

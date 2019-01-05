@@ -10,9 +10,11 @@ import com.duangframework.db.mysql.convert.template.DeleteConvetorTemplate;
 import com.duangframework.db.mysql.convert.template.ReadConvetorTemplate;
 import com.duangframework.db.mysql.convert.template.UpdateConvetorTemplate;
 import com.duangframework.exception.MongodbException;
+import com.duangframework.exception.MysqlException;
 import com.duangframework.kit.ToolsKit;
 import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.BsonValue;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +48,10 @@ public class DBCollection  {
         try {
             row = DBSession.execute(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
             logger.info("insert "+row+" data to " + database.getName() + "."+name+" is success");
+            return new WriteResult(row, false, row);
         } catch (Exception e) {
-            throw  new MongodbException(e.getMessage(), e);
+            throw  new MysqlException(e.getMessage(), e);
         }
-        return new WriteResult(row, false, row);
     }
 
     /**
@@ -61,9 +63,18 @@ public class DBCollection  {
     public UpdateResult updateOne(Document queryDoc, Document updateDoc) {
         updateDoc.remove(IdEntity.ID_FIELD); //更新时，将updateDoc里的ID字段去掉，以queryDoc里的字段为准，避免语句生成出错
         ConvetorObject convetorObject = ConvetorFactory.convetor(new UpdateConvetorTemplate( new ConvetorObject(name, queryDoc, updateDoc)));
-        System.out.println(convetorObject.getStatement());
-        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
-        return null;
+        int row = 0;
+        try {
+            row = DBSession.execute(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
+            logger.info("update "+row+" data to " + database.getName() + "."+name+" is success");
+            return UpdateResult.acknowledged(row, (long)row, null);
+        } catch (Exception e) {
+            throw  new MysqlException(e.getMessage(), e);
+        }
+//        System.out.println(convetorObject.getStatement());
+//        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
+
+
     }
 
     /**
@@ -85,8 +96,8 @@ public class DBCollection  {
      */
     public List<Map<String,Object>> find(Document queryDoc) {
         ConvetorObject convetorObject = ConvetorFactory.convetor(new ReadConvetorTemplate(new ConvetorObject(name, queryDoc, null)));
-        System.out.println(convetorObject.getStatement());
-        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
+//        System.out.println(convetorObject.getStatement());
+//        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
         try {
             List<Map<String,Object>> resultList = DBSession.query(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
             return resultList;
