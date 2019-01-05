@@ -136,7 +136,7 @@ public class HttpKit {
      * @return
      */
     public HttpResult post() {
-        HttpRequest httpRequest = _body.isEmpty() ? HttpRequest.post(_url, _paramMap, _encode).headers(_headerMap)
+        HttpRequest httpRequest = _body.isEmpty() ? HttpRequest.post(_url,  _encode).headers(_headerMap).form(_paramMap)
                 : HttpRequest.post(_url,  _encode).headers(_headerMap).send(_body.getBytes());
         return new HttpResult(httpRequest);
     }
