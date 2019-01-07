@@ -1,6 +1,7 @@
 package com.duangframework.kit;
 
 import com.duangframework.utils.DataType;
+import com.duangframework.utils.TypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,8 @@ public class ObjectKit {
             return;
         }
         field.setAccessible(true);
+        field.set(obj, TypeConverter.convert(type, fieldValue));
+        /*
         if (DataType.isString(type)) {
             field.set(obj, fieldValue.toString());
         } else if (DataType.isInteger(type)) {
@@ -108,6 +111,7 @@ public class ObjectKit {
         } else {
             field.set(obj, fieldValue); // for others
         }
+        */
     }
 
     /**

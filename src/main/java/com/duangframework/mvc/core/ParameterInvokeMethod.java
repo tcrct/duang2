@@ -14,6 +14,7 @@ import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.DataType;
 import com.duangframework.utils.GenericsUtils;
+import com.duangframework.utils.TypeConverter;
 import com.duangframework.vtor.annotation.VtorKit;
 import com.duangframework.vtor.core.VtorFactory;
 import org.slf4j.Logger;
@@ -140,6 +141,54 @@ public class ParameterInvokeMethod {
             throw new ValidatorException(e.getMessage(), e);
         }
         return entityMap;
+    }
+
+    private static Object invokeBean2(IRequest request, Class parameterType) {
+        Field[] fields = parameterType.getFields();
+        Object obj = null;
+        try {
+            obj = ObjectKit.newInstance(parameterType);
+            for(Field field : fields) {
+                System.out.println(field.getName()+"                         "+field.getType()+"                          "+field.getGenericType());
+                String fieldName = field.getName();
+                Object fieldValue = request.getParameter(fieldName);
+                if(ToolsKit.isNotEmpty(fieldValue)) {
+                    ObjectKit.setField(obj, field, fieldValue, field.getType());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    private static Object invokeBean3(IRequest request, Class parameterType) {
+        Method[] methods = parameterType.getMethods();
+        Object obj = null;
+        try {
+            obj = ObjectKit.newInstance(parameterType);
+            for(Method method : methods) {
+                String methodName = method.getName();
+                if (methodName.startsWith("set") == false) {// only setter method
+                    continue;
+                }
+                Class<?>[] types = method.getParameterTypes();
+                if (types.length != 1) {                    // only one parameter
+                    continue;
+                }
+                System.out.println("types[0]: " + types[0].getTypeName());
+                System.out.println("types[0]: " + types[0].getName());
+                System.out.println("types[0]: " + types[0].getGenericSuperclass());
+                String attrName = methodName.substring(3);
+                Object value = request.getParameter(ToolsKit.firstCharToLowerCase(attrName));
+                if(ToolsKit.isNotEmpty(value)) {
+                    method.invoke(obj, TypeConverter.convert(types[0], value));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
     }
 
     /**

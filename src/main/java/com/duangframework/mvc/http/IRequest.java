@@ -33,7 +33,7 @@ public interface IRequest {
 
     InputStream getInputStream() throws IOException;
 
-    String getParameter(String name);
+    <T> T getParameter(String name);
 
     Enumeration<String> getParameterNames();
 

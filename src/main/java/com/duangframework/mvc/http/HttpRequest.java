@@ -168,9 +168,9 @@ public class HttpRequest implements IRequest{
     }
 
     @Override
-    public String getParameter(String name) {
+    public <T> T getParameter(String name) {
         Object paramObj = params.get(name);
-        return ToolsKit.isEmpty(paramObj) ? "" : (String)paramObj;
+        return ToolsKit.isEmpty(paramObj) ? null : (T)paramObj;
     }
 
     @Override
