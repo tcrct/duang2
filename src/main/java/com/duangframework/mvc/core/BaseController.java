@@ -2,6 +2,7 @@ package com.duangframework.mvc.core;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.duangframework.exception.IException;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ServiceException;
@@ -19,6 +20,7 @@ import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.mvc.render.*;
 import com.duangframework.utils.DataType;
+import com.duangframework.utils.GenericsUtils;
 import com.duangframework.vtor.core.VtorFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -393,6 +397,10 @@ public abstract class BaseController {
         return getBean(tClass, ReturnDto.DATA_FIELD);
     }
 
+    protected <T> T getBean(TypeReference tClass) {
+        return (T)ToolsKit.jsonParseObject(getJson(), tClass);
+    }
+
     /**
      * 根据类，取出请求参数并将其转换为Bean对象返回
      * 默认验证
@@ -425,19 +433,39 @@ public abstract class BaseController {
                 if(ToolsKit.isNotEmpty(tokenid)) {
                     request.setAttribute(ReturnDto.TOKENID_FIELD, tokenid);
                 }
-                Object dataObj = jsonObject.getString(dataKey);
-                if (ToolsKit.isNotEmpty(dataObj)) {
-                    if (dataObj instanceof JSONArray) {
-                        jsonString = ((JSONArray) dataObj).toJSONString();
-                    } else if (dataObj instanceof JSONObject) {
-                        jsonString = ((JSONObject) dataObj).toJSONString();
-                    }
-                }
-                if(ToolsKit.isArrayJsonString(jsonString)) {
-                    resultBeanList.addAll(ToolsKit.jsonParseArray(jsonString, tClass));
-                } else if(ToolsKit.isMapJsonString(jsonString)) {
+                // TODO ... 要优化
+//                Object dataObj = jsonObject.get(dataKey);
+//                if (ToolsKit.isNotEmpty(dataObj)) {
+//                    if (dataObj instanceof JSONArray) {
+//                        jsonString = ((JSONArray) dataObj).toJSONString();
+//                    } else if (dataObj instanceof JSONObject) {
+//                        jsonString = ((JSONObject) dataObj).toJSONString();
+//                    }
+//                }
+//                String dataJson = jsonObject.getString(dataKey);
+//                if(ToolsKit.isNotEmpty(dataJson)) {
+//                    Class typeClass = GenericsUtils.getSuperClassGenricType(tClass);
+//                    System.out.println("typeClass: " + typeClass);
+//                    if (ToolsKit.isArrayJsonString(dataJson)) {
+//                        resultBeanList.addAll(ToolsKit.jsonParseArray(dataJson, tClass));
+//                    } else if (ToolsKit.isMapJsonString(dataJson)) {
+//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration());  // 知道是ApiDto.calss
+//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getGenericSuperclass());
+//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getDeclaringClass());
+//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getEnclosingClass());
+//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getComponentType());
+//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getBounds()[0]);
+//                        Type genericTypeClass = tClass.getTypeParameters()[0].getGenericDeclaration().getGenericSuperclass().getClass();
+//                        ParameterizedType paramTypeItem = (ParameterizedType)genericTypeClass;
+////                        ParameterizedType paramTypeItem = (ParameterizedType)tClass.getGenericSuperclass();
+//                        Type[] paramTypesItem = paramTypeItem.getActualTypeArguments();
+//                        System.out.println("###########: " + paramTypesItem[0]);
+//                        resultBean = ToolsKit.jsonParseObject(dataJson, paramTypesItem[0]);
+//                    }
+
+//                } else {
                     resultBean = ToolsKit.jsonParseObject(jsonString, tClass);
-                }
+//                }
             } else if(contentType.contains(ContentTypeEnums.XML.getValue())) {
                 resultBean = ToolsKit.xmlParseObject(getXml(), tClass);
             }

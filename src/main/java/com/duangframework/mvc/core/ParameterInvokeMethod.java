@@ -1,12 +1,19 @@
 package com.duangframework.mvc.core;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ValidatorException;
+import com.duangframework.kit.ClassKit;
+import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
+import com.duangframework.mvc.dto.ApiDto;
+import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.DataType;
+import com.duangframework.utils.GenericsUtils;
 import com.duangframework.vtor.annotation.VtorKit;
 import com.duangframework.vtor.core.VtorFactory;
 import org.slf4j.Logger;
@@ -14,8 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map;
 
@@ -50,12 +56,21 @@ public class ParameterInvokeMethod {
         IRequest request = controller.getRequest();
         requestParamValueObj = new Object[methodParams.length];
         for (int i = 0; i < methodParams.length; i++) {
+            System.out.println(methodParams[i].getParameterizedType().getClass());
             Class<?> parameterType = methodParams[i].getType();
+            // 取参数里的泛型
+            Type type = methodParams[i].getParameterizedType();
+            if(ToolsKit.isNotEmpty(type)) {
+                Type[] typeParams = ((ParameterizedType) type).getActualTypeArguments();
+                if(typeParams.length > 0) {
+                    type = typeParams[0];
+                }
+            }
             Annotation[] annotations = methodParams[i].getAnnotations();
             String paramValue = request.getParameter(paramNameArray[i]);
             boolean isBean = DataType.isBeanType(parameterType);
             if(isBean) {
-                requestParamValueObj[i] = invokeBean(request, parameterType, annotations, i);
+                requestParamValueObj[i] = invokeBean(request, parameterType, annotations, type, i);
                 continue;
             } else if(ToolsKit.isEmpty(paramValue)) { // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
                 requestParamValueObj[i]  = getDefualtValueOnType(parameterType);
@@ -135,10 +150,21 @@ public class ParameterInvokeMethod {
      * @param index                     索引位置
      * @return
      */
-    private static Object invokeBean(IRequest request, Class<?> parameterType, Annotation[] annotation, int index) {
+    private static Object invokeBean(IRequest request, Class parameterType, Annotation[] annotation, Type type, int index) {
+        Object entity = null;
         // 如果是继承了IdEntity或对象有设置Bean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
-        Object entity = ToolsKit.jsonParseObject(json, parameterType);
+        System.out.println("genricTypeClass: " + parameterType);
+        if(parameterType.equals(ApiDto.class)){
+            Map<String,Object> jsonMap = ToolsKit.jsonParseObject(json, Map.class);
+            Object dataJson = jsonMap.get(ApiDto.DATA_FIELD);
+            if(ToolsKit.isNotEmpty(dataJson)) {
+                Object genricEntity = ((JSONObject)dataJson).toJavaObject(type);
+                entity = new ApiDto(jsonMap.get(ApiDto.TOKENID_FIELD).toString(), genricEntity);
+            }
+        } else {
+            entity = ToolsKit.jsonParseObject(json, parameterType);
+        }
         if(ToolsKit.isEmpty(entity)) {
             logger.warn("invokeBean: json字符串转换为Object时出错，json字符串可能是空，所以返回null退出...");
             return null;
