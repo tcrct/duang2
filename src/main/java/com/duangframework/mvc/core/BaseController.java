@@ -9,6 +9,7 @@ import com.duangframework.exception.ServiceException;
 import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.dto.ApiDto;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.dto.upload.DownLoadStream;
 import com.duangframework.mvc.dto.upload.FileItem;
@@ -21,6 +22,7 @@ import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.mvc.render.*;
 import com.duangframework.utils.DataType;
 import com.duangframework.utils.GenericsUtils;
+import com.duangframework.utils.TypeConverter;
 import com.duangframework.vtor.core.VtorFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import org.apache.commons.io.IOUtils;
@@ -29,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -421,6 +425,7 @@ public abstract class BaseController {
     protected <T> T getBean(Class<T> tClass, String dataKey, boolean isValidator) {
         List<T> resultBeanList = new ArrayList<>();
         T resultBean = null;
+        boolean isApiBean = false;
         String contentType = request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString());
         try {
             if (ToolsKit.isEmpty(contentType) || contentType.contains(ContentTypeEnums.FORM.getValue())) {
@@ -428,51 +433,53 @@ public abstract class BaseController {
                 resultBean = ToolsKit.jsonParseObject(paramsJson, tClass);
             }else if(contentType.contains(ContentTypeEnums.JSON.getValue())) {
                 String jsonString = getJson();
-                JSONObject jsonObject = JSONObject.parseObject(jsonString);
-                String tokenid = jsonObject.getString(ReturnDto.TOKENID_FIELD);
-                if(ToolsKit.isNotEmpty(tokenid)) {
-                    request.setAttribute(ReturnDto.TOKENID_FIELD, tokenid);
+                Type genSuperClass = tClass.getGenericSuperclass();
+//                System.out.println(tClass.getGenericSuperclass().getTypeName() + "      tClass.getSuperclass(): " + tClass.getSuperclass());
+                String tokenid = null;
+                String dataJson = null;
+                if(ApiDto.class.equals(tClass.getSuperclass())) {
+                    JSONObject jsonObject = JSONObject.parseObject(jsonString);
+                    tokenid = jsonObject.getString(ReturnDto.TOKENID_FIELD);
+                    Object dataJsonObject = jsonObject.get(dataKey);
+                    if(dataJsonObject instanceof  JSONObject){
+                        dataJson = ((JSONObject) dataJsonObject).toJSONString();
+                    }
+                    isApiBean = null != tokenid && null != dataJson;
                 }
-                // TODO ... 要优化
-//                Object dataObj = jsonObject.get(dataKey);
-//                if (ToolsKit.isNotEmpty(dataObj)) {
-//                    if (dataObj instanceof JSONArray) {
-//                        jsonString = ((JSONArray) dataObj).toJSONString();
-//                    } else if (dataObj instanceof JSONObject) {
-//                        jsonString = ((JSONObject) dataObj).toJSONString();
-//                    }
-//                }
-//                String dataJson = jsonObject.getString(dataKey);
-//                if(ToolsKit.isNotEmpty(dataJson)) {
-//                    Class typeClass = GenericsUtils.getSuperClassGenricType(tClass);
-//                    System.out.println("typeClass: " + typeClass);
-//                    if (ToolsKit.isArrayJsonString(dataJson)) {
-//                        resultBeanList.addAll(ToolsKit.jsonParseArray(dataJson, tClass));
-//                    } else if (ToolsKit.isMapJsonString(dataJson)) {
-//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration());  // 知道是ApiDto.calss
-//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getGenericSuperclass());
-//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getDeclaringClass());
-//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getEnclosingClass());
-//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getGenericDeclaration().getComponentType());
-//                        System.out.println("###########: " + tClass.getTypeParameters()[0].getBounds()[0]);
-//                        Type genericTypeClass = tClass.getTypeParameters()[0].getGenericDeclaration().getGenericSuperclass().getClass();
-//                        ParameterizedType paramTypeItem = (ParameterizedType)genericTypeClass;
-////                        ParameterizedType paramTypeItem = (ParameterizedType)tClass.getGenericSuperclass();
-//                        Type[] paramTypesItem = paramTypeItem.getActualTypeArguments();
-//                        System.out.println("###########: " + paramTypesItem[0]);
-//                        resultBean = ToolsKit.jsonParseObject(dataJson, paramTypesItem[0]);
-//                    }
-
-//                } else {
+                if (isApiBean && genSuperClass instanceof ParameterizedType) {
+                    ParameterizedType genType = (ParameterizedType)genSuperClass;
+//                    System.out.println(genType.getRawType());
+//                    System.out.println(genType.getTypeName());
+                    Type[] paramTypes = genType.getActualTypeArguments();
+                    if(ToolsKit.isNotEmpty(paramTypes)) {
+                        Type genTypeClass = paramTypes[0];                // ApiDto <> 里的泛型
+                        Type rawTypeClass = genType.getRawType();      // ApiDto
+                        if(ApiDto.class.getName().equals(rawTypeClass.getTypeName())) {
+                            ApiDto apiDto = new ApiDto();
+                            if (null != tokenid) {
+                                request.setAttribute(ReturnDto.TOKENID_FIELD, tokenid);
+                                apiDto.setTokenid(tokenid);
+                            }
+                            if(null != dataJson) {
+                                apiDto.setData(ToolsKit.jsonParseObject(dataJson, genTypeClass));
+                                resultBean = (T)apiDto;
+                            }
+                        }
+                    }
+                } else {
                     resultBean = ToolsKit.jsonParseObject(jsonString, tClass);
-//                }
+                }
             } else if(contentType.contains(ContentTypeEnums.XML.getValue())) {
                 resultBean = ToolsKit.xmlParseObject(getXml(), tClass);
             }
             // 开启验证
             if(isValidator) {
                 if(ToolsKit.isNotEmpty(resultBean)) {
-                    VtorFactory.validator(resultBean);
+                    if(isApiBean) {
+                        VtorFactory.validator(((ApiDto)resultBean).getData());
+                    } else {
+                        VtorFactory.validator(resultBean);
+                    }
                 } else if(ToolsKit.isNotEmpty(resultBeanList)) {
                     for(int i=0; i<resultBeanList.size(); i++) {
                         VtorFactory.validator(resultBeanList.get(i));

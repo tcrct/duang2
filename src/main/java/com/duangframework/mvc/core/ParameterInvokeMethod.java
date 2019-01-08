@@ -57,21 +57,21 @@ public class ParameterInvokeMethod {
         IRequest request = controller.getRequest();
         requestParamValueObj = new Object[methodParams.length];
         for (int i = 0; i < methodParams.length; i++) {
-            System.out.println(methodParams[i].getParameterizedType().getClass());
             Class<?> parameterType = methodParams[i].getType();
             // 取参数里的泛型
             Type type = methodParams[i].getParameterizedType();
-            if(ToolsKit.isNotEmpty(type)) {
+            Type genType = null;  // 泛型
+            if(ToolsKit.isNotEmpty(type) && (type instanceof ParameterizedType)) {
                 Type[] typeParams = ((ParameterizedType) type).getActualTypeArguments();
                 if(typeParams.length > 0) {
-                    type = typeParams[0];
+                    genType = typeParams[0];
                 }
             }
             Annotation[] annotations = methodParams[i].getAnnotations();
             String paramValue = request.getParameter(paramNameArray[i]);
             boolean isBean = DataType.isBeanType(parameterType);
             if(isBean) {
-                requestParamValueObj[i] = invokeBean(request, parameterType, annotations, type, i);
+                requestParamValueObj[i] = invokeBean(request, parameterType, annotations, genType, i);
                 continue;
             } else if(ToolsKit.isEmpty(paramValue)) { // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
                 requestParamValueObj[i]  = getDefualtValueOnType(parameterType);
@@ -196,6 +196,7 @@ public class ParameterInvokeMethod {
      * @param request   请求对象
      * @param parameterType     参数类型
      * @param annotation            注解对象
+     * @param type                      泛型对象
      * @param index                     索引位置
      * @return
      */
@@ -203,8 +204,8 @@ public class ParameterInvokeMethod {
         Object entity = null;
         // 如果是继承了IdEntity或对象有设置Bean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
-        System.out.println("genricTypeClass: " + parameterType);
-        if(parameterType.equals(ApiDto.class)){
+//        System.out.println("genricTypeClass: " + parameterType);
+        if(ApiDto.class.equals(parameterType) && ToolsKit.isNotEmpty(type)){
             Map<String,Object> jsonMap = ToolsKit.jsonParseObject(json, Map.class);
             Object dataJson = jsonMap.get(ApiDto.DATA_FIELD);
             if(ToolsKit.isNotEmpty(dataJson)) {

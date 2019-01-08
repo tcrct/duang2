@@ -1,5 +1,6 @@
 package com.duangframework.mvc.dto;
 
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
 
 
