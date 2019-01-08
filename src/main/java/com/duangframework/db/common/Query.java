@@ -11,6 +11,7 @@ import com.duangframework.utils.DataType;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,7 +255,7 @@ public class Query<T> {
             throw new MongodbException("query key is null...");
         }
         value = DataType.conversionVariableType(value);
-        if (IdEntity.ID_FIELD.equals(key) || IdEntity.ENTITY_ID_FIELD.equals(key)) {
+        if ((IdEntity.ID_FIELD.equals(key) || IdEntity.ENTITY_ID_FIELD.equals(key)) && ObjectId.isValid(value.toString())) {
             append(key, oper, MongoUtils.toObjectIds(value));
         } else {
             append(key, oper, value);
@@ -377,7 +378,7 @@ public class Query<T> {
 		logger.debug("find: " + queryObj.toString());
 		return DecodeConvetor.convetor(clazz, resultDbo);
     }
-    
+
 	public List<T> results() {
 		DBCursor cursor = null;
 		DBObject fieldsDbo = getDBFields();
