@@ -60,7 +60,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -73,12 +81,12 @@
 
     <distributionManagement>
         <repository>
-            <id>nexus-releases</id>
-            <url>http://maven.sythealth.com/nexus/content/repositories/releases/</url>
+            <id>nexus</id>
+            <url>http://192.168.100.100:7071/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>http://maven.sythealth.com/nexus/content/repositories/snapshots/</url>
+            <id>nexus</id>
+            <url>http://192.168.100.100:7071/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

@@ -150,7 +150,12 @@ public  class MysqlBaseDao<T> implements IDao<Query, Update> {
      * @throws Exception
      */
     public long update(String  id, Document document) throws Exception {
-        Document query = new Document(IdEntity.ID_FIELD, new ObjectId(id));
+        Document query = null;
+        if(ObjectId.isValid(id)) {
+            query = new Document(IdEntity.ID_FIELD, new ObjectId(id));
+        } else {
+            query = new Document(IdEntity.ENTITY_ID_FIELD, id);
+        }
         collection.updateOne(query, document);
         return 0;
     }
