@@ -1,10 +1,12 @@
 package com.duangframework.db.mongodb.convert.encode;
 
 
+import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.db.annotation.Id;
 import com.duangframework.db.annotation.IdType;
 import com.duangframework.db.mongodb.common.Operator;
 import com.duangframework.exception.MongodbException;
+import com.duangframework.kit.ToolsKit;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,7 @@ public class IdEncoder extends Encoder {
 		if(IdType.OID.equals(id.type())) {
 			return Operator.ID;
 		} else {
-			return field.getName();
+			return ToolsKit.getFieldName(field);
 		}
 	}
 

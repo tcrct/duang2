@@ -1,5 +1,8 @@
 package com.duangframework.db.mongodb.convert.encode;
 
+import com.duangframework.db.annotation.ConvertField;
+import com.duangframework.kit.ToolsKit;
+
 import java.lang.reflect.Field;
 
 /**
@@ -14,7 +17,7 @@ public class PropertyEncoder extends Encoder {
 
     @Override
     public String getFieldName() {
-        return field.getName();
+        return ToolsKit.getFieldName(field);
     }
 
     @Override

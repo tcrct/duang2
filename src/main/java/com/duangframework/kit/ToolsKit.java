@@ -7,6 +7,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
+import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.exception.IException;
 import com.duangframework.exception.SecurityException;
 import com.duangframework.mvc.annotation.Bean;
@@ -291,9 +292,14 @@ public final class ToolsKit {
 
 
     public static String getFieldName(Field field) {
-        JSONField jsonField = field.getAnnotation(JSONField.class);
-        return (ToolsKit.isEmpty(jsonField)) ? field.getName() :
-                (ToolsKit.isEmpty(jsonField.format()) ? jsonField.name() : jsonField.format());
+        ConvertField convertField = field.getAnnotation(ConvertField.class);
+        if(null != convertField) {
+            return convertField.name();
+        }
+        return field.getName();
+//        JSONField jsonField = field.getAnnotation(.class);
+//        return (ToolsKit.isEmpty(jsonField)) ? field.getName() :
+//                (ToolsKit.isEmpty(jsonField.format()) ? jsonField.name() : jsonField.format());
     }
 
     public static FileFilter fileFilter(final File dir, final String extName){
