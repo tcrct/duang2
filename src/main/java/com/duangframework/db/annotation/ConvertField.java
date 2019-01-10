@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  * @author Created by laotang
  * @date on 2017/11/16.
  */
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
 public @interface ConvertField {
     String name() default "";
 }
