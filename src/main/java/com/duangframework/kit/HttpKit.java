@@ -64,7 +64,9 @@ public class HttpKit {
     }
 
     public HttpKit param(String key, Object value) {
-        _paramMap.put(key, value);
+        if(null != value) {
+            _paramMap.put(key, value);
+        }
         return this;
     }
 

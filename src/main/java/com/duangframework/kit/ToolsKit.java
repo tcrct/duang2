@@ -2,19 +2,16 @@ package com.duangframework.kit;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.exception.IException;
-import com.duangframework.exception.SecurityException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import com.duangframework.security.dto.EncryptDto;
 import com.duangframework.utils.*;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import org.apache.commons.codec.DecoderException;
@@ -29,7 +26,6 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by laotang on 2017/10/31.
@@ -448,63 +444,6 @@ public final class ToolsKit {
             password = sb.toString();
         }
         return password;
-    }
-
-    /**
-     * 按uri(\n)->header(\n)->params顺序合成一个字符串，每一个以换行符\n分隔
-     * @param encryptDto
-     * @return
-     */
-    public static String buildSignString(EncryptDto encryptDto) {
-        if(null == encryptDto) {
-            throw new NullPointerException("encryptDto is null");
-        }
-        StringBuilder signStr = new StringBuilder();
-        String lb = "\n";
-        signStr.append(encryptDto.getUri()).append(lb);
-        Map<String,String> headerParams = encryptDto.getHeaders();
-        //如果有@"Accept"头，这个头需要参与签名
-        if (headerParams.containsKey(HttpHeaderNames.ACCEPT.toString())) {
-            signStr.append(headerParams.get(HttpHeaderNames.ACCEPT.toString())).append(lb);
-        }
-        //如果有@"Content-MD5"头，这个头需要参与签名
-        if (headerParams.containsKey(HttpHeaderNames.CONTENT_MD5.toString())) {
-            signStr.append(headerParams.get(HttpHeaderNames.CONTENT_MD5.toString())).append(lb);
-        }
-        //如果有@"Content-Type"头，这个头需要参与签名
-        if (headerParams.containsKey(HttpHeaderNames.CONTENT_TYPE.toString())) {
-            signStr.append(headerParams.get(HttpHeaderNames.CONTENT_TYPE.toString())).append(lb);
-        }
-        //签名优先读取HTTP_CA_HEADER_DATE，因为通过浏览器过来的请求不允许自定义Date（会被浏览器认为是篡改攻击）
-        if (headerParams.containsKey(HttpHeaderNames.DATE.toString())) {
-            signStr.append(headerParams.get(HttpHeaderNames.DATE.toString())).append(lb);
-        }
-
-        // Header部份
-        Map<String,String> headerParamItemMap = new TreeMap<>(headerParams);
-        for(Iterator<Map.Entry<String,String>> iterator = headerParamItemMap.entrySet().iterator(); iterator.hasNext();) {
-            Map.Entry<String,String> entry = iterator.next();
-            if(entry.getKey().startsWith(ConstEnums.FRAMEWORK_OWNER.getValue())) {
-                signStr.append(entry.getValue()).append(lb);
-            }
-        }
-
-        // Param部份
-        Map<String, Object> paramsMap = encryptDto.getParams();
-        if(null != paramsMap && paramsMap.isEmpty()) {
-            Map<String, Object> parameters = new TreeMap<>(paramsMap);
-            for(Iterator<Map.Entry<String,Object>> iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
-                Map.Entry<String,Object> entry = iterator.next();
-                Object value = entry.getValue();
-                if(null != value) {
-                    signStr.append(entry.getKey()).append("=").append(value).append("&");
-                }
-            }
-            if (signStr.toString().endsWith("&")) {
-                signStr.deleteCharAt(signStr.length() - 1);
-            }
-        }
-        return signStr.toString();
     }
 
     /**
