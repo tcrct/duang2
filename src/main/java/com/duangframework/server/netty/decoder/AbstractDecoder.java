@@ -1,5 +1,7 @@
 package com.duangframework.server.netty.decoder;
 
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
@@ -25,9 +27,25 @@ public abstract class AbstractDecoder<T> {
 
     protected FullHttpRequest request;
     protected  Map<String,Object> requestParamsMap;
+    protected boolean isEncryptParam;
+    protected String json;
 
     public AbstractDecoder(FullHttpRequest request) {
         this.request = request;
+        String isEncryptParamString = request.headers().getAsString(ConstEnums.DUANG_ENCRYPT.getValue());
+        if(ToolsKit.isNotEmpty(isEncryptParamString)) {
+            isEncryptParam = Boolean.valueOf(isEncryptParamString).booleanValue();
+        }
+        requestParamsMap = new ConcurrentHashMap<>();
+        json = request.content().toString(HttpConstants.DEFAULT_CHARSET);
+    }
+
+    /**
+     *
+     * @param decodeJson  解密后的JSON字符串
+     */
+    public AbstractDecoder(String decodeJson) {
+        json = decodeJson;
         requestParamsMap = new ConcurrentHashMap<>();
     }
 

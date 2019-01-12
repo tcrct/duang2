@@ -7,6 +7,7 @@ import com.duangframework.server.common.ServerConfig;
 import com.duangframework.server.netty.decoder.AbstractDecoder;
 import com.duangframework.server.netty.decoder.DecoderFactory;
 import com.duangframework.utils.DuangId;
+import com.duangframework.utils.WebKit;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -70,7 +71,6 @@ public class HttpRequest implements IRequest{
     };
 
     private HttpRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
-        requestId = new DuangId().toString();
         ctx = channelHandlerContext;
         request = fullHttpRequest;
         init();
@@ -111,6 +111,7 @@ public class HttpRequest implements IRequest{
             }
             remoteAddress = (InetSocketAddress)ctx.channel().remoteAddress();
             localAddress = (InetSocketAddress)ctx.channel().localAddress();
+            requestId = WebKit.getRequestId(headers, params);
         } catch (Exception e) {
             throw new HttpDecoderException(e.getMessage(), e);
         }
@@ -187,7 +188,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public Map<String, Object> getParameterMap() {
-        if(ToolsKit.isEmpty(params)) {
+        if(null == params) {
             return new HashMap<>(1);
         }
         return params;

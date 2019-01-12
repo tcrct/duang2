@@ -31,6 +31,7 @@
         <io.version>2.4</io.version>
         <common.version>3.4</common.version>
         <codec.version>1.10</codec.version>
+        <encrypt.version>1.0-SNAPSHOT</encrypt.version>
     </properties>
 
     <build>
@@ -208,6 +209,14 @@
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.duangframework.encrypt</groupId>
+            <artifactId>duang-encrypt</artifactId>
+            <version>${encrypt.version}</version>
+        </dependency>
+
+
 
         <!--&lt;!&ndash; JWT &ndash;&gt;-->
         <!--<dependency>-->

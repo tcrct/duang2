@@ -1,7 +1,10 @@
 package com.duangframework.server.netty.decoder;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.duangframework.encrypt.core.EncryptFactory;
+import com.duangframework.encrypt.core.EncryptUtils;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.enums.ConstEnums;
@@ -9,9 +12,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  *POST请求，内容格式为JSON的解码类
@@ -24,10 +26,18 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         super(request);
     }
 
+    public JsonDecoder(String decodeJson) {
+        super(decodeJson);
+    }
+
     @Override
     public Map<String, Object> decoder() throws Exception {
-        String json = request.content().toString(HttpConstants.DEFAULT_CHARSET);
         json = ToolsKit.isNotEmpty(json) ? json.trim() : "";
+        // 如果是开启参数加密，则添加到Map后直接退出
+        if(isEncryptParam) {
+            requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
+            return requestParamsMap;
+        }
         if(ToolsKit.isNotEmpty(json)) {
             // 去掉制表符
             json = json.replace("\n", "").replace("\t", "").replace("\r", "");
@@ -63,6 +73,11 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         }
     }
 
+    /**
+     * 没做递归处理，考虑到请求Dto一般就是两层数据，如有多层次，需要做递归处理
+     * @param dataObj
+     * @return
+     */
     private Map<String, Object> parseMapValue(Map<String, Object> dataObj) {
         Map<String, Object> params = new HashMap<>(dataObj.size());
         for (Iterator<Map.Entry<String, Object>> entryIterator = dataObj.entrySet().iterator(); entryIterator.hasNext(); ) {
@@ -70,9 +85,27 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
             String key = entry.getKey();
             Object value = entry.getValue();
             if(ToolsKit.isNotEmpty(value)) {
+                if(value instanceof JSONObject) {
+                    value = ToolsKit.jsonParseObject(ToolsKit.toJsonString(value), Map.class);
+                }
+                if(value instanceof JSONArray) {
+                    JSONArray jsonArray = (JSONArray)value;
+                    List<Object> valueMapList = new ArrayList<>();
+                    for(Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();){
+                        Object itemObjValue = iterator.next();
+                        if(itemObjValue instanceof JSONObject) {
+                            Map<String,Object> valueMap = ToolsKit.jsonParseObject(ToolsKit.toJsonString(itemObjValue), Map.class);
+                            valueMapList.add(valueMap);
+                        } else {
+                            valueMapList.add(itemObjValue);
+                        }
+                    }
+                    value = valueMapList;
+                }
                 params.put(key, value);
             }
         }
         return params;
     }
+
 }

@@ -28,6 +28,8 @@ public enum ConstEnums {
     HTTPS_SCHEME_FIELD("https://", "请求协议"),
     DEFAULT_CHAR_ENCODE("UTF-8", "编码格式"),
     DEFAULT_LINEBREAK("\n", "换行符"),
+    REQUEST_ID_FIELD("requestid", "duang框架的请求ID，每一个请求都应该包含有该ID, 该值先取header头"),
+    DUANG_ENCRYPT("encrypt-param", "是否开启参数加密"),
     ;
 
 

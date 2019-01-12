@@ -5,6 +5,7 @@ import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.server.netty.handler.ProgressiveFutureListener;
 import io.netty.buffer.Unpooled;
@@ -186,5 +187,11 @@ public class WebKit {
         returnDto.setParams(request.getParameterMap());
         returnDto.setHead(headDto);
         response.write(returnDto);
+    }
+
+    public static String getRequestId(Map<String, String> headers, Map<String,Object> params) {
+        String requestIdFieldName = ConstEnums.REQUEST_ID_FIELD.getValue();
+        String requestId = headers.get(requestIdFieldName);
+        return ToolsKit.isEmpty(requestId) ? params.getOrDefault(requestIdFieldName, new DuangId().toString())+"" : requestId;
     }
 }
