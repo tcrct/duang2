@@ -230,6 +230,7 @@ public class ParameterInvokeMethod {
         // 如果Bean的话，无需在参数添加注解，遍历bean里的field进行判断是否需要验证
         try {
             if(isBean&& ToolsKit.isNotEmpty(entity)) {VtorKit.validate(entity);}
+            
         } catch (Exception e) {
             throw new ValidatorException(e.getMessage(), e);
         }
