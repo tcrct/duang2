@@ -1,6 +1,5 @@
 package com.duangframework.server;
 
-import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.CustomInitRun;
@@ -8,6 +7,7 @@ import com.duangframework.mvc.core.InitRun;
 import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.core.helper.PluginHelper;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.mvc.http.enums.EnvEnum;
 import com.duangframework.mvc.http.handler.HandlerChain;
 import com.duangframework.mvc.plugin.PluginChain;
 import com.duangframework.server.common.BootStrap;
@@ -35,6 +35,7 @@ public class Application {
     private int port;
     private static Application application;
     private static NettyServer nettyServer;
+    private String serverEnv = "dev";
 
     // ----- ssl
     private String certFilePath;
@@ -55,6 +56,11 @@ public class Application {
 
     public Application port(int port) {
         this.port = port;
+        return application;
+    }
+
+    public Application env(EnvEnum envEnum) {
+        this.serverEnv = envEnum.name();
         return application;
     }
 
@@ -116,8 +122,18 @@ public class Application {
             if(ToolsKit.isNotEmpty(serverPort)) {
                 port = Integer.parseInt(serverPort);
             }
+            // env
+            String serverEnvString = System.getProperty(ConstEnums.PROPERTIES.USE_ENV.getValue());
+            if(ToolsKit.isEmpty(serverEnvString)) {
+                serverEnvString = PropKit.get(ConstEnums.PROPERTIES.USE_ENV.getValue());
+            }
+            if(ToolsKit.isNotEmpty(serverEnvString)) {
+                this.serverEnv = serverEnvString;
+            }
 
             bootStrap = new BootStrap(host, port);
+            bootStrap.setEnvModel(EnvEnum.valueOf(serverEnv.toUpperCase()));
+
             // ssl
             if(ToolsKit.isNotEmpty(certFilePath) && ToolsKit.isNotEmpty(privateKeyPath) && ToolsKit.isNotEmpty(privateKeyPassword)) {
                 bootStrap.builderSslContext(certFilePath, privateKeyPath, privateKeyPassword);
