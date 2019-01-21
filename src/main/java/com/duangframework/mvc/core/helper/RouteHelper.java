@@ -2,6 +2,7 @@ package com.duangframework.mvc.core.helper;
 
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ObjectKit;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Before;
 import com.duangframework.mvc.annotation.Controller;
@@ -36,13 +37,17 @@ public class RouteHelper {
         try {
             Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
             List<Class<?>> clontrllerClassList = ClassHelper.getClontrllerClassList();
+            String productUriPrefix = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_URI_PREFIX.getValue());
+            if(ToolsKit.isNotEmpty(productUriPrefix)) {
+                productUriPrefix = productUriPrefix.startsWith("/") ? productUriPrefix : "/" + productUriPrefix;
+            }
             for (Class<?> controllerClass : clontrllerClassList) {
                 if (!controllerClass.isAnnotationPresent(Controller.class)) {
                     logger.warn("Controller类["+controllerClass.getName()+ "]没有@Controller注解, 退出本次循环...");
                     continue;
                 }
                 Mapping controllerMapping = controllerClass.getAnnotation(Mapping.class);
-                String controllerKey = buildMappingKey(controllerMapping, controllerClass.getSimpleName());
+                String controllerKey = buildMappingKey(controllerMapping, controllerClass.getSimpleName(), productUriPrefix);
                 // 遍历Controller类所有的方法
                 Method[] actionMethods = controllerClass.getDeclaredMethods();
                 if(ToolsKit.isEmpty(actionMethods)) {
@@ -70,7 +75,7 @@ public class RouteHelper {
         }
     }
 
-    private static String buildMappingKey(Mapping mapping, String mappingKey) {
+    private static String buildMappingKey(Mapping mapping, String mappingKey, String productUriPrefix) {
         if(ToolsKit.isNotEmpty(mapping) && ToolsKit.isNotEmpty(mapping.value())) {
             mappingKey = mapping.value();
         } else {
@@ -78,7 +83,9 @@ public class RouteHelper {
                 mappingKey = "/"+mappingKey.substring(0, mappingKey.length() - "controller".length());
             }
         }
-        return mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1).toLowerCase() : mappingKey.toLowerCase();
+        String uri = mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1).toLowerCase() : mappingKey.toLowerCase();
+        return  ToolsKit.isEmpty(productUriPrefix)
+                ? uri : productUriPrefix + uri;
     }
 
     private static void printRouteKey() {
