@@ -30,7 +30,6 @@ final public class RequestAccessHandler{
      * @throws Exception
      */
     public static void doHandler(String target, IRequest request, IResponse response) throws Exception {
-
         Route route = RouteHelper.getRouteMap().get(target);
         if(null == route){
             route = getRestfulRoute(request, target);

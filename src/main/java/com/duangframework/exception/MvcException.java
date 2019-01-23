@@ -31,7 +31,7 @@ public class MvcException extends AbstractDuangException implements IException {
         if(ToolsKit.isEmpty(super.getMessage())) {
             return ExceptionEnums.MVC_ERROR.getMessage();
         } else {
-            return ExceptionEnums.MVC_ERROR.getMessage() + ": " + super.getMessage();
+            return super.getMessage();
         }
     }
 }
