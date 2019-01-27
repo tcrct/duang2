@@ -46,6 +46,10 @@ public class MvcMain {
             target = target.substring(0, target.length()-1);
         }
 
+        if(target.startsWith("//")) {
+            throw new MvcException("请检查uri是否正确,若使用了nginx,注意proxy_pass不要以/结尾");
+        }
+
 //        // 验证该请求URI是否存在
 //        if( !RouteHelper.getRouteMap().containsKey(target) &&
 //                !target.startsWith(ConstEnums.FRAMEWORK_MAPPING_KEY.getValue())) {
@@ -66,6 +70,7 @@ public class MvcMain {
     public static void doHttpTask(IRequest request, IResponse response) throws MvcException {
         try {
             String target = getResourcePath(request);
+            System.out.println("doHttpTask: " + target);
             // 请求访问处理器前的处理器链，可以对请求进行过滤
             HandlerHelper.doBeforeChain(target, request, response);
             // 请求访问处理器

@@ -115,6 +115,7 @@ public enum ConstEnums {
         REQUEST_TIMEOUT("3000", "默认的请求过期时间毫秒"),
         PRODUCT_APPID("product.appid", "项目APPID"),
         PRODUCT_CODE("product.code", "项目简单称"),
+        PRODUCT_URI_PREFIX("product.uri.prefix", "项目api映射前缀，如果存在则强制添加"),
         JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
         SERVER_HOST("server.host", "服务器地址"),
         SERVER_PORT("server.port", "服务器端口"),

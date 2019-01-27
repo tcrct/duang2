@@ -11,6 +11,8 @@ import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -21,6 +23,8 @@ import java.util.function.Consumer;
  * @date 2017/10/31
  */
 public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(JsonDecoder.class);
 
     public JsonDecoder(FullHttpRequest request) {
         super(request);
@@ -35,6 +39,7 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         json = ToolsKit.isNotEmpty(json) ? json.trim() : "";
         // 如果是开启参数加密，则添加到Map后直接退出
         if(isEncryptParam) {
+            logger.warn("encrypt string: " + json);
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
             return requestParamsMap;
         }

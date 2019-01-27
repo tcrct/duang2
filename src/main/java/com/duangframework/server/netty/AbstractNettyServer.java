@@ -2,6 +2,7 @@ package com.duangframework.server.netty;
 
 import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.mvc.http.enums.EnvEnum;
 import com.duangframework.utils.OS;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.server.common.BootStrap;
@@ -39,12 +40,12 @@ public abstract class AbstractNettyServer implements IServer {
     protected BootStrap bootStrap;
 
     public AbstractNettyServer(BootStrap bootStrap) {
-        this( bootStrap, false);
+        this( bootStrap, bootStrap.getEnvModel());
     }
 
-    public AbstractNettyServer(BootStrap bs, boolean devModel) {
+    public AbstractNettyServer(BootStrap bs, EnvEnum envModel) {
         bootStrap = bs;
-        bootStrap.setDevModel(devModel);
+        bootStrap.setEnvModel(envModel);
         init();//初始化
     }
 

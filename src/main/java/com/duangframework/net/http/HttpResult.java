@@ -26,6 +26,7 @@ public class HttpResult implements Serializable {
 
     public HttpResult(HttpRequest httpRequest) {
         this.httpRequest = httpRequest;
+        isSuccess();
     }
 
     /**

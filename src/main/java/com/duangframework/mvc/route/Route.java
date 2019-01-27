@@ -89,7 +89,7 @@ public class Route {
             routeKey = controllerKey + methodKey;
         }
         routeKey = PathKit.fixPath(routeKey);
-        this.requestMapping = new RequestMapping(routeKey,
+        this.requestMapping = new RequestMapping(routeKey.toLowerCase(),
                 methodMapping.desc(),
                 methodMapping.order(),
                 methodMapping.timeout(),
@@ -141,7 +141,11 @@ public class Route {
         if(ToolsKit.isNotEmpty(controllerMapping)) {
             controllerKey = controllerMapping.value();
             if(ToolsKit.isEmpty(controllerKey)) {
-                String productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+                String productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_URI_PREFIX.getValue());
+                if(ToolsKit.isEmpty(productCode)) {
+                   productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).toLowerCase().replace("-", "").replace("_", "");
+                }
+                productCode = productCode.startsWith("/") ? productCode.substring(1) : productCode;
                 controllerKey = "/"+productCode + (controllerKey.startsWith("/") ? controllerKey : "/" + controllerKey);
             }
         }

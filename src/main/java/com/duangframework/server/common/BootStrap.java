@@ -1,19 +1,15 @@
 package com.duangframework.server.common;
 
-import com.duangframework.exception.MvcException;
 import com.duangframework.exception.NettyStartUpException;
-import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
-import com.duangframework.mvc.http.enums.ConstEnums;
-import com.duangframework.websocket.IWebSocket;
+import com.duangframework.mvc.http.enums.EnvEnum;
 import com.duangframework.websocket.WebSocketHandlerHelper;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.ServerChannel;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
@@ -46,8 +42,8 @@ public class BootStrap implements Closeable {
     private String host;
     /** 应用端口*/
     private int port;
-    /** 是否开发模式，默认为true*/
-    private boolean devModel = true;
+    /** 开发模式，默认为dev*/
+    private EnvEnum envModel = EnvEnum.DEV;
     /** boss线程数*/
     private int bossThreadGroupCount = ServerConfig.MAX_BOSS_EXECUTORS_NUMBER;
     /** worker线程数*/
@@ -62,7 +58,7 @@ public class BootStrap implements Closeable {
     /** */
     private int bockLog = ServerConfig.SO_BACKLOG;
     private static BootStrap _bootStrap;
-    private long startTimeMillis = 0;
+    private long startTimeMillis = 0L;
     /**  是否开启请求Gzip压缩*/
     private boolean enableGzip = true;
     /**  是否开启请求跨域处理*/
@@ -223,11 +219,15 @@ public class BootStrap implements Closeable {
     }
 
     public boolean isDevModel() {
-        return devModel;
+        return EnvEnum.DEV.equals(envModel);
     }
 
-    public void setDevModel(boolean devModel) {
-        this.devModel = devModel;
+    public EnvEnum getEnvModel() {
+        return envModel;
+    }
+
+    public void setEnvModel(EnvEnum envModel) {
+        this.envModel = envModel;
     }
 
     public int getBossThreadGroupCount() {

@@ -128,7 +128,7 @@ public abstract class BaseController {
     public String getValue(String key) {
         String values = "";
         try {
-            values = request.getParameter(key);
+            values = request.getParameter(key) + "";
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
         }
