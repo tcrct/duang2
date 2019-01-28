@@ -2,7 +2,10 @@ package com.duangframework.server.netty.handler;
 
 import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mqtt.core.IMqttMessageListener;
 import com.duangframework.mqtt.core.MqttContext;
+import com.duangframework.mqtt.core.MqttResult;
+import com.duangframework.mqtt.pool.MqttPoolFactory;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
@@ -209,18 +212,19 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         //ctx.write(MQEncoder.doEncode(ctx.alloc(),connAckMessage));
         ctx.writeAndFlush(connAckMessage);
         //String user = message.variableHeader().name();
-        String stbCode = message.payload().clientIdentifier();
-        logger.debug("connect ,stb_code is :" + stbCode);
+        String clientId = message.payload().clientIdentifier();
+        logger.debug("connect ,clientId is :" + clientId);
         //将用户信息写入变量
         if (!ctx.channel().hasAttr(USER))
         {
-            ctx.channel().attr(USER).set(stbCode);
+            ctx.channel().attr(USER).set(clientId);
         }
-        //将连接信息写入缓存
-        if(!TERMINAL_ONLINE_MAP.containsKey(stbCode)) {
-            MqttContext mqttContext = new MqttContext(ctx, stbCode, bootStrap.getMqttOptions());
-            TERMINAL_ONLINE_MAP.put(stbCode, mqttContext);
-        }
+        //将连接上下文写入缓存
+        MqttPoolFactory.setTerminalMap(clientId, ctx);
+//        if(!TERMINAL_ONLINE_MAP.containsKey(clientId)) {
+////            MqttContext mqttContext = new MqttContext(ctx, stbCode, bootStrap.getMqttOptions());
+//            TERMINAL_ONLINE_MAP.put(clientId, mqttContext);
+//        }
 //        log.debug("the user num is " + userMap.size());
 
         /**
@@ -288,13 +292,25 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         //        long time = System.currentTimeMillis();
         MqttPublishMessage message = (MqttPublishMessage)request;
         ByteBuf buf = message.payload();
-        String msg = new String(ByteBufUtil.getBytes(buf));
-        logger.debug("终端消息上报 start，终端编码为："+ctx.channel().attr(USER).get()+" 终端上报消息体："+msg);
+        String payload = new String(ByteBufUtil.getBytes(buf));
+        logger.debug("终端消息上报 start，终端编码为："+ctx.channel().attr(USER).get()+" 终端上报消息体："+payload);
         int msgId = message.variableHeader().messageId();
+        int packetId = message.variableHeader().packetId();
+        System.out.println(msgId+"                      "+packetId);
         if (msgId == -1)
             msgId = 1;
-        //主题名
-        String topicName = message.variableHeader().topicName();
+        //主题, 需要保证唯一性
+        String topic = message.variableHeader().topicName();
+        IMqttMessageListener listener = MqttPoolFactory.getSubscribeListener(topic);
+        if(ToolsKit.isNotEmpty(listener)) {
+            MqttResult mqttResult = new MqttResult();
+            mqttResult.setBody(ByteBufUtil.getBytes(buf));
+            mqttResult.setMessageId(msgId);
+            mqttResult.setTopic(topic);
+            mqttResult.setQos(message.fixedHeader().qosLevel().value());
+            listener.messageArrived(mqttResult);
+        }
+
         //test code
     /*    if(topicName.equals("test"))
         {
@@ -345,14 +361,13 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
 //            log.error("终端消息上报 end 终端上报消息格式错误！终端编号为: "+ctx.channel().attr(USER).get()+" 上报消息为： "+msg);
 //        }
 //
-//        if (message.fixedHeader().qosLevel() == MqttQoS.AT_LEAST_ONCE)
-//        {
-//            MqttMessageIdVariableHeader header = MqttMessageIdVariableHeader.from(msgId);
-//            MqttPubAckMessage puback = new MqttPubAckMessage(Constants.PUBACK_HEADER, header);
-//            ctx.write(puback);
-//        }
-        msg = null;
-        topicName = null;
+        if (message.fixedHeader().qosLevel() == MqttQoS.AT_LEAST_ONCE) {
+            MqttMessageIdVariableHeader header = MqttMessageIdVariableHeader.from(msgId);
+            MqttPubAckMessage puback = new MqttPubAckMessage(PUBACK_HEADER, header);
+            ctx.write(puback);
+        }
+//        msg = null;
+//        topic = null;
     }
 
     @Override

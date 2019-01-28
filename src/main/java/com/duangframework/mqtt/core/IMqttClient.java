@@ -12,12 +12,12 @@ public interface IMqttClient {
      * 发布
      * @param messageDto
      */
-    void publish(MqMessage messageDto);
+    void publish(MqttMessage messageDto);
 
     /**
      * 订阅
      */
-    void subscribe(String topic, IMqttCallback<MqResult> mqCallback);
+    void subscribe(String topic, IMqttMessageListener<MqttResult> mqCallback);
 
     /**
      * 取消订阅

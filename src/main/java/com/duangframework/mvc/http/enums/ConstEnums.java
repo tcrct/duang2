@@ -257,6 +257,28 @@ public enum ConstEnums {
         }
     }
 
+    public enum MQTT {
+
+        CLIENT_ID ("mqtt.client","mqtt客户端ID"),
+        ACCOUNT ("mqtt.account","登录帐号"),
+        PASSWORD ("mqtt.password","登录密码"),
+        ;
+
+        private final String value;
+        private final String desc;
+        private MQTT(String value, String desc) {
+            this.value = value;
+            this.desc = desc;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
 
     public enum JWT {
 

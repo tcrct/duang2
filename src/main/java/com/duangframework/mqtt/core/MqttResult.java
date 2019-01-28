@@ -5,17 +5,20 @@ import com.duangframework.mvc.http.enums.ConstEnums;
 
 import java.nio.charset.Charset;
 
-public class MqResult implements java.io.Serializable {
+public class MqttResult implements java.io.Serializable {
 
     private Integer qos;
-    private String messageId;
+    private Integer messageId;
     private byte[] body;
     private String topic;
+    private boolean mutable = true;
+    private boolean retained = false;
+    private boolean dup = false;
 
-    public MqResult() {
+    public MqttResult() {
     }
 
-    public MqResult(Integer qos, String messageId, byte[] body, String topic) {
+    public MqttResult(Integer qos, Integer messageId, byte[] body, String topic) {
         this.qos = qos;
         this.messageId = messageId;
         this.body = body;
@@ -34,7 +37,7 @@ public class MqResult implements java.io.Serializable {
         this.qos = qos;
     }
 
-    public void setMessageId(String messageId) {
+    public void setMessageId(Integer messageId) {
         this.messageId = messageId;
     }
 
@@ -50,7 +53,7 @@ public class MqResult implements java.io.Serializable {
         return qos;
     }
 
-    public String getMessageId() {
+    public Integer getMessageId() {
         return messageId;
     }
 
@@ -72,7 +75,7 @@ public class MqResult implements java.io.Serializable {
 
     @Override
     public String toString() {
-        return "MqResult{" +
+        return "MqttResult{" +
                 "qos=" + qos +
                 ", messageId='" + messageId + '\'' +
                 ", body='" + getBodyString() + '\'' +

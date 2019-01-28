@@ -1,6 +1,5 @@
 package com.duangframework.mqtt.core;
 
-import com.duangframework.utils.DuangId;
 import io.netty.handler.codec.mqtt.MqttQoS;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,20 +7,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 要发布的信息对象
  */
-public class MqMessage implements java.io.Serializable {
+public class MqttMessage implements java.io.Serializable {
 
     public String topic;
     public Integer messageId = new AtomicInteger().intValue();
     public String message;
     public int qos = MqttQoS.AT_LEAST_ONCE.value();
 
-    public MqMessage() {}
 
-    public MqMessage(String topic, String message) {
+
+    public MqttMessage() {}
+
+    public MqttMessage(String topic, String message) {
         this(topic, message, 1);
     }
 
-    public MqMessage(String topic, String message, int qos) {
+    public MqttMessage(String topic, String message, int qos) {
         this.topic = topic;
         this.messageId = getMessageId();
         this.message = message;

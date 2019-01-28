@@ -2,6 +2,7 @@ package com.duangframework.mqtt.core;
 
 
 import com.duangframework.kit.ToolsKit;
+import io.netty.handler.codec.mqtt.MqttQoS;
 
 /**
  * Created by laotang on 2019/1/6.
@@ -15,13 +16,15 @@ public class MqttOptions implements java.io.Serializable {
     private String account;
     private String password;
     private MqttProts mqttProts;
+    private MqttQoS mqttQoS;
 
-    private MqttOptions(String host, String clientId, String account, String password, MqttProts mqttProts) {
+    private MqttOptions(String host, String clientId, String account, String password, MqttProts mqttProts, MqttQoS mqttQoS) {
         this.host = host;
         this.clientId = clientId;
         this.account = account;
         this.password = password;
         this.mqttProts = mqttProts;
+        this.mqttQoS = mqttQoS;
     }
 
     public String getBroker() {
@@ -48,12 +51,17 @@ public class MqttOptions implements java.io.Serializable {
         return mqttProts;
     }
 
+    public MqttQoS getMqttQoS() {
+        return mqttQoS;
+    }
+
     public static class Builder {
         private String host = "0.0.0.0";
         private String clientId;
         private String account;
         private String password;
         private MqttProts mqttProts;
+        private MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
 
         public Builder host(String host) {
             this.host = host;
@@ -79,13 +87,17 @@ public class MqttOptions implements java.io.Serializable {
             this.mqttProts = mqttProts;
             return this;
         }
+        public Builder qos(MqttQoS mqttQoS) {
+            this.mqttQoS = mqttQoS;
+            return this;
+        }
 
         public MqttOptions build() {
             // 没有设置就使用默认值
             if(ToolsKit.isEmpty(mqttProts)) {
                 mqttProts = new MqttProts.Builder().build();
             }
-            return new MqttOptions(host, clientId, account, password, mqttProts);
+            return new MqttOptions(host, clientId, account, password, mqttProts, mqttQoS);
         }
     }
 
