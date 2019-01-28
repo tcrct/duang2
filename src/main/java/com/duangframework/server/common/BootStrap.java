@@ -3,7 +3,10 @@ package com.duangframework.server.common;
 import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mqtt.core.MqttOptions;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.enums.EnvEnum;
+import com.duangframework.utils.DuangId;
 import com.duangframework.websocket.WebSocketHandlerHelper;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -23,6 +26,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *容器启动配置类
@@ -33,6 +38,7 @@ import java.net.InetSocketAddress;
 public class BootStrap implements Closeable {
 
     private static Logger logger = LoggerFactory.getLogger(BootStrap.class);
+    public static final String HTTP_SERVER_NAME = "HttpServer";
 
     /**
      * 项目名称
@@ -63,7 +69,11 @@ public class BootStrap implements Closeable {
     private boolean enableGzip = true;
     /**  是否开启请求跨域处理*/
     private boolean enableCors = true;
-    private String[] corsOrigins;
+
+    /**  MQTT */
+    private MqttOptions mqttOptions;
+
+    private List<DuangSocketAddress> socketAddressList = new ArrayList<>();
 
     public static BootStrap getInstants() {
         return _bootStrap;
@@ -80,7 +90,7 @@ public class BootStrap implements Closeable {
     private void init() {
 //        loadLibrary();
         try {
-            allocator = new PooledByteBufAllocator(PlatformDependent.directBufferPreferred());
+            allocator = PooledByteBufAllocator.DEFAULT; //new PooledByteBufAllocator(PlatformDependent.directBufferPreferred());
         } catch (Exception e) {
             throw new NettyStartUpException(e.getMessage(), e);
         }
@@ -179,8 +189,20 @@ public class BootStrap implements Closeable {
         this.idleTimeInSeconds = idleTimeInSeconds;
     }
 
-    public InetSocketAddress getSockerAddress() {
-        return new InetSocketAddress(host, port);
+    public List<DuangSocketAddress> getSocketAddressList() {
+        if(socketAddressList.isEmpty()) {
+            socketAddressList.add(new DuangSocketAddress(buildSocketServerId(HTTP_SERVER_NAME), HTTP_SERVER_NAME, new InetSocketAddress(host, port)));
+            if(ToolsKit.isNotEmpty(mqttOptions)) {
+                String mqttHost = mqttOptions.getHost();
+                Integer mqttTcpProt = mqttOptions.getMqttProts().getTcp();
+                socketAddressList.add(new DuangSocketAddress(buildSocketServerId(MqttOptions.MQTTSERVER_NAME), MqttOptions.MQTTSERVER_NAME, new InetSocketAddress(mqttHost, mqttTcpProt)));
+            }
+        }
+        return socketAddressList;
+    }
+
+    private String buildSocketServerId(String name) {
+        return ConstEnums.FRAMEWORK_OWNER.getValue()+"_"+name;
     }
 
     public Class<? extends ServerChannel> getDefaultChannel() {
@@ -270,10 +292,18 @@ public class BootStrap implements Closeable {
     }
 
 
-
-
     /** WebSocket **/
     public boolean isEnableWebSocket() {
         return !WebSocketHandlerHelper.getWebSocketHandlerMap().isEmpty();
+    }
+
+
+
+    public MqttOptions getMqttOptions() {
+        return mqttOptions;
+    }
+
+    public void setMqttOptions(MqttOptions mqttOptions) {
+        this.mqttOptions = mqttOptions;
     }
 }

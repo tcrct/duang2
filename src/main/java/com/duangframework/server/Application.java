@@ -2,6 +2,7 @@ package com.duangframework.server;
 
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mqtt.core.MqttOptions;
 import com.duangframework.mvc.core.CustomInitRun;
 import com.duangframework.mvc.core.InitRun;
 import com.duangframework.mvc.core.helper.HandlerHelper;
@@ -41,6 +42,9 @@ public class Application {
     private String certFilePath;
     private String privateKeyPath;
     private String privateKeyPassword;
+
+    // -----mqtt
+    private MqttOptions mqttOptions;
 
     public static Application duang() {
         if(application == null) {
@@ -90,6 +94,11 @@ public class Application {
         return application;
     }
 
+    public Application mqtt(MqttOptions mqttOptions) {
+        this.mqttOptions = mqttOptions;
+        return application;
+    }
+
     public Application init(InitRun initRunObj) {
         CustomInitRun.getInstance().add(initRunObj);
         return application;
@@ -134,11 +143,16 @@ public class Application {
             bootStrap = new BootStrap(host, port);
             bootStrap.setEnvModel(EnvEnum.valueOf(serverEnv.toUpperCase()));
 
+            // mqtt
+            if(null != mqttOptions) {
+                bootStrap.setMqttOptions(mqttOptions);
+            }
+
             // ssl
             if(ToolsKit.isNotEmpty(certFilePath) && ToolsKit.isNotEmpty(privateKeyPath) && ToolsKit.isNotEmpty(privateKeyPassword)) {
                 bootStrap.builderSslContext(certFilePath, privateKeyPath, privateKeyPassword);
             }
-            // start
+            // http, wersocket server start
             nettyServer = new NettyServer(bootStrap);
             nettyServer.start();
         } catch (Exception e) {

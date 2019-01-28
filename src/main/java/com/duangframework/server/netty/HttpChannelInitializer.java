@@ -64,7 +64,7 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 //            channelPipeline.addLast(new WebSocketServerProtocolHandler(bootStrap.getWebSocketPath(), null, true));
 //            channelPipeline.addLast(new WebSocketBaseHandler_bak(bootStrap));
 //        }
-        // 真正处理HTTP业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
+        // 真正处理业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
         channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
     }
 

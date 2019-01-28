@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,8 @@ public class ChannelBaseHandler extends SimpleChannelInboundHandler<Object> {
             }
         } else if (object instanceof WebSocketFrame) { //如果是Websocket请求，则进行websocket操作
             WebSocketBaseHandler.channelRead(bootStrap, ctx, (WebSocketFrame) object);
+        } else if (object instanceof MqttMessage) {
+
         }
     }
 

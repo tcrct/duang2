@@ -261,7 +261,7 @@ public class HttpRequest implements IRequest{
      */
     @Override
     public String getLocalAddr() {
-//        InetSocketAddress inetSocketAddress = BootStrap.getInstants().getSockerAddress();
+//        InetSocketAddress inetSocketAddress = BootStrap.getInstants().getSocketAddressList();
         return getScheme()+"://"+localAddress.getHostString() + ":" + localAddress.getPort();
     }
 

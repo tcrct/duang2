@@ -62,6 +62,9 @@ public abstract class AbstractNettyServer implements IServer {
         Group group = EpollEventLoopGroups.group(bootStrap);
         nettyBootstrap.group(group.getBoosMultithreadEventLoopGroup(), group.getWorkerMultithreadEventLoopGroup());
         nettyBootstrap.option(ChannelOption.SO_BACKLOG, bootStrap.getBockLog())
+                .option(ChannelOption.ALLOCATOR, bootStrap.getAllocator())
+                // 使用内存池，完成ByteBuf的解码工作之后必须显式的调用 ReferenceCountUtil.release(msg)对接收缓冲区ByteBuf进行内存释放，
+                // 否则它会被认为仍然在使用中，这样会导致内存泄露。
                 .childOption(ChannelOption.ALLOCATOR, bootStrap.getAllocator())
                 .childOption(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT)
                 .childOption(ChannelOption.SO_RCVBUF, 65536)
