@@ -70,7 +70,6 @@ public class MvcMain {
     public static void doHttpTask(IRequest request, IResponse response) throws MvcException {
         try {
             String target = getResourcePath(request);
-            System.out.println("doHttpTask: " + target);
             // 请求访问处理器前的处理器链，可以对请求进行过滤
             HandlerHelper.doBeforeChain(target, request, response);
             // 请求访问处理器
