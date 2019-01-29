@@ -49,6 +49,9 @@ public class MqttPoolFactory {
     }
 
     public static void removeMqttContext(String clinetId) {
+        if(ToolsKit.isEmpty(clinetId)) {
+            return;
+        }
         removeMqttContext(clinetId, "");
     }
     public static void removeMqttContext(String clinetId, String topic) {

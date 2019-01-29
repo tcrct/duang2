@@ -50,14 +50,6 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
 
     private final AttributeKey<String> CLIENTID_ATTRIBUTE = AttributeKey.valueOf(ConstEnums.FRAMEWORK_OWNER+"." + ConstEnums.MQTT.CLIENT_ID);
 
-    public static Map<String,Long> unconnectMap=new HashMap<String, Long>();
-
-    // 所有该上报的消息集合   mac+plan
-    //    public static Map<Integer,Map<String, UpMessage>> upMap=new ConcurrentHashMap<Integer,Map<String, UpMessage>>();
-
-    // 在线用户与MQTT Context, key为用户ID
-    public static Map<String, MqttContext> TERMINAL_ONLINE_MAP = new ConcurrentHashMap<>();
-
     public MqttServerHandler(BootStrap bootStrap) {
         this.bootStrap = bootStrap;
     }
@@ -65,7 +57,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     @Override
     //连接成功后调用的方法
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        String msg = ToolsKit.formatDate(new Date(), ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue()) + " connection eqmm is success: " + InetAddress.getLocalHost().getHostName();
+        String msg = ToolsKit.formatDate(new Date(), ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue()) + " connection mqtt is success: " + InetAddress.getLocalHost().getHostName();
         logger.warn("channelActive:" + msg);
         ReturnDto dto = ToolsKit.buildReturnDto(null, msg);
         ctx.writeAndFlush(ToolsKit.toJsonString(dto));
@@ -121,13 +113,11 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     @Override
     public void channelInactive(ChannelHandlerContext ctx)
     {
-        logger.warn(ctx.channel().remoteAddress().toString().substring(1,ctx.channel().remoteAddress().toString().lastIndexOf(":")) + "is close!");
-        //清理用户缓存
-        if (ctx.channel().hasAttr(CLIENTID_ATTRIBUTE)) {
-            String user = ctx.channel().attr(CLIENTID_ATTRIBUTE).get();
-//            userMap.remove(user);
-//            userOnlineMap.remove(user);
-        }
+        logger.warn(ctx.channel().remoteAddress().toString().substring(1,ctx.channel().remoteAddress().toString().lastIndexOf(":")) + " is close!");
+        //清理缓存
+        String clientId = getClientId(ctx);
+        ctx.channel().attr(CLIENTID_ATTRIBUTE).remove();
+        MqttPoolFactory.removeMqttContext(clientId);
     }
 
     /**
@@ -137,27 +127,19 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
      * READER_IDLE 里 关闭链接
      */
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception
-    {
-        if (evt instanceof IdleStateEvent)
-        {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent)evt;
+            String clientId = getClientId(ctx);
             if (event.state().equals(IdleState.READER_IDLE)) {
-            	if (ctx.channel().hasAttr(CLIENTID_ATTRIBUTE)) {
-            		String user = ctx.channel().attr(CLIENTID_ATTRIBUTE).get();
-            		 logger.warn("ctx heartbeat timeout,close!"+user);//+ctx);
-                    logger.warn("ctx heartbeat timeout,close!");//+ctx);
-                     if(unconnectMap.containsKey(user)) {
-                     	unconnectMap.put(user, unconnectMap.get(user)+1);
-                     }else {
-                     	unconnectMap.put(user, new Long(1));
-                     }
-            	}
+                logger.warn(clientId + " heartbeat timeout, so close!");
+                 MqttPoolFactory.removeMqttContext(clientId);
                 ctx.fireChannelInactive();
                 ctx.close();
             }else if(event.state().equals(IdleState.ALL_IDLE)) {
-            	logger.debug("发送心跳给客户端");
-            	buildHearBeat(ctx);
+            	logger.debug("send heartbeat to client["+clientId+"]");
+                MqttFixedHeader mqttFixedHeader=new MqttFixedHeader(MqttMessageType.PINGREQ, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+                ctx.writeAndFlush(new MqttMessage(mqttFixedHeader));
             }
         }
         super.userEventTriggered(ctx, evt);
@@ -169,8 +151,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
      * @param request
      */
     private void doPingreo(ChannelHandlerContext ctx, Object request) {
-        MqttMessage mqttMessage = (MqttMessage)request;
-        logger.debug("响应心跳！");
+        logger.debug("received client[" + getClientId(ctx) + "] heartbeat");
         MqttFixedHeader header = new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0);
         ctx.writeAndFlush(new MqttMessage(header));
     }
@@ -178,15 +159,6 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     private void doPingresp(ChannelHandlerContext ctx, Object request)  {
         MqttMessage mqttMessage = (MqttMessage)request;
         logger.debug("收到心跳请求: " + ToolsKit.toJsonString(mqttMessage));
-    }
-
-    /**
-     * 封装心跳请求
-     * @param ctx
-     */
-    private void buildHearBeat(ChannelHandlerContext ctx) {
-        MqttFixedHeader mqttFixedHeader=new MqttFixedHeader(MqttMessageType.PINGREQ, false, MqttQoS.AT_MOST_ONCE, false, 0);
-        ctx.writeAndFlush(new MqttMessage(mqttFixedHeader));
     }
 
     /**
@@ -198,12 +170,16 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     private void doUnSubscribe(ChannelHandlerContext ctx, Object request) {
         MqttUnsubscribeMessage message = (MqttUnsubscribeMessage)request;
         List<String> topicList = message.payload().topics();
-        String clientId = ctx.channel().attr(CLIENTID_ATTRIBUTE).get();
-        ctx.channel().attr(CLIENTID_ATTRIBUTE).remove();
+        String clientId = getClientId(ctx);
+        StringBuilder sb = new StringBuilder();
         for(String topic : topicList) {
+            sb.append(topic).append(",");
             MqttPoolFactory.removeMqttContext(clientId, topic);
         }
-        logger.warn(clientId + " unsubscribe success");
+        if(sb.length() > 1) {
+            sb.deleteCharAt(sb.length()-1);
+        }
+        logger.warn(clientId + "["+sb+ "] unsubscribe success");
     }
 
     /**
@@ -254,6 +230,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
      */
     private void doSubscribe(ChannelHandlerContext ctx, Object request) {
         MqttSubscribeMessage message = (MqttSubscribeMessage)request;
+        String clientId = getClientId(ctx);
         int msgId = message.variableHeader().messageId();
         if (msgId <= -1) {
             msgId = 1;
@@ -261,6 +238,14 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         MqttMessageIdVariableHeader header = MqttMessageIdVariableHeader.from(msgId);
         MqttSubAckPayload payload = new MqttSubAckPayload();
         MqttSubAckMessage suback = new MqttSubAckMessage(SUBACK_HEADER, header, payload);
+        StringBuilder sb = new StringBuilder();
+        for(MqttTopicSubscription topic : message.payload().topicSubscriptions()) {
+            sb.append(topic.topicName()).append(",");
+        }
+        if(sb.length() > 1) {
+            sb.deleteCharAt(sb.length()-1);
+        }
+        logger.warn(clientId + "["+  sb +"] subscribe success");
         ctx.writeAndFlush(suback);
     }
 
@@ -282,7 +267,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     private void doPublish(ChannelHandlerContext ctx, Object request) {
         MqttPublishMessage message = (MqttPublishMessage)request;
         ByteBuf buf = message.payload();
-        String clientId = ctx.channel().attr(CLIENTID_ATTRIBUTE).get();
+        String clientId = getClientId(ctx);
         logger.debug("client publish message id："+clientId+"   message："+new String(ByteBufUtil.getBytes(buf)));
         int packetId = message.variableHeader().packetId();
         if (packetId <= -1) {
@@ -329,4 +314,11 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         ctx.close();
     }
 
+
+    public String getClientId(ChannelHandlerContext ctx) {
+        if (ctx.channel().hasAttr(CLIENTID_ATTRIBUTE)) {
+            return ctx.channel().attr(CLIENTID_ATTRIBUTE).get();
+        }
+        return "";
+    }
 }
