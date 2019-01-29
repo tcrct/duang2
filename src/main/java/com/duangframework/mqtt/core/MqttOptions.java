@@ -17,6 +17,13 @@ public class MqttOptions implements java.io.Serializable {
     private String password;
     private MqttProts mqttProts;
     private MqttQoS mqttQoS;
+    private boolean isWillFlag;
+    private boolean isCleanSession;
+    private Integer keepAliveTimeSeconds;
+    private boolean isRetain;
+    private boolean isDup;
+    private Integer version;
+
 
     private MqttOptions(String host, String clientId, String account, String password, MqttProts mqttProts, MqttQoS mqttQoS) {
         this.host = host;
@@ -53,6 +60,54 @@ public class MqttOptions implements java.io.Serializable {
 
     public MqttQoS getMqttQoS() {
         return mqttQoS;
+    }
+
+    public boolean isWillFlag() {
+        return isWillFlag;
+    }
+
+    public void setWillFlag(boolean willFlag) {
+        isWillFlag = willFlag;
+    }
+
+    public boolean isCleanSession() {
+        return isCleanSession;
+    }
+
+    public void setCleanSession(boolean cleanSession) {
+        isCleanSession = cleanSession;
+    }
+
+    public Integer isKeepAliveTimeSeconds() {
+        return keepAliveTimeSeconds;
+    }
+
+    public void setKeepAliveTimeSeconds(int keepAliveTimeSeconds) {
+        this.keepAliveTimeSeconds = keepAliveTimeSeconds;
+    }
+
+    public boolean isRetain() {
+        return isRetain;
+    }
+
+    public void setRetain(boolean retain) {
+        isRetain = retain;
+    }
+
+    public boolean isDup() {
+        return isDup;
+    }
+
+    public void setDup(boolean dup) {
+        isDup = dup;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public static class Builder {

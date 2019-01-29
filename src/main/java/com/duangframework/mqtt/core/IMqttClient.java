@@ -1,5 +1,7 @@
 package com.duangframework.mqtt.core;
 
+import com.duangframework.mqtt.model.MqttMessage;
+
 import java.util.Set;
 
 /**
@@ -12,28 +14,28 @@ public interface IMqttClient {
      * 发布
      * @param messageDto
      */
-    void publish(MqttMessage messageDto);
+    void publish(MqttMessage messageDto, String... clientId);
 
     /**
      * 订阅
      */
-    void subscribe(String topic, IMqttMessageListener<MqttResult> mqCallback);
+    void subscribe(String clientId, String topic, IMqttMessageListener<MqttMessage> mqCallback);
 
     /**
      * 取消订阅
      * @param topic
      */
-    void unsubscribe(String topic);
+    void unsubscribe(String clientId, String topic);
 
     /**
      * 取得所有订阅主题
      */
-    Set<String> getAllTopic();
+    Set<String> getAllSubscribeTopic(String clientId);
 
     /**
      * 断开链接
      */
-    void disconnect();
+    void disconnect(String clientId);
 
 
 }

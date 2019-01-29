@@ -217,7 +217,7 @@ public class BeanHelper {
                         }
                     }
                 }
-//                System.out.println(proxyAnnotaionList.get(0).value()[0].getId());
+//                System.out.println(proxyAnnotaionList.get(0).value()[0].getClientId());
                 bean= buildProxyBean(clazz, proxyAnnotaionList);
             } else {
                 bean = ObjectKit.newInstance(clazz);

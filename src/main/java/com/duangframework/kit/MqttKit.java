@@ -2,9 +2,8 @@ package com.duangframework.kit;
 
 import com.duangframework.mqtt.MqttClient;
 import com.duangframework.mqtt.core.IMqttMessageListener;
-import com.duangframework.mqtt.core.MqttMessage;
 import com.duangframework.mqtt.core.MqttOptions;
-import com.duangframework.mqtt.core.MqttResult;
+import com.duangframework.mqtt.model.MqttMessage;
 import com.duangframework.server.common.BootStrap;
 
 /**
@@ -13,9 +12,10 @@ import com.duangframework.server.common.BootStrap;
 public class MqttKit {
 
     private static MqttClient mqttClient;
+    private String clientId;
     private String topic;
     private String message;
-    private IMqttMessageListener<MqttResult> listener;
+    private IMqttMessageListener<MqttMessage> listener;
 
     private static class MqttKitHolder {
         private static final MqttKit INSTANCE = new MqttKit();
@@ -23,10 +23,21 @@ public class MqttKit {
 
     private MqttKit() {
         MqttOptions options = BootStrap.getInstants().getMqttOptions();
-        mqttClient = new MqttClient(options.getClientId(), options.getAccount(), options.getPassword());
+        this.clientId = options.getClientId();
+        mqttClient = new MqttClient(clientId, options.getAccount(), options.getPassword());
     }
     public static final MqttKit duang() {
         return MqttKitHolder.INSTANCE;
+    }
+
+    /**
+     * 指定客户端ID，不设置时，取Duang.java里指定的MqttOptions.getClientId()
+     * @param clientId
+     * @return
+     */
+    public MqttKit client(String clientId) {
+        this.clientId = clientId;
+        return this;
     }
 
     /**
@@ -54,7 +65,7 @@ public class MqttKit {
      * @param listener
      * @return
      */
-    public MqttKit  listener(IMqttMessageListener<MqttResult> listener) {
+    public MqttKit  listener(IMqttMessageListener<MqttMessage> listener) {
         this.listener = listener;
         return this;
     }
@@ -63,13 +74,13 @@ public class MqttKit {
      * 根据主题发布消息
      */
     public void publish() {
-        mqttClient.publish(new MqttMessage(topic, message));
+        mqttClient.publish(new MqttMessage(topic, message), clientId);
     }
 
     /**
      * 根据主题订阅消息
      */
     public void subscribe() {
-        mqttClient.subscribe(topic, listener);
+        mqttClient.subscribe(clientId, topic, listener);
     }
 }

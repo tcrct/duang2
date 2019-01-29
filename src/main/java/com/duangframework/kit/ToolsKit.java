@@ -473,4 +473,15 @@ public final class ToolsKit {
     }
 
 
+    /**
+     * 设定安全的KEY
+     * @param key
+     * @param key2
+     */
+    public static String buildEntryptKey(String key, String key2) {
+        byte[] hashKey = Digests.sha1(key.getBytes(), key2.getBytes());
+        return Encodes.encodeHex(hashKey);
+    }
+
+
 }

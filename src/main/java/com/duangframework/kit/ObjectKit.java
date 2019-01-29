@@ -312,7 +312,7 @@ public class ObjectKit {
     public static boolean isExcludeMethod(Method method, Set<String> excludedMethodName) {
         return excludedMethodName.contains(method.getName());
         //如果是Object, Controller公用方法名并且有参数的方法, 则返回true
-//        return (excludedMethodName.contains(method.getId()) && method.getParameterTypes().length ==0 );
+//        return (excludedMethodName.contains(method.getClientId()) && method.getParameterTypes().length ==0 );
     }
 
     /**
