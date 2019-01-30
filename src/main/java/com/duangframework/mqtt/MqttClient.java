@@ -1,12 +1,9 @@
 package com.duangframework.mqtt;
 
-import com.duangframework.exception.SecurityException;
-import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mqtt.core.*;
 import com.duangframework.mqtt.model.MqttMessage;
 import com.duangframework.mqtt.pool.MqttPoolFactory;
-import com.duangframework.mvc.http.enums.ConstEnums;
 import java.util.Set;
 
 public class MqttClient implements IMqttClient {
@@ -22,11 +19,11 @@ public class MqttClient implements IMqttClient {
         auth();
     }
 
-    public void auth() {
-        String systemAccount = PropKit.get(ConstEnums.MQTT.ACCOUNT.getValue());
-        String systemPwd = PropKit.get(ConstEnums.MQTT.PASSWORD.getValue());
-        if(!systemAccount.equals(account) || !systemPwd.equals(password)) {
-            throw new SecurityException("access is not allowed");
+    private void auth() {
+        try {
+            MqttFactory.auth(clientId, account, password);
+        } catch (Exception e) {
+            throw e;
         }
     }
 

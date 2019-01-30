@@ -103,7 +103,6 @@ public class MqttPoolFactory {
             SUBSCRIBE_TOPIC_MAP.putIfAbsent(clinetId, set);
             removeSubscribeMqttContext(clinetId, topic);
         }
-
     }
 
 }

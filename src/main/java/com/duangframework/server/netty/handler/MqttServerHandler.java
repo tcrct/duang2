@@ -206,13 +206,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
             account= connectPayload.userName();
             password = new String(connectPayload.passwordInBytes(), CharsetUtil.UTF_8);
         }
-        MqttOptions options = new MqttOptions.Builder()
-                .clientId(clientId)
-                .account(account)
-                .password(password)
-                .ports(new MqttProts.Builder().build())
-                .qos(MqttQoS.valueOf(variableHeader.willQos()))
-                .build();
+        MqttOptions options = new MqttOptions(clientId, account, password, MqttQoS.valueOf(variableHeader.willQos()));
         options.setCleanSession(variableHeader.isCleanSession());
         options.setKeepAliveTimeSeconds(variableHeader.keepAliveTimeSeconds());
         options.setRetain(variableHeader.isWillRetain());

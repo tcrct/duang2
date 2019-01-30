@@ -3,6 +3,7 @@ package com.duangframework.server;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mqtt.core.MqttOptions;
+import com.duangframework.mqtt.core.MqttProts;
 import com.duangframework.mvc.core.CustomInitRun;
 import com.duangframework.mvc.core.InitRun;
 import com.duangframework.mvc.core.helper.HandlerHelper;
@@ -94,8 +95,11 @@ public class Application {
         return application;
     }
 
-    public Application mqtt(MqttOptions mqttOptions) {
-        this.mqttOptions = mqttOptions;
+    public Application mqtt() {
+        return mqtt(new MqttProts.Builder().build());
+    }
+    public Application mqtt(MqttProts mqttProts) {
+        this.mqttOptions = new MqttOptions(host, mqttProts);
         return application;
     }
 

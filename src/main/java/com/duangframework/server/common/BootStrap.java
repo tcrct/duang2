@@ -194,6 +194,9 @@ public class BootStrap implements Closeable {
             socketAddressList.add(new DuangSocketAddress(buildSocketServerId(HTTP_SERVER_NAME), HTTP_SERVER_NAME, new InetSocketAddress(host, port)));
             if(ToolsKit.isNotEmpty(mqttOptions)) {
                 String mqttHost = mqttOptions.getHost();
+                if(ToolsKit.isEmpty(mqttHost)) {
+                    mqttHost = getHost();
+                }
                 Integer mqttTcpProt = mqttOptions.getMqttProts().getTcp();
                 socketAddressList.add(new DuangSocketAddress(buildSocketServerId(MqttOptions.MQTTSERVER_NAME), MqttOptions.MQTTSERVER_NAME, new InetSocketAddress(mqttHost, mqttTcpProt)));
             }

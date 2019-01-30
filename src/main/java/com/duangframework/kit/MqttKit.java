@@ -4,6 +4,7 @@ import com.duangframework.mqtt.MqttClient;
 import com.duangframework.mqtt.core.IMqttMessageListener;
 import com.duangframework.mqtt.core.MqttOptions;
 import com.duangframework.mqtt.model.MqttMessage;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
 
 /**
@@ -17,14 +18,16 @@ public class MqttKit {
     private String message;
     private IMqttMessageListener<MqttMessage> listener;
 
+
     private static class MqttKitHolder {
         private static final MqttKit INSTANCE = new MqttKit();
     }
 
     private MqttKit() {
-        MqttOptions options = BootStrap.getInstants().getMqttOptions();
-        this.clientId = options.getClientId();
-        mqttClient = new MqttClient(clientId, options.getAccount(), options.getPassword());
+        String account = PropKit.get(ConstEnums.MQTT.ACCOUNT.getValue(), "admin");
+        String password = PropKit.get(ConstEnums.MQTT.PASSWORD.getValue(), "1b88ab6d");
+        clientId = ConstEnums.FRAMEWORK_OWNER.getValue()+"." + ConstEnums.MQTT.CLIENT_ID.getValue();
+        mqttClient = new MqttClient(clientId, account, password);
     }
     public static final MqttKit duang() {
         return MqttKitHolder.INSTANCE;

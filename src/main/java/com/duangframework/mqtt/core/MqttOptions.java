@@ -10,6 +10,7 @@ import io.netty.handler.codec.mqtt.MqttQoS;
 public class MqttOptions implements java.io.Serializable {
 
     public static final String MQTTSERVER_NAME = "MqttServer";
+    public static final String MQTTSERVER_HOST = "0.0.0.0";
 
     private String host;
     private String clientId;
@@ -24,8 +25,19 @@ public class MqttOptions implements java.io.Serializable {
     private boolean isDup;
     private Integer version;
 
+    public MqttOptions() {
+        this(MQTTSERVER_HOST, new MqttProts.Builder().build());
+    }
 
-    private MqttOptions(String host, String clientId, String account, String password, MqttProts mqttProts, MqttQoS mqttQoS) {
+    public MqttOptions(String host, MqttProts mqttProts) {
+        this(host, "", "", "", mqttProts, MqttQoS.AT_LEAST_ONCE);
+    }
+
+    public MqttOptions(String clientId, String account, String password, MqttQoS mqttQoS) {
+        this(MQTTSERVER_HOST, clientId, account, password, null, mqttQoS);
+    }
+
+    public MqttOptions(String host, String clientId, String account, String password, MqttProts mqttProts, MqttQoS mqttQoS) {
         this.host = host;
         this.clientId = clientId;
         this.account = account;
@@ -42,24 +54,48 @@ public class MqttOptions implements java.io.Serializable {
         return host;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public String getClientId() {
         return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public String getAccount() {
         return account;
     }
 
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public MqttProts getMqttProts() {
         return mqttProts;
     }
 
+    public void setMqttProts(MqttProts mqttProts) {
+        this.mqttProts = mqttProts;
+    }
+
     public MqttQoS getMqttQoS() {
         return mqttQoS;
+    }
+
+    public void setMqttQoS(MqttQoS mqttQoS) {
+        this.mqttQoS = mqttQoS;
     }
 
     public boolean isWillFlag() {
@@ -78,11 +114,11 @@ public class MqttOptions implements java.io.Serializable {
         isCleanSession = cleanSession;
     }
 
-    public Integer isKeepAliveTimeSeconds() {
+    public Integer getKeepAliveTimeSeconds() {
         return keepAliveTimeSeconds;
     }
 
-    public void setKeepAliveTimeSeconds(int keepAliveTimeSeconds) {
+    public void setKeepAliveTimeSeconds(Integer keepAliveTimeSeconds) {
         this.keepAliveTimeSeconds = keepAliveTimeSeconds;
     }
 
@@ -109,51 +145,4 @@ public class MqttOptions implements java.io.Serializable {
     public void setVersion(Integer version) {
         this.version = version;
     }
-
-    public static class Builder {
-        private String host = "0.0.0.0";
-        private String clientId;
-        private String account;
-        private String password;
-        private MqttProts mqttProts;
-        private MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
-
-        public Builder host(String host) {
-            this.host = host;
-            return this;
-        }
-
-        public Builder clientId(String clientId) {
-            this.clientId = clientId;
-            return this;
-        }
-
-        public Builder account(String account) {
-            this.account = account;
-            return this;
-        }
-
-        public Builder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public Builder ports(MqttProts mqttProts) {
-            this.mqttProts = mqttProts;
-            return this;
-        }
-        public Builder qos(MqttQoS mqttQoS) {
-            this.mqttQoS = mqttQoS;
-            return this;
-        }
-
-        public MqttOptions build() {
-            // 没有设置就使用默认值
-            if(ToolsKit.isEmpty(mqttProts)) {
-                mqttProts = new MqttProts.Builder().build();
-            }
-            return new MqttOptions(host, clientId, account, password, mqttProts, mqttQoS);
-        }
-    }
-
 }

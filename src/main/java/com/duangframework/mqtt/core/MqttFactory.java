@@ -1,8 +1,11 @@
 package com.duangframework.mqtt.core;
 
+import com.duangframework.exception.SecurityException;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mqtt.model.MqttMessage;
 import com.duangframework.mqtt.pool.MqttPoolFactory;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.*;
@@ -70,5 +73,14 @@ public class MqttFactory {
     public static void disconnect(String clientId) {
         MqttPoolFactory.removeMqttContext(clientId);
         logger.warn("client: " + clientId+ " disconnect is success");
+    }
+
+    public static boolean auth(String client, String account, String password) {
+        String systemAccount = PropKit.get(ConstEnums.MQTT.ACCOUNT.getValue());
+        String systemPwd = PropKit.get(ConstEnums.MQTT.PASSWORD.getValue());
+        if (!systemAccount.equals(account) || !systemPwd.equals(password)) {
+            throw new SecurityException(client+ " access is not allowed");
+        }
+        return true;
     }
 }
