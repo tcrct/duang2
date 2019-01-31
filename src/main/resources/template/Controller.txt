@@ -1,12 +1,17 @@
 package ${basePackage}.controller.${entityPackageName};
 
-import com.duangframework.mvc.annotation.Controller;
-import com.duangframework.mvc.annotation.Import;
-import com.duangframework.mvc.annotation.Mapping;
+import com.duangframework.mvc.annotation.*;
 import com.duangframework.mvc.core.BaseController;
+import com.duangframework.vtor.annotation.*;
 import ${entityClassName};
 import ${basePackage}.service.${entityPackageName}.${entityName}Service;
 
+/**
+ *  ${entityName} 控制层
+ *
+ * @author
+ * @Date ${currentTime}
+ */
 @Controller
 @Mapping(value = "${controllerMappingValue}", desc = "${controllerMappingDesc}")
 public class ${entityName}Controller extends BaseController {
@@ -14,10 +19,41 @@ public class ${entityName}Controller extends BaseController {
     @Import
     private ${entityName}Service ${entityVarName}Service;
 
-    @Mapping(value = "/insert", desc = "新增")
-    public void insert(${entityName} ${entityVarName}) {
+    /**
+     *  新增或编辑后，保存${entityName}对象
+     *  根据${entityName}对象中的id字符进行判断执行insert或update
+     * @param ${entityVarName} 实体对象
+     */
+    @Mapping(value = "/save", desc = "保存")
+    public void save(${entityName} ${entityVarName}) {
         try {
-            returnSuccessJson(${entityVarName}Service.insert(${entityVarName}));
+            returnSuccessJson(${entityVarName}Service.save(${${entityVarName}}));
+        } catch (Exception e) {
+            returnFailJson(e);
+        }
+    }
+
+    /**
+     *  根据ID删除一条记录
+     * @param id    符合DuangId规则的字符串
+     */
+    @Mapping(value = "/delete", desc = "删除")
+    public void deleteById(@DuangId String id) {
+        try {
+            returnSuccessJson(${entityVarName}Service.deleteById(id));
+        } catch (Exception e) {
+            returnFailJson(e);
+        }
+    }
+
+    /**
+     *  根据ID查找一条记录
+     * @param id    符合DuangId规则的字符串
+     */
+    @Mapping(value = "/findbyid", desc = "查找")
+    public void findById(@DuangId String id) {
+        try {
+            returnSuccessJson(${entityVarName}Service.findById(id));
         } catch (Exception e) {
             returnFailJson(e);
         }

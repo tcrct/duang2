@@ -75,6 +75,7 @@ public class GenerateCode {
             model.setControllerMappingDesc(controllerMappingDesc);
             model.setEntityPackageName(model.getEntityName().toLowerCase());
             model.setEntityClassName(entityClass.getName());
+            model.setCurrentTime(ToolsKit.getCurrentDateString());
 
             AbstractGenerateCode controllerGenerateCode = new ControllerGenerateCode(model);
             AbstractGenerateCode serviceGenerateCode = new ServiceGenerateCode(model);

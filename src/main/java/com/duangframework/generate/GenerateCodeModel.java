@@ -1,6 +1,7 @@
 package com.duangframework.generate;
 
 import com.duangframework.db.IdEntity;
+import com.duangframework.kit.ToolsKit;
 
 public class GenerateCodeModel {
 
@@ -24,6 +25,8 @@ public class GenerateCodeModel {
 
     private String controllerMappingValue;
     private String controllerMappingDesc;
+
+    private String currentTime = ToolsKit.getCurrentDateString();
 
     public GenerateCodeModel() {
     }
@@ -128,5 +131,13 @@ public class GenerateCodeModel {
 
     public void setEntityClassName(String entityClassName) {
         this.entityClassName = entityClassName;
+    }
+
+    public String getCurrentTime() {
+        return currentTime;
+    }
+
+    public void setCurrentTime(String currentTime) {
+        this.currentTime = currentTime;
     }
 }
