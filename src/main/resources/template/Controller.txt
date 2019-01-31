@@ -1,0 +1,26 @@
+package ${basePackage}.controller.${entityPackageName};
+
+import com.duangframework.mvc.annotation.Controller;
+import com.duangframework.mvc.annotation.Import;
+import com.duangframework.mvc.annotation.Mapping;
+import com.duangframework.mvc.core.BaseController;
+import ${entityClassName};
+import ${basePackage}.service.${entityPackageName}.${entityName}Service;
+
+@Controller
+@Mapping(value = "${controllerMappingValue}", desc = "${controllerMappingDesc}")
+public class ${entityName}Controller extends BaseController {
+
+    @Import
+    private ${entityName}Service ${entityVarName}Service;
+
+    @Mapping(value = "/insert", desc = "新增")
+    public void insert(${entityName} ${entityVarName}) {
+        try {
+            returnSuccessJson(${entityVarName}Service.insert(${entityVarName}));
+        } catch (Exception e) {
+            returnFailJson(e);
+        }
+    }
+
+}

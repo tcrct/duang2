@@ -4,16 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ValidatorException;
-import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.ApiDto;
-import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.DataType;
-import com.duangframework.utils.GenericsUtils;
 import com.duangframework.utils.TypeConverter;
 import com.duangframework.vtor.annotation.VtorKit;
 import com.duangframework.vtor.core.VtorFactory;
@@ -230,7 +227,7 @@ public class ParameterInvokeMethod {
         // 如果Bean的话，无需在参数添加注解，遍历bean里的field进行判断是否需要验证
         try {
             if(isBean&& ToolsKit.isNotEmpty(entity)) {VtorKit.validate(entity);}
-            
+
         } catch (Exception e) {
             throw new ValidatorException(e.getMessage(), e);
         }
