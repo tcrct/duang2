@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 public abstract class AbstractNettyServer implements IServer {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractNettyServer.class);
-    protected SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    protected SimpleDateFormat sdf = new SimpleDateFormat(ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
 
     protected ServerBootstrap nettyBootstrap;
     protected BootStrap bootStrap;
@@ -51,10 +51,10 @@ public abstract class AbstractNettyServer implements IServer {
 
     private void init() {
         if(bootStrap.getPort()== 0){
-            throw new NettyStartUpException("Server Startup Fail: " + bootStrap.getPort() + " is not setting!");
+            throw new NettyStartUpException("server startup fail: " + bootStrap.getPort() + " is not setting!");
         }
         if(isUse()){
-            throw new NettyStartUpException("Server Startup Fail: " + bootStrap.getPort() + " is use!");
+            throw new NettyStartUpException("server startup fail: " + bootStrap.getPort() + " is use!");
         }
        // 添加ResourceLeakDetector，内存泄露检测
         if(EnvEnum.DEV.equals(bootStrap.getEnvModel())) {
