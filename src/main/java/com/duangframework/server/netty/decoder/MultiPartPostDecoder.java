@@ -11,7 +11,9 @@ import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.HttpPostMultipartRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.MixedAttribute;
+import io.netty.util.ReferenceCountUtil;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +48,14 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
                         if (fileUpload.isInMemory()) {
                             ByteBuf byteBuf = fileUpload.getByteBuf();
                             bytes = ByteBufUtil.getBytes(byteBuf);
+                            ReferenceCountUtil.release(byteBuf);
                         } else {
                             bytes = fileUpload.get();
                         }
                         if(null == bytes) {
                             throw new MvcException("MultiPartPostDecoder Is Fail :  bytes is null... " );
                         }
+//                        Arrays.copyOfRange(bytes, 0, bytes.length);
                         fileItem = new FileItem(fileUpload.getName(), fileUpload.getContentTransferEncoding(), fileUpload.getFilename(), fileUpload.getContentType(), bytes.length, bytes);
                         requestParamsMap.put(fileItem.getName(), fileItem);
                     }

@@ -57,7 +57,13 @@ public abstract class AbstractNettyServer implements IServer {
             throw new NettyStartUpException("Server Startup Fail: " + bootStrap.getPort() + " is use!");
         }
        // 添加ResourceLeakDetector，内存泄露检测
-        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
+        if(EnvEnum.DEV.equals(bootStrap.getEnvModel())) {
+            //对每一个对象都进行检测，并且打印内存泄露的地方，负载较高，适合测试模式
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+        } else{
+            //使用抽样检测的方式（抽样间隔为：samplingInterval），并且打印哪里发生了内存泄露
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
+        }
         nettyBootstrap = new ServerBootstrap();
         Group group = EpollEventLoopGroups.group(bootStrap);
         nettyBootstrap.group(group.getBoosMultithreadEventLoopGroup(), group.getWorkerMultithreadEventLoopGroup());
