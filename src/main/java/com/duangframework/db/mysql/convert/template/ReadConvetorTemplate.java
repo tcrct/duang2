@@ -47,7 +47,11 @@ public class ReadConvetorTemplate extends AbstractConvetorTemplate {
         kvModle.getQueryKvItem().iterator().forEachRemaining(new Consumer<KvItem>() {
             @Override
             public void accept(KvItem kvItem) {
-                selectSql.append(kvItem.getKey()).append("=?").append(AND_FIELD);
+                selectSql.append(kvItem.getKey())
+                        .append(EMPTY_SPACE)
+                        .append(kvItem.getOperator())
+                        .append(EMPTY_SPACE)
+                        .append("?").append(AND_FIELD);
             }
         });
         selectSql.delete(selectSql.length()-4, selectSql.length());
@@ -56,7 +60,7 @@ public class ReadConvetorTemplate extends AbstractConvetorTemplate {
 
     @Override
     protected Object[] params(KvModle kvModle) {
-        List params = new ArrayList(kvModle.getUpdateKvItem().size());
+        List params = new ArrayList();
         params.addAll(getParamsList(kvModle.getQueryKvItem()));
         return params.toArray();
     }

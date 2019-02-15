@@ -81,6 +81,24 @@ public abstract  class AbstractGenerateCode {
     protected abstract String build();
     protected abstract File file();
 
+    protected File getFile(String type) {
+        String packagePath = model.getBasePackage()+ ".generate";
+        packagePath = packagePath.replace(".", File.separator);
+        String path = model.getSourceDirPath()+File.separator+ packagePath+File.separator+ model.getEntityName() + type + ".java";
+        return new File(path);
+    }
+
+    protected String getSourceCode(String sourctCode) {
+        if(replaceValueMap.isEmpty()){
+            return "";
+        }
+        for(Iterator<Map.Entry<String,String>> iterator = replaceValueMap.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry<String,String> entry = iterator.next();
+            sourctCode = sourctCode.replace(entry.getKey(), entry.getValue());
+        }
+        return sourctCode;
+    }
+
     public void generate() {
         String descText = build();
         System.out.println(descText);

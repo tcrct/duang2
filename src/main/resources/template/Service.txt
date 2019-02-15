@@ -1,0 +1,80 @@
+package ${basePackage}.service;
+
+import com.duangframework.db.IdEntity;
+import com.duangframework.db.common.Query;
+import com.duangframework.db.common.Update;
+import com.duangframework.db.mongodb.common.MongoDao;
+import com.duangframework.exception.ServiceException;
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Import;
+import com.duangframework.mvc.annotation.Service;
+import com.duangframework.utils.DuangId;
+import com.duangframework.vtor.annotation.VtorKit;
+import ${entityClassName};
+
+/**
+ *  ${entityName} 业务层
+ *
+ * @author
+ * @Date ${currentTime}
+ */
+@Service
+public class UserService {
+
+    @Import
+    private MongoDao<${entityName}> ${entityVarName}Dao;
+
+    /**
+     * 保存${entityName}对象
+     * @param ${entityVarName}  ${entityName}对象
+     * @return  保存成功返回${entityName}对象， 否则抛出异常
+     */
+    public User save(${entityName} ${entityVarName}) {
+        try {
+            VtorKit.validate(${entityVarName});
+            return ${entityVarName}Dao.save(${entityVarName});
+        } catch (Exception e) {
+            throw new ServiceException("save ${entityName} is fail: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     *  根据ID删除${entityName}对象记录
+     * @param id    ${entityName}对象id字段值
+     * @return  删除成功返回true, 否则抛出异常
+     */
+    public boolean deleteById(String id) {
+        if(!ToolsKit.isValidDuangId(id)) {
+            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
+        }
+        try {
+            Query query = new Query();
+            query.eq(IdEntity.ID_FIELD, new DuangId(id));
+            Update update = new Update();
+            update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
+            ${entityVarName}Dao.update(query, update);
+            return true;
+        } catch (Exception e) {
+            throw new ServiceException("deleteById for ${entityName} is fail: "+ e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 根据id查找${entityName}对象记录
+     * @param id    ${entityName}对象id字段值
+     * @return 查找成功返回${entityName}对象, 否则抛出异常
+     */
+    public User findById(String id) {
+        if(!ToolsKit.isValidDuangId(id)) {
+            throw new ServiceException("findById for ${entityName} is fail: id is not DuangId");
+        }
+        try {
+            Query query = new Query();
+            query.eq(IdEntity.ID_FIELD, new DuangId(id));
+            return ${entityVarName}Dao.findOne(query);
+        } catch (Exception e) {
+            throw new ServiceException("findById for ${entityName} is fail: "+ e.getMessage(), e);
+        }
+    }
+
+}

@@ -71,11 +71,11 @@ public class GenerateCode {
             model.setEntityClass(entityClass);
             model.setEntityName(entityClass.getSimpleName());
             model.setEntityVarName(model.getEntityName().substring(0, 1).toLowerCase() + model.getEntityName().substring(1));
-            model.setControllerMappingValue(controllerMappingValue);
-            model.setControllerMappingDesc(controllerMappingDesc);
             model.setEntityPackageName(model.getEntityName().toLowerCase());
             model.setEntityClassName(entityClass.getName());
             model.setCurrentTime(ToolsKit.getCurrentDateString());
+            model.setControllerMappingValue(ToolsKit.isEmpty(controllerMappingValue)? "/"+model.getEntityVarName():controllerMappingValue);
+            model.setControllerMappingDesc(ToolsKit.isEmpty(controllerMappingDesc)?model.getEntityName():controllerMappingDesc);
 
             AbstractGenerateCode controllerGenerateCode = new ControllerGenerateCode(model);
             AbstractGenerateCode serviceGenerateCode = new ServiceGenerateCode(model);

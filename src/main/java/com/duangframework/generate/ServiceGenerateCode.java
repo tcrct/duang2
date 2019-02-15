@@ -1,6 +1,8 @@
 package com.duangframework.generate;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ServiceGenerateCode extends AbstractGenerateCode {
 
@@ -11,19 +13,11 @@ public class ServiceGenerateCode extends AbstractGenerateCode {
     @Override
     protected String build() {
         String sourctCode = templateMap.get(SERVICE_FIDLE);
-//        String descCode = sourctCode.replace("${entityClassName}", model.getEntityClass().getName())
-//                .replace("${entityName}", entityName)
-//                .replace("${entityVarName}", entityVarName)
-//                .replace("${entityPackageName}", entityName.toLowerCase())
-//                .replace("${basePackage}", basePackage)
-//                .replace("${subPackage}", subPackage)
-//                .replace("${controllerMappingValue}", controllerMappingValue)
-//                .replace("${controllerMappingDesc}", controllerMappingDesc);
-        return"";
+        return getSourceCode(sourctCode);
     }
 
     @Override
     protected File file() {
-        return null;
+        return getFile(SERVICE_FIDLE);
     }
 }

@@ -1,10 +1,17 @@
 package com.duangframework.db.convetor;
 
+
+import com.duangframework.db.mongodb.common.Operator;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.utils.DuangId;
+import com.mongodb.DBObject;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -48,6 +55,17 @@ public abstract class AbstractConvetorTemplate {
                 Object value = kvItem.getValue();
                 if(value instanceof DuangId || value instanceof ObjectId) {
                     value = value.toString();
+                }
+                if(value instanceof DBObject || value instanceof Document) {
+                    Map dboMap = ((DBObject)value).toMap();
+                    if(ToolsKit.isNotEmpty(dboMap)) {
+                        for (Iterator<Map.Entry<String, Object>> iterator = dboMap.entrySet().iterator(); iterator.hasNext(); ) {
+                            Map.Entry<String, Object> entry = iterator.next();
+                            if (Operator.REGEX.equalsIgnoreCase(entry.getKey())) {
+                                value = entry.getValue().toString().replace(".*", "%");
+                            }
+                        }
+                    }
                 }
                 params.add(value);
             }

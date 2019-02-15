@@ -1,15 +1,15 @@
-package ${basePackage}.controller.${entityPackageName};
+package ${basePackage}.controller;
 
 import com.duangframework.mvc.annotation.*;
 import com.duangframework.mvc.core.BaseController;
 import com.duangframework.vtor.annotation.*;
 import ${entityClassName};
-import ${basePackage}.service.${entityPackageName}.${entityName}Service;
+import ${basePackage}.service.${entityName}Service;
 
 /**
  *  ${entityName} 控制层
  *
- * @author
+ * @author duang
  * @Date ${currentTime}
  */
 @Controller
@@ -27,7 +27,7 @@ public class ${entityName}Controller extends BaseController {
     @Mapping(value = "/save", desc = "保存")
     public void save(${entityName} ${entityVarName}) {
         try {
-            returnSuccessJson(${entityVarName}Service.save(${${entityVarName}}));
+            returnSuccessJson(${entityVarName}Service.save(${entityVarName}));
         } catch (Exception e) {
             returnFailJson(e);
         }
