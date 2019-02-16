@@ -94,6 +94,9 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
         }
 
         public RedisAdapter build() {
+            if(ToolsKit.isEmpty(id)) {
+                id = MD5.MD5Encode(toString());
+            }
             return new RedisAdapter(id, database, host, username, password, port, timeout, url, isDefault);
         }
     }
@@ -151,7 +154,7 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
 
     @Override
     public String getId() {
-        return ToolsKit.isEmpty(id) ? MD5.MD5Encode(toString()) : id;
+        return id;
     }
 
     @Override

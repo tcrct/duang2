@@ -31,7 +31,7 @@ public class EhCacheAdapter extends AbstractCacheSource<ResourcePoolsBuilder> im
 
     @Override
     public String getId() {
-        return ToolsKit.isEmpty(alias) ?  MD5.MD5Encode(toString()) : alias;
+        return alias;
     }
 
     @Override
@@ -67,6 +67,9 @@ public class EhCacheAdapter extends AbstractCacheSource<ResourcePoolsBuilder> im
         }
 
         public EhCacheAdapter build() {
+            if(ToolsKit.isEmpty(alias)) {
+                alias = MD5.MD5Encode(toString());
+            }
             return new EhCacheAdapter(alias, heap);
         }
     }

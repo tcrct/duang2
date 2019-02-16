@@ -156,8 +156,10 @@ public final class ClassKit {
     public static String getEntityName(Class<?> cls, boolean isLowerCase) {
         Entity entity = cls.getAnnotation(Entity.class);
         // TODO 兼容Duang2.0版的Entity
-
-        String name= ( null == entity )? getClassSimpleName(cls, isLowerCase) : entity.name();
+        String name =  getClassSimpleName(cls, isLowerCase);
+        if(null != entity && ToolsKit.isNotEmpty(entity.name())) {
+            name = entity.name();
+        }
         return isLowerCase ? name.toLowerCase() : name;
     }
 
