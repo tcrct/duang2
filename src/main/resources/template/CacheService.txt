@@ -1,0 +1,62 @@
+package ${basePackage}.cache;
+
+import com.duangframework.cache.CacheManager;
+import com.duangframework.cache.CacheModelOptions;
+import com.duangframework.exception.ServiceException;
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Service;
+import com.duangframework.vtor.annotation.VtorKit;
+import ${basePackage}.cache.enums.${entityName}KeyCacheEnum;
+import ${entityClassName};
+
+/**
+*   ${entityName} 缓存层
+ *
+ * @author
+ * @Date ${currentTime}
+ */
+@Service
+public class ${entityName}CacheService {
+
+    /**
+     * 保存${entityName}对象到Redis缓存
+     * @param user  ${entityName}对象，须有id值
+     */
+    public void save(${entityName} ${entityVarName}) {
+        try {
+            VtorKit.validate(${entityVarName});
+            CacheManager.getRedisClient().set(
+                    new CacheModelOptions.Builder(${entityName}CacheKeyEnum.${entityUpperCaseName}).customKey(user.getId()).builder(),
+                    ${entityVarName});
+        } catch (Exception e) {
+            throw new ServiceException("save ${entityName} is fail: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 根据ID查找缓存里的${entityName}对象
+     * @param id   ${entityName}对象id字段值
+     * @return 查找成功返回${entityName}对象
+     */
+    public ${entityName} findById(String id) {
+        if(!ToolsKit.isValidDuangId(id)) {
+            throw new ServiceException("findById for ${entityName} is fail: id is not DuangId");
+        }
+        return CacheManager.getRedisClient().get(
+                new CacheModelOptions.Builder(${entityName}CacheKeyEnum.${entityUpperCaseName}).customKey(id).builder(),
+                ${entityName}.class);
+    }
+
+    /**
+     * 根据ID删除缓存里的${entityName}对象
+     * @param id    ${entityName}对象id字段值
+     * @return  删除成功返回true
+     */
+    public boolean deleteById(String id) {
+        if(!ToolsKit.isValidDuangId(id)) {
+            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
+        }
+        return 0 != CacheManager.getRedisClient().del(id);
+    }
+
+}

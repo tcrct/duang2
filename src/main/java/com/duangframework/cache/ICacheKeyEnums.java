@@ -7,13 +7,15 @@ package com.duangframework.cache;
  */
 public interface ICacheKeyEnums {
 
+    int DEFAULT_TTL = 60*30*1000;
+
     /**
      *取出缓存Key的前缀
      */
     String getKeyPrefix();
 
     /**
-     * 取出缓存Key的有效时间
+     * 取出缓存Key的有效时间,毫秒
      * @return
      */
     int getKeyTTL();

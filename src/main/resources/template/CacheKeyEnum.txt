@@ -1,0 +1,42 @@
+package ${basePackage}.cache.enums;
+
+import com.duangframework.cache.ICacheKeyEnums;
+
+/**
+ * ${entityName}对象缓存Key枚举对象
+ * ICacheKeyEnums.DEFAULT_TTL 为30分钟
+ *
+ * @author
+ * @Date ${currentTime}
+ */
+public enum ${entityName}CacheKeyEnum implements ICacheKeyEnums {
+
+    ${entityUpperCaseName}("cache:${entityVarName}", ICacheKeyEnums.DEFAULT_TTL, "${entityName}对象缓存KEY前缀"),
+    ;
+
+
+    private final String prefix;
+    private final int ttl;
+    private final String desc;
+
+    ${entityName}CacheKeyEnum(String prefix , int ttl, String desc) {
+        this.prefix = prefix;
+        this.ttl = ttl;
+        this.desc = desc;
+    }
+
+    @Override
+    public String getKeyPrefix() {
+        return prefix;
+    }
+
+    @Override
+    public int getKeyTTL() {
+        return ttl;
+    }
+
+    @Override
+    public String getKeyDesc() {
+        return desc;
+    }
+}

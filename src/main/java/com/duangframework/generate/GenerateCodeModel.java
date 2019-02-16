@@ -19,6 +19,8 @@ public class GenerateCodeModel {
     private String entityName;
     // 实体类名称(首字母小写)
     private String entityVarName;
+    // 实体类名称(字母全大写)
+    private String entityUpperCaseName;
 
     private String entityPackageName;
     private String entityClassName;
@@ -43,6 +45,7 @@ public class GenerateCodeModel {
         this.controllerMappingDesc = controllerMappingDesc;
         this.entityPackageName = entityClass.getSimpleName().toLowerCase();
         this.entityClassName = entityClass.getName();
+        this.entityUpperCaseName = entityName.toUpperCase();
     }
 
     public String getSourceDirPath() {
@@ -139,5 +142,13 @@ public class GenerateCodeModel {
 
     public void setCurrentTime(String currentTime) {
         this.currentTime = currentTime;
+    }
+
+    public String getEntityUpperCaseName() {
+        return entityUpperCaseName;
+    }
+
+    public void setEntityUpperCaseName(String entityUpperCaseName) {
+        this.entityUpperCaseName = entityUpperCaseName;
     }
 }

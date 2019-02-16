@@ -23,9 +23,11 @@ import java.util.jar.JarFile;
 
 public abstract  class AbstractGenerateCode {
 
-    private static final String TEMPLATE_DIR_FIDLE= "template/";
-    protected static final String CONTROLLER_FIDLE= "Controller";
-    protected static final String SERVICE_FIDLE= "Service";
+    private static final String TEMPLATE_DIR_FIDLE = "template/";
+    protected static final String CONTROLLER_FIDLE = "Controller";
+    protected static final String SERVICE_FIDLE = "Service";
+    protected static final String CACHE_SERVICE_FIDLE = "CacheService";
+    protected static final String CACHE_KEY_ENUM_FIDLE = "CacheKeyEnum";
 
 
     protected static final Map<String, String> templateMap = new HashMap<>();

@@ -10,6 +10,7 @@ import com.duangframework.mvc.annotation.Import;
 import com.duangframework.mvc.annotation.Service;
 import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
+import ${basePackage}.cache.${entityName}CacheService;
 import ${entityClassName};
 
 /**
@@ -19,8 +20,10 @@ import ${entityClassName};
  * @Date ${currentTime}
  */
 @Service
-public class UserService {
+public class ${entityName}Service {
 
+    @Import
+    private ${entityName}CacheService ${entityVarName}CacheService;
     @Import
     private MongoDao<${entityName}> ${entityVarName}Dao;
 
@@ -32,30 +35,11 @@ public class UserService {
     public User save(${entityName} ${entityVarName}) {
         try {
             VtorKit.validate(${entityVarName});
-            return ${entityVarName}Dao.save(${entityVarName});
+            ${entityName} entity = ${entityVarName}Dao.save(${entityVarName});
+            ${entityVarName}CacheService.save(entity);
+            return entity;
         } catch (Exception e) {
             throw new ServiceException("save ${entityName} is fail: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     *  根据ID删除${entityName}对象记录
-     * @param id    ${entityName}对象id字段值
-     * @return  删除成功返回true, 否则抛出异常
-     */
-    public boolean deleteById(String id) {
-        if(!ToolsKit.isValidDuangId(id)) {
-            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
-        }
-        try {
-            Query query = new Query();
-            query.eq(IdEntity.ID_FIELD, new DuangId(id));
-            Update update = new Update();
-            update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
-            ${entityVarName}Dao.update(query, update);
-            return true;
-        } catch (Exception e) {
-            throw new ServiceException("deleteById for ${entityName} is fail: "+ e.getMessage(), e);
         }
     }
 
@@ -69,6 +53,10 @@ public class UserService {
             throw new ServiceException("findById for ${entityName} is fail: id is not DuangId");
         }
         try {
+            ${entityName} entity = ${entityVarName}CacheService.findById(id);
+            if(ToolsKit.isNotEmpty(entity)) {
+                return entity;
+            }
             Query query = new Query();
             query.eq(IdEntity.ID_FIELD, new DuangId(id));
             return ${entityVarName}Dao.findOne(query);
@@ -76,5 +64,27 @@ public class UserService {
             throw new ServiceException("findById for ${entityName} is fail: "+ e.getMessage(), e);
         }
     }
+
+    /**
+         *  根据ID删除${entityName}对象记录
+         * @param id    ${entityName}对象id字段值
+         * @return  删除成功返回true, 否则抛出异常
+         */
+        public boolean deleteById(String id) {
+            if(!ToolsKit.isValidDuangId(id)) {
+                throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
+            }
+            try {
+                Query query = new Query();
+                query.eq(IdEntity.ID_FIELD, new DuangId(id));
+                Update update = new Update();
+                update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
+                ${entityVarName}Dao.update(query, update);
+                ${entityVarName}CacheService.deleteById(id);
+                return true;
+            } catch (Exception e) {
+                throw new ServiceException("deleteById for ${entityName} is fail: "+ e.getMessage(), e);
+            }
+        }
 
 }

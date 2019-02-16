@@ -145,6 +145,7 @@ public enum ConstEnums {
         REDIS_PASSWORD("redis.password", "redis密码"),
         REDIS_PORT("redis.port", "redis端口"),
         REDIS_TIMEOUT("redis.timeout", "redis超时时间，秒作单位"),
+        REDIS_TTL("redis.ttl", "redis存活时间，毫秒作单位"),
 
         /** security*/
         SECURITY_URI_PREFIX("security.uri.prefix", "安全验证的URI前缀，左匹配方式"),

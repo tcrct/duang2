@@ -5,21 +5,8 @@ import com.duangframework.kit.PathKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import org.apache.commons.io.IOUtils;
-
-import java.io.InputStream;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class GenerateCode {
-
-
 
     public static class Builder {
         private String sourceDirPath;
@@ -76,11 +63,17 @@ public class GenerateCode {
             model.setCurrentTime(ToolsKit.getCurrentDateString());
             model.setControllerMappingValue(ToolsKit.isEmpty(controllerMappingValue)? "/"+model.getEntityVarName():controllerMappingValue);
             model.setControllerMappingDesc(ToolsKit.isEmpty(controllerMappingDesc)?model.getEntityName():controllerMappingDesc);
+            model.setEntityUpperCaseName(model.getEntityName().toUpperCase());
 
             AbstractGenerateCode controllerGenerateCode = new ControllerGenerateCode(model);
             AbstractGenerateCode serviceGenerateCode = new ServiceGenerateCode(model);
+            AbstractGenerateCode cacheServiceGenerateCode = new CacheServiceGenerateCode(model);
+            AbstractGenerateCode cacheKeyEnumGenerateCode = new CacheKeyEnumGenerateCode(model);
+
             controllerGenerateCode.generate();
             serviceGenerateCode.generate();
+            cacheServiceGenerateCode.generate();
+            cacheKeyEnumGenerateCode.generate();
         }
 
     }
