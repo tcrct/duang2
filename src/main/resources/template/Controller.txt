@@ -3,6 +3,7 @@ package ${basePackage}.controller;
 import com.duangframework.mvc.annotation.*;
 import com.duangframework.mvc.core.BaseController;
 import com.duangframework.vtor.annotation.*;
+import com.duangframework.mvc.dto.SearchListDto;
 import ${entityClassName};
 import ${basePackage}.service.${entityName}Service;
 

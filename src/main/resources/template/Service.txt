@@ -10,6 +10,7 @@ import com.duangframework.mvc.annotation.Import;
 import com.duangframework.mvc.annotation.Service;
 import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
+import com.duangframework.mvc.dto.SearchListDto;
 import ${basePackage}.cache.${entityName}CacheService;
 import ${entityClassName};
 
