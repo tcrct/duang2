@@ -161,9 +161,9 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
 //            public Boolean execute(Jedis jedis) {
 //                String result = "";
 //                if(value instanceof String){
-//                    result = jedis.set(options.getKey(), (String) value);
+//                    result = jedis.set(options.getField(), (String) value);
 //                }else{
-//                    result = jedis.set(SafeEncoder.encode(options.getKey()), SerializableUtils.serialize(value));
+//                    result = jedis.set(SafeEncoder.encode(options.getField()), SerializableUtils.serialize(value));
 //                }
 //                return "OK".equalsIgnoreCase(result);
 //            }
@@ -810,7 +810,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
     }
 
     /**
-     * 返回名称为options.getKey()的zset中score>=min且score<=max结果之间的区间数据 <br/>
+     * 返回名称为options.getField()的zset中score>=min且score<=max结果之间的区间数据 <br/>
      *  offset, count就相当于sql中limit的用法 <br/>
      *  select * from table where score >=min and score <=max limit offset count
      *

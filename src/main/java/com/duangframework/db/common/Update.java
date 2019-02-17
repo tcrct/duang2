@@ -102,9 +102,9 @@ public class Update<T> {
 //			Entry<String,Object> entry = it.next();
 //			Object value = entry.getValue();
 //			 if (value instanceof DBObject || value instanceof BasicDBObject) {
-//				 values.put(entry.getKey(),entry.getValue());
+//				 values.put(entry.getField(),entry.getValue());
 //			} else {
-//				values.put(entry.getKey(), MongoUtils.toBson(value));
+//				values.put(entry.getField(), MongoUtils.toBson(value));
 //			}
 //		}
 //		DBObject dbo = new BasicDBObject(values);

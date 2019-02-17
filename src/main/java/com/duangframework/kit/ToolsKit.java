@@ -7,13 +7,11 @@ import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.db.annotation.ConvertField;
+import com.duangframework.db.common.Query;
 import com.duangframework.exception.IException;
 import com.duangframework.mvc.annotation.Bean;
-import com.duangframework.mvc.dto.HeadDto;
-import com.duangframework.mvc.dto.ReturnDto;
-import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.mvc.dto.*;
 import com.duangframework.utils.*;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -483,5 +481,50 @@ public final class ToolsKit {
         return Encodes.encodeHex(hashKey);
     }
 
+    /**
+     * 将搜索对象转换为查询对象
+     * @param searchListDto
+     * @return
+     */
+    public static Query searchDto2Query(SearchListDto searchListDto) {
+        Query query = new Query();
+        int pageNo = searchListDto.getPageNo();
+        if(pageNo == 1) {pageNo = 0;}
+        query.page(new PageDto(pageNo, searchListDto.getPageSize()));
+        List<SearchDto> searchDtoList = searchListDto.getSearchDtos();
+        if(ToolsKit.isNotEmpty(searchDtoList)) {
+            for(SearchDto searchDto : searchDtoList) {
+                String field = searchDto.getField();
+                String operator = ToolsKit.isEmpty(searchDto.getOperator()) ? "==" : searchDto.getOperator();
+                Object value = searchDto.getValue();
+                if (ToolsKit.isNotEmpty(field) && ToolsKit.isNotEmpty(value)) {
+                    switch (operator) {
+                        case "!=":
+                            query.ne(field, value);
+                            break;
+                        case ">":
+                            query.gt(field, value);
+                            break;
+                        case ">=":
+                            query.gte(field, value);
+                            break;
+                        case "<":
+                            query.lt(field, value);
+                            break;
+                        case "<=":
+                            query.lte(field, value);
+                            break;
+                        case "like":
+                            query.like(field, value);
+                            break;
+                        default:
+                            query.eq(field, value);
+                            break;
+                    }
+                }
+            }
+        }
+        return query;
+    }
 
 }

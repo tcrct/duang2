@@ -458,7 +458,7 @@ public abstract class BaseController {
                             ApiDto apiDto = new ApiDto();
                             if (null != tokenid) {
                                 request.setAttribute(ReturnDto.TOKENID_FIELD, tokenid);
-                                apiDto.setTokenid(tokenid);
+                                apiDto.setTokenId(tokenid);
                             }
                             if(null != dataJson) {
                                 apiDto.setData(ToolsKit.jsonParseObject(dataJson, genTypeClass));

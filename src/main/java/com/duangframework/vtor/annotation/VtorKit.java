@@ -1,5 +1,6 @@
 package com.duangframework.vtor.annotation;
 
+import com.duangframework.db.annotation.Entity;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.db.IdEntity;
 import com.duangframework.vtor.core.VtorFactory;
@@ -23,7 +24,7 @@ public class VtorKit {
      */
     public static <T> T validate(T obj) throws Exception{
 
-        if(obj instanceof IdEntity || obj instanceof java.io.Serializable || obj.getClass().isAnnotationPresent(Bean.class)) {
+        if(obj instanceof IdEntity || obj instanceof java.io.Serializable || obj.getClass().isAnnotationPresent(Bean.class) || obj.getClass().isAnnotationPresent(Entity.class)) {
             VtorFactory.validator(obj);
         } else if(obj instanceof Map){
             VtorFactory.validator((Map)obj);

@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface Pattern {
 
-    String regexp() default "*";
+    String regexp() default ".*";
 
     String message() default "验证不通过";
 

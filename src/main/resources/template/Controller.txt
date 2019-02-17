@@ -10,6 +10,7 @@ import ${basePackage}.service.${entityName}Service;
  *  ${entityName} 控制层
  *
  * @author duang
+ * @since 1.0
  * @Date ${currentTime}
  */
 @Controller
@@ -23,6 +24,7 @@ public class ${entityName}Controller extends BaseController {
      *  新增或编辑后，保存${entityName}对象
      *  根据${entityName}对象中的id字符进行判断执行insert或update
      * @param ${entityVarName} 实体对象
+     * @since 1.0
      */
     @Mapping(value = "/save", desc = "保存")
     public void save(${entityName} ${entityVarName}) {
@@ -36,8 +38,9 @@ public class ${entityName}Controller extends BaseController {
     /**
      *  根据ID删除一条记录
      * @param id    符合DuangId规则的字符串
+     * @since 1.0
      */
-    @Mapping(value = "/delete", desc = "删除")
+    @Mapping(value = "/deletebyid", desc = "删除")
     public void deleteById(@DuangId String id) {
         try {
             returnSuccessJson(${entityVarName}Service.deleteById(id));
@@ -49,6 +52,7 @@ public class ${entityName}Controller extends BaseController {
     /**
      *  根据ID查找一条记录
      * @param id    符合DuangId规则的字符串
+     * @since 1.0
      */
     @Mapping(value = "/findbyid", desc = "查找")
     public void findById(@DuangId String id) {
@@ -59,4 +63,16 @@ public class ${entityName}Controller extends BaseController {
         }
     }
 
+  /**
+     *  根据搜索对象查询记录集合
+     * @param searchListDto    搜索对象
+     */
+    @Mapping(value = "/search", desc = "搜索")
+    public void search(SearchListDto searchListDto) {
+        try {
+            returnSuccessJson(${entityVarName}Service.search(searchListDto));
+        } catch (Exception e) {
+            returnFailJson(e);
+        }
+    }
 }

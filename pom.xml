@@ -20,7 +20,7 @@
         <netty.version>4.1.21.Final</netty.version>
         <cglib.version>3.1</cglib.version>
         <configuration.version>1.10</configuration.version>
-        <mongodb.version>3.6.0</mongodb.version>
+        <mongodb.version>3.10.1</mongodb.version>
         <druid.version>1.0.29</druid.version>
         <mysql.version>5.1.44</mysql.version>
         <jedis.version>2.9.0</jedis.version>

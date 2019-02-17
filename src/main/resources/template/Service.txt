@@ -17,6 +17,7 @@ import ${entityClassName};
  *  ${entityName} 业务层
  *
  * @author
+ * @since 1.0
  * @Date ${currentTime}
  */
 @Service
@@ -30,6 +31,7 @@ public class ${entityName}Service {
     /**
      * 保存${entityName}对象
      * @param ${entityVarName}  ${entityName}对象
+     * @since 1.0
      * @return  保存成功返回${entityName}对象， 否则抛出异常
      */
     public User save(${entityName} ${entityVarName}) {
@@ -46,6 +48,7 @@ public class ${entityName}Service {
     /**
      * 根据id查找${entityName}对象记录
      * @param id    ${entityName}对象id字段值
+     * @since 1.0
      * @return 查找成功返回${entityName}对象, 否则抛出异常
      */
     public User findById(String id) {
@@ -66,25 +69,43 @@ public class ${entityName}Service {
     }
 
     /**
-         *  根据ID删除${entityName}对象记录
-         * @param id    ${entityName}对象id字段值
-         * @return  删除成功返回true, 否则抛出异常
-         */
-        public boolean deleteById(String id) {
-            if(!ToolsKit.isValidDuangId(id)) {
-                throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
-            }
-            try {
-                Query query = new Query();
-                query.eq(IdEntity.ID_FIELD, new DuangId(id));
-                Update update = new Update();
-                update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
-                ${entityVarName}Dao.update(query, update);
-                ${entityVarName}CacheService.deleteById(id);
-                return true;
-            } catch (Exception e) {
-                throw new ServiceException("deleteById for ${entityName} is fail: "+ e.getMessage(), e);
-            }
+     *  根据ID删除${entityName}对象记录
+     * @param id    ${entityName}对象id字段值
+     * @since 1.0
+     * @return  删除成功返回true, 否则抛出异常
+     */
+    public boolean deleteById(String id) {
+        if(!ToolsKit.isValidDuangId(id)) {
+            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
         }
+        try {
+            Query query = new Query();
+            query.eq(IdEntity.ID_FIELD, new DuangId(id));
+            Update update = new Update();
+            update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
+            ${entityVarName}Dao.update(query, update);
+            ${entityVarName}CacheService.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            throw new ServiceException("deleteById for ${entityName} is fail: "+ e.getMessage(), e);
+        }
+    }
+
+     /**
+     * 根据搜索对象搜索符合条件的User对象记录
+     * @param searchListDto     搜索对象
+     * @return
+     */
+    public PageDto<${entityName}> search(SearchListDto searchListDto) {
+        if(ToolsKit.isEmpty(searchListDto)) {
+            throw new ServiceException("searchListDto is null");
+        }
+        try {
+            return ${entityVarName}Dao.findPage(ToolsKit.searchDto2Query(searchListDto));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException("search for ${entityName} is fail: "+ e.getMessage(), e);
+        }
+    }
 
 }

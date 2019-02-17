@@ -1,6 +1,7 @@
 package com.duangframework.vtor.core;
 
 
+import com.duangframework.db.annotation.Entity;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.PropKit;
@@ -8,6 +9,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.scan.ScanClassFactory;
+import com.duangframework.utils.DataType;
 import com.duangframework.vtor.core.template.AbstractValidatorTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +60,7 @@ public final class VtorFactory {
 
 	/**
 	 * List, Set集合验证
-	 * 集合里的元素必须实现了java.io.Serializable接口 且  设置了@VtorBean注解
+	 * 集合里的元素必须实现了java.io.Serializable接口 且  设置了@Bean注解
 	 * @param beanCollections
 	 * @throws Exception
 	 */
@@ -69,7 +71,7 @@ public final class VtorFactory {
 		init();
 		boolean isValidator = false;
 		for(Object item : beanCollections) {
-			if(item instanceof  Serializable || item.getClass().isAnnotationPresent(Bean.class)) {
+			if(isValidatorObj(item)) {
 				isValidator = true;
 				validator(item);
 			}
@@ -92,7 +94,7 @@ public final class VtorFactory {
 		for(Iterator<Map.Entry<String, Object>> iterator = beanMap.entrySet().iterator(); iterator.hasNext();) {
 			Map.Entry<String, Object> entry = iterator.next();
 			Object item = entry.getValue();
-			if(item instanceof Serializable || item.getClass().isAnnotationPresent(Bean.class)) {
+			if(isValidatorObj(item)) {
 				isValidator =true;
 				validator(item);
 			}
@@ -102,6 +104,10 @@ public final class VtorFactory {
 
 	private static void loggerInfo() {
 		logger.warn("框架并没进行注解验证，请注意对象或集合元素是否实现[ java.io.Serializable ]接口及设置了[ @Bean ]注解");
+	}
+
+	private static boolean isValidatorObj(Object item) {
+		return item instanceof  Serializable || item.getClass().isAnnotationPresent(Bean.class) || item.getClass().isAnnotationPresent(Entity.class);
 	}
 
     /**
@@ -120,20 +126,32 @@ public final class VtorFactory {
         boolean isValidatorBean = false;
         for(int i=0; i<fields.length; i++){
             Field field = fields[i];
-            Annotation[] annotationArray = field.getAnnotations();
-            if(ToolsKit.isEmpty(annotationArray)) {
-            	return;
+            Class<?> typeClass = field.getType();
+			if(DataType.isListType(typeClass) || DataType.isSetType(typeClass)) {
+				Collection collection = (Collection)ObjectKit.getFieldValue(bean, field);
+				validator(collection);
+				isValidatorBean = true;
 			}
-            for(Annotation annotation : annotationArray) {
-            	// 如果在验证处理器集合包含了该验证注解则进行验证，并将该bena添加到map缓存，以便再次使用时直接取出字段属性进行验证
-                if(VALIDATOR_HANDLE_MAP.containsKey(annotation.annotationType())) {
-                    Object fieldValue = ObjectKit.getFieldValue(bean, field);
-                    Class<?> fieldType = field.getType();
-                    String fieldName = field.getName();
-                    validator(annotation, fieldType, fieldName, fieldValue);
-                    isValidatorBean = true;
-                }
-            }
+			else if(DataType.isMapType(typeClass)) {
+				Map map = (Map)ObjectKit.getFieldValue(bean, field);
+				validator(map);
+				isValidatorBean = true;
+			} else {
+				Annotation[] annotationArray = field.getAnnotations();
+				if (ToolsKit.isEmpty(annotationArray)) {
+					continue;
+				}
+				for (Annotation annotation : annotationArray) {
+					// 如果在验证处理器集合包含了该验证注解则进行验证，并将该bena添加到map缓存，以便再次使用时直接取出字段属性进行验证
+					if (VALIDATOR_HANDLE_MAP.containsKey(annotation.annotationType())) {
+						Object fieldValue = ObjectKit.getFieldValue(bean, field);
+						Class<?> fieldType = field.getType();
+						String fieldName = field.getName();
+						validator(annotation, fieldType, fieldName, fieldValue);
+						isValidatorBean = true;
+					}
+				}
+			}
         }
         // 添加到集合
         if(isValidatorBean){

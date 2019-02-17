@@ -17,7 +17,7 @@ public class ControllerGenerateCode extends AbstractGenerateCode {
 //        }
 //        for(Iterator<Map.Entry<String,String>> iterator = replaceValueMap.entrySet().iterator(); iterator.hasNext();) {
 //            Map.Entry<String,String> entry = iterator.next();
-//            sourctCode = sourctCode.replace(entry.getKey(), entry.getValue());
+//            sourctCode = sourctCode.replace(entry.getField(), entry.getValue());
 //        }
 //        return sourctCode;
     }

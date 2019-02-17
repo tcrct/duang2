@@ -7,6 +7,7 @@ import com.duangframework.cache.ICacheKeyEnums;
  * ICacheKeyEnums.DEFAULT_TTL 为30分钟
  *
  * @author
+ * @since 1.0
  * @Date ${currentTime}
  */
 public enum ${entityName}CacheKeyEnum implements ICacheKeyEnums {

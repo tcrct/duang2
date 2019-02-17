@@ -41,6 +41,7 @@ public class Query<T> {
         queryObj = new LinkedHashMap();
         orderObj = new Order();
         fieldObj = new Field();
+        hintObj = new LinkedHashMap();
         pageObj = new PageDto<T>(0, 1);
     }
 

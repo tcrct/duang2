@@ -13,6 +13,7 @@ import ${entityClassName};
 *   ${entityName} 缓存层
  *
  * @author
+ * @since 1.0
  * @Date ${currentTime}
  */
 @Service
@@ -36,6 +37,7 @@ public class ${entityName}CacheService {
     /**
      * 根据ID查找缓存里的${entityName}对象
      * @param id   ${entityName}对象id字段值
+     * @since 1.0
      * @return 查找成功返回${entityName}对象
      */
     public ${entityName} findById(String id) {
@@ -50,13 +52,14 @@ public class ${entityName}CacheService {
     /**
      * 根据ID删除缓存里的${entityName}对象
      * @param id    ${entityName}对象id字段值
+     * @since 1.0
      * @return  删除成功返回true
      */
     public boolean deleteById(String id) {
         if(!ToolsKit.isValidDuangId(id)) {
             throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
         }
-        return 0 != CacheManager.getRedisClient().del(id);
+        CacheModelOptions options = new CacheModelOptions.Builder(UserCacheKeyEnum.USER).customKey(id).builder();
+        return 0 != CacheManager.getRedisClient().del(options.getKey());
     }
-
 }

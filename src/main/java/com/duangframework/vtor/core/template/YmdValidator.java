@@ -9,7 +9,7 @@ import com.duangframework.vtor.annotation.Ymd;
 import java.lang.annotation.Annotation;
 
 /**
- * html转义验证处理器 ???
+ * 日期验证处理器
  * @author Created by laotang
  * @date createed in 2018/6/30.
  */
