@@ -1,11 +1,11 @@
-package ${basePackage}.controller;
+package ${basePackage}.controller.${entityVarName};
 
 import com.duangframework.mvc.annotation.*;
 import com.duangframework.mvc.core.BaseController;
 import com.duangframework.vtor.annotation.*;
 import com.duangframework.mvc.dto.SearchListDto;
 import ${entityClassName};
-import ${basePackage}.service.${entityName}Service;
+import ${basePackage}.service.${entityVarName}.${entityName}Service;
 
 /**
  *  ${entityName} 控制层

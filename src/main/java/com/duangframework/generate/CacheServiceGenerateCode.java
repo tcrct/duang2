@@ -16,6 +16,7 @@ public class CacheServiceGenerateCode extends AbstractGenerateCode {
 
     @Override
     protected File file() {
-        return getFile(CACHE_SERVICE_FIDLE);
+        String subPackage = CACHE_FIDLE.toLowerCase() + File.separator + model.getEntityVarName();
+        return getFile(subPackage, CACHE_SERVICE_FIDLE);
     }
 }

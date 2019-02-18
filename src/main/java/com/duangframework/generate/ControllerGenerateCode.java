@@ -24,6 +24,7 @@ public class ControllerGenerateCode extends AbstractGenerateCode {
 
     @Override
     protected File file() {
-        return getFile(CONTROLLER_FIDLE);
+        String subPackage = CONTROLLER_FIDLE.toLowerCase() + File.separator + model.getEntityVarName();
+        return getFile(subPackage, CONTROLLER_FIDLE);
     }
 }

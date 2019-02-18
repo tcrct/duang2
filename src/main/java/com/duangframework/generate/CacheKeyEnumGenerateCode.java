@@ -16,6 +16,7 @@ public class CacheKeyEnumGenerateCode extends AbstractGenerateCode {
 
     @Override
     protected File file() {
-        return getFile(CACHE_KEY_ENUM_FIDLE);
+        String subPackage = CACHE_FIDLE + File.separator + model.getEntityVarName() + File.separator + CACHE_ENUMS_FIDLE;
+        return getFile(subPackage, CACHE_KEY_ENUM_FIDLE);
     }
 }

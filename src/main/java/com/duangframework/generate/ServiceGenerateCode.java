@@ -18,6 +18,7 @@ public class ServiceGenerateCode extends AbstractGenerateCode {
 
     @Override
     protected File file() {
-        return getFile(SERVICE_FIDLE);
+        String subPackage = SERVICE_FIDLE.toLowerCase() + File.separator + model.getEntityVarName();
+        return getFile(subPackage, SERVICE_FIDLE);
     }
 }

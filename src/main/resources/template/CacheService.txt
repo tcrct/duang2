@@ -1,4 +1,4 @@
-package ${basePackage}.cache;
+package ${basePackage}.cache.${entityVarName};
 
 import com.duangframework.cache.CacheManager;
 import com.duangframework.cache.CacheModelOptions;
@@ -6,13 +6,13 @@ import com.duangframework.exception.ServiceException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Service;
 import com.duangframework.vtor.annotation.VtorKit;
-import ${basePackage}.cache.enums.${entityName}KeyCacheEnum;
+import ${basePackage}.cache.${entityVarName}.enums.${entityName}KeyCacheEnum;
 import ${entityClassName};
 
 /**
 *   ${entityName} 缓存层
  *
- * @author
+ * @author duang
  * @since 1.0
  * @Date ${currentTime}
  */

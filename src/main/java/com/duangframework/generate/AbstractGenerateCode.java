@@ -28,6 +28,8 @@ public abstract  class AbstractGenerateCode {
     protected static final String SERVICE_FIDLE = "Service";
     protected static final String CACHE_SERVICE_FIDLE = "CacheService";
     protected static final String CACHE_KEY_ENUM_FIDLE = "CacheKeyEnum";
+    protected static final String CACHE_FIDLE = "cache";
+    protected static final String CACHE_ENUMS_FIDLE = "enums";
 
 
     protected static final Map<String, String> templateMap = new HashMap<>();
@@ -83,10 +85,10 @@ public abstract  class AbstractGenerateCode {
     protected abstract String build();
     protected abstract File file();
 
-    protected File getFile(String type) {
+    protected File getFile(String subPackage, String type) {
         String packagePath = model.getBasePackage()+ ".generate";
         packagePath = packagePath.replace(".", File.separator);
-        String path = model.getSourceDirPath()+File.separator+ packagePath+File.separator+ model.getEntityName() + type + ".java";
+        String path = model.getSourceDirPath()+File.separator+ packagePath+File.separator+ subPackage +File.separator+ model.getEntityName() + type + ".java";
         return new File(path);
     }
 
