@@ -11,6 +11,7 @@ import com.duangframework.mvc.annotation.Service;
 import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
 import com.duangframework.mvc.dto.SearchListDto;
+import com.duangframework.mvc.dto.PageDto;
 import ${basePackage}.cache.${entityName}CacheService;
 import ${entityClassName};
 
@@ -35,7 +36,7 @@ public class ${entityName}Service {
      * @since 1.0
      * @return  保存成功返回${entityName}对象， 否则抛出异常
      */
-    public User save(${entityName} ${entityVarName}) {
+    public ${entityName} save(${entityName} ${entityVarName}) {
         try {
             VtorKit.validate(${entityVarName});
             ${entityName} entity = ${entityVarName}Dao.save(${entityVarName});
@@ -52,7 +53,7 @@ public class ${entityName}Service {
      * @since 1.0
      * @return 查找成功返回${entityName}对象, 否则抛出异常
      */
-    public User findById(String id) {
+    public ${entityName} findById(String id) {
         if(!ToolsKit.isValidDuangId(id)) {
             throw new ServiceException("findById for ${entityName} is fail: id is not DuangId");
         }

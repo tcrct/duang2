@@ -21,13 +21,13 @@ public class ${entityName}CacheService {
 
     /**
      * 保存${entityName}对象到Redis缓存
-     * @param user  ${entityName}对象，须有id值
+     * @param ${entityVarName}  ${entityName}对象，须有id值
      */
     public void save(${entityName} ${entityVarName}) {
         try {
             VtorKit.validate(${entityVarName});
             CacheManager.getRedisClient().set(
-                    new CacheModelOptions.Builder(${entityName}CacheKeyEnum.${entityUpperCaseName}).customKey(user.getId()).builder(),
+                    new CacheModelOptions.Builder(${entityName}CacheKeyEnum.${entityUpperCaseName}).customKey(${entityVarName}.getId()).builder(),
                     ${entityVarName});
         } catch (Exception e) {
             throw new ServiceException("save ${entityName} is fail: " + e.getMessage(), e);
@@ -59,7 +59,7 @@ public class ${entityName}CacheService {
         if(!ToolsKit.isValidDuangId(id)) {
             throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
         }
-        CacheModelOptions options = new CacheModelOptions.Builder(UserCacheKeyEnum.USER).customKey(id).builder();
+        CacheModelOptions options = new CacheModelOptions.Builder(${entityName}CacheKeyEnum.${entityUpperCaseName}).customKey(id).builder();
         return 0 != CacheManager.getRedisClient().del(options.getKey());
     }
 }
