@@ -1,6 +1,8 @@
 package com.duangframework.cache;
 
 
+import com.duangframework.kit.ToolsKit;
+
 /**
  * @author Created by laotang
  * @date createed in 2018/5/17.
@@ -45,7 +47,11 @@ public class CacheModelOptions {
 
 
     public String getKey() {
-        return keyPrefix.endsWith(":") ? keyPrefix + customKey : keyPrefix+":"+customKey;
+        if(keyPrefix.endsWith(":") && ToolsKit.isNotEmpty(customKey)){
+            return keyPrefix + customKey;
+        } else {
+            return ToolsKit.isNotEmpty(customKey) ?keyPrefix+":"+customKey : keyPrefix;
+        }
     }
 
     public String getKeyPrefix() {

@@ -12,43 +12,45 @@ import java.util.Set;
 public class SecurityUser implements java.io.Serializable {
 
 
-    private String userid;      //用户ID
+    private String userId;      //用户ID
     private String account;  // 用户帐号
     private String username;  // 用户真实姓名
     private String password;  // 密码
     private String salt;    // 盐值
-    private String codeid;  // 标识码
+    private String codeId;  // 标识码
+    private String tokenId; // 登录成功后的token
     private Set<String> companys = new HashSet<String>(); // 公司
     private Set<String> departments = new HashSet<String>(); // 部门
-    private Set<String> usergroups = new HashSet<String>(); // 用户组
-    private Set<String> rolegroups = new HashSet<String>();   //角色组
+    private Set<String> userGroups = new HashSet<String>(); // 用户组
+    private Set<String> roleGroups = new HashSet<String>();   //角色组
     private Set<String> roles = new HashSet<>();    //角色
-    private Map<String, String> authoritys = new HashMap<>();   //权限
+    private Map<String, String> authoritys = new HashMap<>();   //权限, key为权限ID，value为URI
 
     public SecurityUser() {
     }
 
-    public SecurityUser(String userid, String account, String username, String password, String salt, String codeid, Set<String> companys, Set<String> departments, Set<String> usergroups, Set<String> rolegroups, Set<String> roles, Map<String, String> authoritys) {
-        this.userid = userid;
+    public SecurityUser(String userId, String account, String username, String password, String salt, String codeId, String tokenId, Set<String> companys, Set<String> departments, Set<String> userGroups, Set<String> roleGroups, Set<String> roles, Map<String, String> authoritys) {
+        this.userId = userId;
         this.account = account;
         this.username = username;
         this.password = password;
         this.salt = salt;
-        this.codeid = codeid;
+        this.codeId = codeId;
+        this.tokenId = tokenId;
         this.companys = companys;
         this.departments = departments;
-        this.usergroups = usergroups;
-        this.rolegroups = rolegroups;
+        this.userGroups = userGroups;
+        this.roleGroups = roleGroups;
         this.roles = roles;
         this.authoritys = authoritys;
     }
 
-    public String getUserid() {
-        return userid;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getAccount() {
@@ -83,12 +85,12 @@ public class SecurityUser implements java.io.Serializable {
         this.salt = salt;
     }
 
-    public String getCodeid() {
-        return codeid;
+    public String getCodeId() {
+        return codeId;
     }
 
-    public void setCodeid(String codeid) {
-        this.codeid = codeid;
+    public void setCodeId(String codeId) {
+        this.codeId = codeId;
     }
 
     public Set<String> getCompanys() {
@@ -107,20 +109,20 @@ public class SecurityUser implements java.io.Serializable {
         this.departments = departments;
     }
 
-    public Set<String> getUsergroups() {
-        return usergroups;
+    public Set<String> getUserGroups() {
+        return userGroups;
     }
 
-    public void setUsergroups(Set<String> usergroups) {
-        this.usergroups = usergroups;
+    public void setUserGroups(Set<String> userGroups) {
+        this.userGroups = userGroups;
     }
 
-    public Set<String> getRolegroups() {
-        return rolegroups;
+    public Set<String> getRoleGroups() {
+        return roleGroups;
     }
 
-    public void setRolegroups(Set<String> rolegroups) {
-        this.rolegroups = rolegroups;
+    public void setRoleGroups(Set<String> roleGroups) {
+        this.roleGroups = roleGroups;
     }
 
     public Set<String> getRoles() {
@@ -137,5 +139,32 @@ public class SecurityUser implements java.io.Serializable {
 
     public void setAuthoritys(Map<String, String> authoritys) {
         this.authoritys = authoritys;
+    }
+
+    public String getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(String tokenId) {
+        this.tokenId = tokenId;
+    }
+
+    @Override
+    public String toString() {
+        return "SecurityUser{" +
+                "userId='" + userId + '\'' +
+                ", account='" + account + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", salt='" + salt + '\'' +
+                ", codeId='" + codeId + '\'' +
+                ", tokenId='" + tokenId + '\'' +
+                ", companys=" + companys +
+                ", departments=" + departments +
+                ", userGroups=" + userGroups +
+                ", roleGroups=" + roleGroups +
+                ", roles=" + roles +
+                ", authoritys=" + authoritys +
+                '}';
     }
 }

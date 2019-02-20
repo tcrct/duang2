@@ -9,9 +9,12 @@ import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.db.common.Query;
 import com.duangframework.exception.IException;
+import com.duangframework.exception.ServiceException;
+import com.duangframework.exception.ValidatorException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.*;
 import com.duangframework.utils.*;
+import com.duangframework.vtor.annotation.VtorKit;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -479,6 +482,22 @@ public final class ToolsKit {
     public static String buildEntryptKey(String key, String key2) {
         byte[] hashKey = Digests.sha1(key.getBytes(), key2.getBytes());
         return Encodes.encodeHex(hashKey);
+    }
+
+    /**
+     * 验证对象属性值是否正确
+     * @param validateObj   待验证的对象
+     * @return
+     */
+    public static void validatorObj(Object validateObj) {
+        if (ToolsKit.isEmpty(validateObj)) {
+            throw new ValidatorException("validator object is fail: object is null");
+        }
+        try {
+            VtorKit.validate(validateObj);
+        } catch (Exception e) {
+            throw new ValidatorException(e.getMessage(), e);
+        }
     }
 
     /**
