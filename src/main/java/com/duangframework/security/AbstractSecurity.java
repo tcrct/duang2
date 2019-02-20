@@ -47,7 +47,14 @@ public abstract class AbstractSecurity implements ISecurity {
         return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(securityUser.getAuthoritys())) ? securityUser.getAuthoritys() : new HashMap<>();
     }
 
-    public void logout() throws SecurityException{
-
+    public boolean getout(Object key) throws SecurityException {
+        return logout(key);
     }
+
+    /**
+     * 子类实现
+     * @param key
+     @return
+     */
+    protected abstract boolean logout(Object key) throws SecurityException;
 }

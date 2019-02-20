@@ -6,6 +6,9 @@ import com.duangframework.security.SecurityUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 安全工具类
  * Created by laotang on 2018/11/29.
@@ -14,9 +17,11 @@ public class SecurityKit {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityKit.class);
 
-    private AbstractSecurity securityHelperClass;
+    private static AbstractSecurity securityHelperClass;
     private static SecurityUser securityUser;
     private LoginDto loginDTO;
+    private static Object key;
+    private static Map<Object,SecurityUser> SECURITY_USER_MAP = new HashMap<>();
 
     private static class Holder {
         private static final SecurityKit INSTANCE = new SecurityKit();
@@ -30,6 +35,7 @@ public class SecurityKit {
 
     public static void clear() {
         securityUser = null;
+        key = "";
     }
 
     /**
@@ -39,6 +45,16 @@ public class SecurityKit {
      */
     public SecurityKit param(LoginDto loginDto) {
         loginDTO = loginDto;
+        return this;
+    }
+
+    /**
+     * 设置ID
+     * @param id
+     * @return
+     */
+    public SecurityKit id(Object id) {
+        key = id;
         return this;
     }
 
@@ -59,7 +75,14 @@ public class SecurityKit {
      * @return
      */
     public SecurityUser login() {
-        securityUser = securityHelperClass.getSecurityUser(loginDTO);
+        try {
+            securityUser = securityHelperClass.getSecurityUser(loginDTO);
+            // 添加到缓存，以userId为key
+            SECURITY_USER_MAP.put(securityUser.getUserId(), securityUser);
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+            throw new SecurityException(e.getMessage());
+        }
         return securityUser;
     }
 
@@ -68,13 +91,29 @@ public class SecurityKit {
      * @return
      */
     public boolean logout() {
+        if(ToolsKit.isEmpty(key) && ToolsKit.isNotEmpty(loginDTO)) {
+            key = loginDTO.getAccount();
+        }
+        if(ToolsKit.isEmpty(key)) {
+            throw new NullPointerException("key is null");
+        }
         try {
-            securityHelperClass.logout();
-            return true;
+            return securityHelperClass.getout(key);
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
             throw new SecurityException(e.getMessage());
         }
+    }
+
+    /**
+     * 根据id取出对应的SecurityUser对象
+     * @return SecurityUser
+     */
+    public SecurityUser get() {
+        if(ToolsKit.isEmpty(key)) {
+            throw new NullPointerException("key is null");
+        }
+        return SECURITY_USER_MAP.get(key);
     }
 
 }
