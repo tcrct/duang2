@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
+import com.duangframework.db.IdEntity;
 import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.db.common.Query;
 import com.duangframework.exception.IException;
@@ -13,6 +14,8 @@ import com.duangframework.exception.ServiceException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.*;
+import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.security.SecurityUser;
 import com.duangframework.utils.*;
 import com.duangframework.vtor.annotation.VtorKit;
 import org.apache.commons.codec.DecoderException;
@@ -544,6 +547,148 @@ public final class ToolsKit {
             }
         }
         return query;
+    }
+
+
+    /***
+     * 新增记录时，添加基本数据到对象中
+     *
+     * @param obj 需要反射的对象
+     */
+    public static void addIdEntityData(Object obj) throws Exception {
+        Map<String,String> map = getRequestUserIdTerminal();
+        addIdEntityData(obj,
+                map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
+                map.get(ConstEnums.TERMINAL_FIELD.getValue()));
+    }
+
+    /***
+     * 新增记录时，添加基本数据到对象中
+     *
+     * @param obj 需要反射的对象
+     * @param userId 创建人ID
+     * @param source 数据来源
+     */
+    private static void addIdEntityData(Object obj, String userId, String source) throws Exception {
+        if (isEmpty(obj) || isEmpty(userId)) {
+            throw new ServiceException("自动填充IdEntity数据时出错,需要填充对象为空或创建/更新用户ID为空");
+        }
+        Date currentDate = new Date();
+        Field createTimeField = IdEntity.class.getField(IdEntity.CREATETIME_FIELD);
+        Field updateTimeField = IdEntity.class.getField(IdEntity.UPDATETIME_FIELD);
+        Field statusField = IdEntity.class.getField(IdEntity.STATUS_FIELD);
+        Field createUserIdField = IdEntity.class.getField(IdEntity.CREATEUSERID_FIELD);
+        Field updateUserIdField = IdEntity.class.getField(IdEntity.UPDATEUSERID_FIELD);
+        Field sourceField = IdEntity.class.getField(IdEntity.SOURCE_FIELD);
+        Object value;
+        value = ObjectKit.getFieldValue(obj, createTimeField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, createTimeField, currentDate);
+        }
+        ObjectKit.setField(obj, updateTimeField, currentDate);
+        value = ObjectKit.getFieldValue(obj, statusField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, statusField, IdEntity.STATUS_FIELD_SUCCESS);
+        }
+        value = ObjectKit.getFieldValue(obj, createUserIdField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, createUserIdField, userId);
+        }
+        ObjectKit.setField(obj, updateUserIdField, userId);
+        value = ObjectKit.getFieldValue(obj, sourceField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, sourceField, source);
+        }
+    }
+
+    /**
+     * 修改记录时，修改更新时间，更新人ID到对象中
+     *@param obj 要修改的对象
+     */
+    public static void updateIdEntityData(Object obj) throws Exception {
+        Map<String,String> map = getRequestUserIdTerminal();
+        updateIdEntityData(obj,
+                map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
+                map.get(ConstEnums.TERMINAL_FIELD.getValue()));
+    }
+
+    /**
+     * 修改记录时，修改更新时间，更新人ID到对象中
+     *
+     * @param obj 要修改的对象
+     */
+    private static void updateIdEntityData(Object obj, String userId, String source) throws Exception {
+        Field updateTimeField = IdEntity.class.getField(IdEntity.UPDATETIME_FIELD);
+        Field updateUserIdField = IdEntity.class.getField(IdEntity.UPDATEUSERID_FIELD);
+        Field sourceField = IdEntity.class.getField(IdEntity.SOURCE_FIELD);
+        ObjectKit.setField(obj, updateTimeField, new Date());
+        ObjectKit.setField(obj, updateUserIdField, userId);
+        ObjectKit.setField(obj, sourceField, source);
+    }
+
+    /**
+     * 取出请求里的userid及terminal
+     * @return Map
+     */
+    private static Map<String,String> getRequestUserIdTerminal() {
+        String userId = "";
+        String terminal = "";
+        try {
+            HeadDto headDto = ToolsKit.getThreadLocalDto();
+            if(ToolsKit.isNotEmpty(headDto)) {
+                terminal = headDto.getHeaderMap().get(ConstEnums.TERMINAL_FIELD);
+                String tokenId = headDto.getToken();
+                if(ToolsKit.isNotEmpty(tokenId)) {
+                    userId = getSecurityUser(tokenId).getUserId();
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("updateIdEntityData is fail: " + e.getMessage(), e);
+        }
+        userId = ToolsKit.isEmpty(userId) ? "admin" : userId;
+        terminal = ToolsKit.isEmpty(terminal) ? "console" : terminal;
+        Map<String, String> map =  new HashMap<>();
+        map.put(ConstEnums.REQUEST_ID_FIELD.getValue(), userId);
+        map.put(ConstEnums.TERMINAL_FIELD.getValue(), terminal);
+        return map;
+    }
+
+    /**
+     * 根据key参数，取已经登录的SecurityUser对象
+     * @param key   参数值为userId或tokenId
+     * @return      SecurityUser对象
+     * @Exception SecurityUser对象不存在，则抛出空指针异常
+     */
+    public static SecurityUser getSecurityUser(String key) {
+        SecurityUser securityUser = SecurityKit.duang().id(key).get();
+        if(ToolsKit.isEmpty(securityUser)) {
+            throw new NullPointerException("根据["+key+"]取SecurityUser时失败,SecurityUser对象为null,请确定是否已登录!");
+        }
+        return securityUser;
+    }
+
+    // 定义一个请求对象安全线程类
+    private static DuangThreadLocal<HeadDto> requestHeaderThreadLocal = new DuangThreadLocal<HeadDto>() {
+        @Override
+        public HeadDto initialValue() {
+            return new HeadDto();
+        }
+    };
+
+    /**
+     * 设置请求头DTO到ThreadLocal变量
+     * @param headDto       请求头DTO
+     */
+    public static void setThreadLocalDto(HeadDto headDto) {
+        requestHeaderThreadLocal.set(headDto);
+    }
+
+    /**
+     *  取ThreadLocal里的HeadDto对象
+     * @return
+     */
+    public static HeadDto getThreadLocalDto() {
+        return  requestHeaderThreadLocal.get();
     }
 
 }

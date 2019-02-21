@@ -16,6 +16,7 @@ public class GenerateCode {
         private Class<? extends IdEntity> entityClass;
         private String controllerMappingValue;
         private String controllerMappingDesc;
+        private String cachePrefix;
 
         /**
          *
@@ -47,6 +48,10 @@ public class GenerateCode {
             this.controllerMappingDesc = desc;
             return this;
         }
+        public Builder cachePrefix(String cachePrefix) {
+            this.cachePrefix = cachePrefix;
+            return this;
+        }
 
         public void build() {
             GenerateCodeModel model = new GenerateCodeModel();
@@ -64,6 +69,7 @@ public class GenerateCode {
             model.setControllerMappingValue(ToolsKit.isEmpty(controllerMappingValue)? "/"+model.getEntityVarName():controllerMappingValue);
             model.setControllerMappingDesc(ToolsKit.isEmpty(controllerMappingDesc)?model.getEntityName():controllerMappingDesc);
             model.setEntityUpperCaseName(model.getEntityName().toUpperCase());
+            model.setCachePrefix(ToolsKit.isEmpty(cachePrefix)?ConstEnums.FRAMEWORK_OWNER.getValue():cachePrefix);
 
             AbstractGenerateCode controllerGenerateCode = new ControllerGenerateCode(model);
             AbstractGenerateCode serviceGenerateCode = new ServiceGenerateCode(model);

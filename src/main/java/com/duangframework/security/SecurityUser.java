@@ -19,6 +19,7 @@ public class SecurityUser implements java.io.Serializable {
     private String salt;    // 盐值
     private String codeId;  // 标识码
     private String tokenId; // 登录成功后的token
+    private String terminal;  //终端标识
     private Set<String> companys = new HashSet<String>(); // 公司
     private Set<String> departments = new HashSet<String>(); // 部门
     private Set<String> userGroups = new HashSet<String>(); // 用户组
@@ -29,7 +30,9 @@ public class SecurityUser implements java.io.Serializable {
     public SecurityUser() {
     }
 
-    public SecurityUser(String userId, String account, String username, String password, String salt, String codeId, String tokenId, Set<String> companys, Set<String> departments, Set<String> userGroups, Set<String> roleGroups, Set<String> roles, Map<String, String> authoritys) {
+    public SecurityUser(String userId, String account, String username, String password, String salt, String codeId, String tokenId,
+                        String terminal, Set<String> companys, Set<String> departments, Set<String> userGroups,
+                        Set<String> roleGroups, Set<String> roles, Map<String, String> authoritys) {
         this.userId = userId;
         this.account = account;
         this.username = username;
@@ -37,6 +40,7 @@ public class SecurityUser implements java.io.Serializable {
         this.salt = salt;
         this.codeId = codeId;
         this.tokenId = tokenId;
+        this.terminal = terminal;
         this.companys = companys;
         this.departments = departments;
         this.userGroups = userGroups;
@@ -149,6 +153,14 @@ public class SecurityUser implements java.io.Serializable {
         this.tokenId = tokenId;
     }
 
+    public String getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(String terminal) {
+        this.terminal = terminal;
+    }
+
     @Override
     public String toString() {
         return "SecurityUser{" +
@@ -159,6 +171,7 @@ public class SecurityUser implements java.io.Serializable {
                 ", salt='" + salt + '\'' +
                 ", codeId='" + codeId + '\'' +
                 ", tokenId='" + tokenId + '\'' +
+                ", terminal='" + terminal + '\'' +
                 ", companys=" + companys +
                 ", departments=" + departments +
                 ", userGroups=" + userGroups +

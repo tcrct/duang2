@@ -23,7 +23,6 @@ public abstract class AbstractSecurity implements ISecurity {
             throw new SecurityException(ExceptionEnums.PARAM_NULL.getCode(), "LoginDto is null");
         }
         SecurityUser securityUser = realm(loginDto);
-
         if(ToolsKit.isNotEmpty(securityUser)) {
             this.securityUser = securityUser;
         }
@@ -35,7 +34,7 @@ public abstract class AbstractSecurity implements ISecurity {
      * @param loginDto
     @return
      */
-    protected abstract  SecurityUser realm(LoginDto loginDto) throws SecurityException;
+    public abstract  SecurityUser realm(LoginDto loginDto) throws SecurityException;
 
     @Override
     public Set<String> getRoles() throws SecurityException{
@@ -56,5 +55,5 @@ public abstract class AbstractSecurity implements ISecurity {
      * @param key
      @return
      */
-    protected abstract boolean logout(Object key) throws SecurityException;
+    public abstract boolean logout(Object key) throws SecurityException;
 }

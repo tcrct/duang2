@@ -12,7 +12,7 @@ import com.duangframework.cache.ICacheKeyEnums;
  */
 public enum ${entityName}CacheKeyEnum implements ICacheKeyEnums {
 
-    ${entityUpperCaseName}("cache:${entityVarName}", ICacheKeyEnums.DEFAULT_TTL, "${entityName}对象缓存KEY前缀"),
+    ${entityUpperCaseName}("${cachePrefix}:${entityVarName}", ICacheKeyEnums.DEFAULT_TTL, "${entityName}对象缓存KEY前缀"),
     ;
     private final String prefix;
     private final int ttl;

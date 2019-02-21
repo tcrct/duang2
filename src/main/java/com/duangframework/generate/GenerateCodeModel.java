@@ -28,12 +28,16 @@ public class GenerateCodeModel {
     private String controllerMappingValue;
     private String controllerMappingDesc;
 
+    private String cachePrefix;
+
     private String currentTime = ToolsKit.getCurrentDateString();
 
     public GenerateCodeModel() {
     }
 
-    public GenerateCodeModel(String sourceDirPath, String sourceFileName, String basePackage, String subPackage, Class<? extends IdEntity> entityClass, String entityName, String entityVarName, String controllerMappingValue, String controllerMappingDesc) {
+    public GenerateCodeModel(String sourceDirPath, String sourceFileName, String basePackage,
+                             String subPackage, Class<? extends IdEntity> entityClass, String entityName, String cachePrefix,
+                             String entityVarName, String controllerMappingValue, String controllerMappingDesc) {
         this.sourceDirPath = sourceDirPath;
         this.sourceFileName = sourceFileName;
         this.basePackage = basePackage;
@@ -46,6 +50,7 @@ public class GenerateCodeModel {
         this.entityPackageName = entityClass.getSimpleName().toLowerCase();
         this.entityClassName = entityClass.getName();
         this.entityUpperCaseName = entityName.toUpperCase();
+        this.cachePrefix = cachePrefix;
     }
 
     public String getSourceDirPath() {
@@ -146,6 +151,14 @@ public class GenerateCodeModel {
 
     public String getEntityUpperCaseName() {
         return entityUpperCaseName;
+    }
+
+    public String getCachePrefix() {
+        return cachePrefix;
+    }
+
+    public void setCachePrefix(String cachePrefix) {
+        this.cachePrefix = cachePrefix;
     }
 
     public void setEntityUpperCaseName(String entityUpperCaseName) {

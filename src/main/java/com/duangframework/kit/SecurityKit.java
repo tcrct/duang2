@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -21,7 +22,10 @@ public class SecurityKit {
     private static SecurityUser securityUser;
     private LoginDto loginDTO;
     private static Object key;
+    // userId与SecurityUser映射关系, key为userId
     private static Map<Object,SecurityUser> SECURITY_USER_MAP = new HashMap<>();
+    // tokenId与userId映射关系, key为tokenId
+    private static Map<String,String> TOKENID_USERID_MAP = new HashMap<>();
 
     private static class Holder {
         private static final SecurityKit INSTANCE = new SecurityKit();
@@ -79,6 +83,7 @@ public class SecurityKit {
             securityUser = securityHelperClass.getSecurityUser(loginDTO);
             // 添加到缓存，以userId为key
             SECURITY_USER_MAP.put(securityUser.getUserId(), securityUser);
+            TOKENID_USERID_MAP.put(securityUser.getTokenId(), securityUser.getUserId());
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
             throw new SecurityException(e.getMessage());
@@ -113,7 +118,11 @@ public class SecurityKit {
         if(ToolsKit.isEmpty(key)) {
             throw new NullPointerException("key is null");
         }
+
+        String userId = TOKENID_USERID_MAP.get(key);
+        if(ToolsKit.isNotEmpty(userId)) {
+            key = userId;
+        }
         return SECURITY_USER_MAP.get(key);
     }
-
 }

@@ -29,6 +29,7 @@ public enum ConstEnums {
     DEFAULT_CHAR_ENCODE("UTF-8", "编码格式"),
     DEFAULT_LINEBREAK("\n", "换行符"),
     REQUEST_ID_FIELD("requestid", "duang框架的请求ID，每一个请求都应该包含有该ID, 该值先取header头"),
+    TERMINAL_FIELD("duang-x-terminal", "请求终端标识， 即请求来源，一般是指pc请求，phone请求之类的， 在请求头里应包含，默认为console"),
     DUANG_ENCRYPT("encrypt-param", "是否开启参数加密"),
     ;
 
@@ -119,6 +120,9 @@ public enum ConstEnums {
         JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
         SERVER_HOST("server.host", "服务器地址"),
         SERVER_PORT("server.port", "服务器端口"),
+        TOKENID_FIELD("token", "令牌字段key"),
+        TOKEN_TIMEOUT_FIELD("token.timeout", "令牌过期时间"),
+
 
         /**mongodb*/
         MONGODB_USERNAME("mongodb.username", "用户名"),

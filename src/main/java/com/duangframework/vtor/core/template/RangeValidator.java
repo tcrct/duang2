@@ -22,7 +22,8 @@ public class RangeValidator extends AbstractValidatorTemplate<Range> {
     @Override
     public void handle(Range annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
         if(ToolsKit.isEmpty(paramValue)) {
-            throw new ValidatorException(paramName + "不能为空");
+//            throw new ValidatorException(paramName + "不能为空");
+            return;
         }
         Double value =Double.parseDouble(paramValue.toString());
 

@@ -6,7 +6,8 @@ import com.duangframework.exception.ServiceException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Service;
 import com.duangframework.vtor.annotation.VtorKit;
-import ${basePackage}.cache.${entityVarName}.enums.${entityName}KeyCacheEnum;
+import com.duangframework.generate.curd.ICacheService;
+import ${basePackage}.cache.${entityVarName}.enums.${entityName}CacheKeyEnum;
 import ${entityClassName};
 
 /**
@@ -17,7 +18,7 @@ import ${entityClassName};
  * @Date ${currentTime}
  */
 @Service
-public class ${entityName}CacheService {
+public class ${entityName}CacheService implements ICacheService<${entityName}> {
 
     /**
      * 保存${entityName}对象到Redis缓存

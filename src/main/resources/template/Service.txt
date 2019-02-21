@@ -12,6 +12,7 @@ import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.mvc.dto.PageDto;
+import com.duangframework.generate.curd.CurdService;
 import ${basePackage}.cache.${entityVarName}.${entityName}CacheService;
 import ${entityClassName};
 
@@ -23,7 +24,7 @@ import ${entityClassName};
  * @Date ${currentTime}
  */
 @Service
-public class ${entityName}Service {
+public class ${entityName}Service extends CurdService<${entityName}> {
 
     @Import
     private ${entityName}CacheService ${entityVarName}CacheService;
@@ -38,10 +39,7 @@ public class ${entityName}Service {
      */
     public ${entityName} save(${entityName} ${entityVarName}) {
         try {
-            VtorKit.validate(${entityVarName});
-            ${entityName} entity = ${entityVarName}Dao.save(${entityVarName});
-            ${entityVarName}CacheService.save(entity);
-            return entity;
+            return super.save(${entityVarName}, ${entityVarName}Dao, ${entityVarName}CacheService);
         } catch (Exception e) {
             throw new ServiceException("save ${entityName} is fail: " + e.getMessage(), e);
         }
@@ -54,17 +52,8 @@ public class ${entityName}Service {
      * @return 查找成功返回${entityName}对象, 否则抛出异常
      */
     public ${entityName} findById(String id) {
-        if(!ToolsKit.isValidDuangId(id)) {
-            throw new ServiceException("findById for ${entityName} is fail: id is not DuangId");
-        }
         try {
-            ${entityName} entity = ${entityVarName}CacheService.findById(id);
-            if(ToolsKit.isNotEmpty(entity)) {
-                return entity;
-            }
-            Query query = new Query();
-            query.eq(IdEntity.ID_FIELD, new DuangId(id));
-            return ${entityVarName}Dao.findOne(query);
+            return super.findById(id, ${entityVarName}Dao, ${entityVarName}CacheService);
         } catch (Exception e) {
             throw new ServiceException("findById for ${entityName} is fail: "+ e.getMessage(), e);
         }
@@ -77,17 +66,8 @@ public class ${entityName}Service {
      * @return  删除成功返回true, 否则抛出异常
      */
     public boolean deleteById(String id) {
-        if(!ToolsKit.isValidDuangId(id)) {
-            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
-        }
         try {
-            Query query = new Query();
-            query.eq(IdEntity.ID_FIELD, new DuangId(id));
-            Update update = new Update();
-            update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
-            ${entityVarName}Dao.update(query, update);
-            ${entityVarName}CacheService.deleteById(id);
-            return true;
+           return super.deleteById(id, ${entityVarName}Dao, ${entityVarName}CacheService);
         } catch (Exception e) {
             throw new ServiceException("deleteById for ${entityName} is fail: "+ e.getMessage(), e);
         }
@@ -99,11 +79,8 @@ public class ${entityName}Service {
      * @return
      */
     public PageDto<${entityName}> search(SearchListDto searchListDto) {
-        if(ToolsKit.isEmpty(searchListDto)) {
-            throw new ServiceException("searchListDto is null");
-        }
         try {
-            return ${entityVarName}Dao.findPage(ToolsKit.searchDto2Query(searchListDto));
+            return super.search(searchListDto, ${entityVarName}Dao, ${entityVarName}CacheService);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServiceException("search for ${entityName} is fail: "+ e.getMessage(), e);

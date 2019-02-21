@@ -3,6 +3,7 @@ package com.duangframework.mvc.core.helper;
 import com.duangframework.exception.MvcException;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
+import com.duangframework.mvc.http.handler.DuangHeadHandle;
 import com.duangframework.mvc.http.handler.IHandler;
 import com.duangframework.websocket.IWebSocket;
 
@@ -22,6 +23,7 @@ public class HandlerHelper {
 
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList.clear();
+        beforeHandlerList.add(new DuangHeadHandle());
         HandlerHelper.beforeHandlerList.addAll(beforeHandlerList);
     }
 

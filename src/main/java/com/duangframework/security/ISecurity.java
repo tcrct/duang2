@@ -33,6 +33,4 @@ public interface ISecurity {
      */
     Map<String, String> getResources() throws SecurityException;
 
-
-
 }
