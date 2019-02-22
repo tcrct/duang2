@@ -122,6 +122,8 @@ public enum ConstEnums {
         SERVER_PORT("server.port", "服务器端口"),
         TOKENID_FIELD("token", "令牌字段key"),
         TOKEN_TIMEOUT_FIELD("token.timeout", "令牌过期时间"),
+        BASE_AUTH_USERNAME("base.auth.username", "HTTP基本认证，即请求头参数authorization，Basic Auth的用户名，默认为duang"),
+        BASE_AUTH_PASSWORD("base.auth.password", "HTTP基本认证， 即请求头参数authorization，Basic Auth的密码，默认为duangduangduang"),
 
 
         /**mongodb*/

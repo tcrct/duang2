@@ -4,6 +4,7 @@ import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.vtor.annotation.Empty;
 import com.duangframework.vtor.annotation.NotEmpty;
 import com.duangframework.vtor.annotation.Pattern;
+import com.duangframework.vtor.annotation.Phone;
 
 /**
  * Created by laotang on 2018/11/25.
@@ -21,12 +22,14 @@ public class LoginDto  {
     private String account;
 
     @NotEmpty(message = "密码不能为空")
-    @Pattern(regexp = "^[a-zA-Z0-9]{6}$", message = "密码格式错误")
+    @Pattern(regexp = "^[a-zA-Z0-9]{6,24}$", message = "密码格式错误")
     private String password;
 
-    @NotEmpty(message = "验证码不能为空")
-    @Pattern(regexp = "^[a-zA-Z0-9]{4}$", message = "验证码格式错误")
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,10}$", message = "验证码格式错误")
     private String captcha;
+
+    @Phone
+    private String phone;
 
     @NotEmpty(message = "项目标识不能为空")
     private String projectId;
@@ -36,16 +39,17 @@ public class LoginDto  {
     public LoginDto() {
     }
 
-    public LoginDto(String account, String password, String captcha, String projectId) {
-        this(account,password,captcha, projectId, null);
+    public LoginDto(String account, String password, String captcha, String phone, String projectId) {
+        this(account,password,captcha, phone, projectId, null);
     }
 
-    public LoginDto(String account, String password, String captcha, String projectId, String securityServiceUrl) {
+    public LoginDto(String account, String password, String captcha, String projectId, String phone, String securityServiceUrl) {
         this.account = account;
         this.password = password;
         this.captcha = captcha;
         this.projectId = projectId;
         this.securityServiceUrl = securityServiceUrl;
+        this.phone = phone;
     }
 
     public String getAccount() {
@@ -86,5 +90,25 @@ public class LoginDto  {
 
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    @Override
+    public String toString() {
+        return "LoginDto{" +
+                "account='" + account + '\'' +
+                ", password='" + password + '\'' +
+                ", captcha='" + captcha + '\'' +
+                ", phone='" + phone + '\'' +
+                ", projectId='" + projectId + '\'' +
+                ", securityServiceUrl='" + securityServiceUrl + '\'' +
+                '}';
     }
 }

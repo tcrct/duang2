@@ -43,8 +43,12 @@ public class DuangHeadHandle implements IHandler {
         }
         // 如果不存在tokenId,则判断该请求URI是否允许访问，如果不允许，则抛出异常返回
         if(ToolsKit.isEmpty(tokenId)) {
-            if(!FILTER_TARGET_SET.contains(target)) {
-                throw new SecurityException("current request[ " + target + " ] is not exist tokenid, access is not allowed so exit...");
+            try {
+                if (!FILTER_TARGET_SET.contains(target)) {
+                    throw new MvcException("current request[ " + target + " ] is not exist tokenid, access is not allowed so exit...");
+                }
+            } catch (Exception e) {
+                throw new MvcException(e.getMessage(), e);
             }
         }
         HeadDto headDto = new HeadDto();

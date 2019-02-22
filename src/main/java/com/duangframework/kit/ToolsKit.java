@@ -9,6 +9,7 @@ import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.db.common.Query;
+import com.duangframework.encrypt.core.HttpHeaderNames;
 import com.duangframework.exception.IException;
 import com.duangframework.exception.ServiceException;
 import com.duangframework.exception.ValidatorException;
@@ -691,4 +692,34 @@ public final class ToolsKit {
         return  requestHeaderThreadLocal.get();
     }
 
+    /**
+     * 简单判断是否duang请求
+     *  为了防止恶意请求，对于此类不带tokenId的请求
+     *  客户端必须增加HTTP基本认证。
+     *  默认用户名是 duang  密码是 duangduangduang
+     *  如需要自定义，则在duang.properties里，设置base.auth.username及base.auth.password
+     *  同时亦须对security.filter.uri设置允许访问的uri ，如有多个uri，以小写的,号分隔
+     *  即需要在客户端设置http基本认证， 在服务器的duang.properties文件里对security.filter.uri设置允许访问的uri
+     *
+     * @param headMap   head头信息
+     * @return    正确的请求返回true
+     */
+    public static boolean isDuangRequest(Map<String,String> headMap) {
+        String authorization = headMap.get(HttpHeaderNames.AUTHORIZATION);
+        if(ToolsKit.isEmpty(authorization)) {
+            throw new SecurityException("current request duangframework is not allowed access!");
+        }
+        String duang = ConstEnums.FRAMEWORK_OWNER.getValue();
+        String account = PropKit.get(ConstEnums.PROPERTIES.BASE_AUTH_USERNAME.getValue(), duang);
+        String password = PropKit.get(ConstEnums.PROPERTIES.BASE_AUTH_PASSWORD.getValue(), duang+duang+duang);
+        if(!authorization.equals(createBaseAuthHeaderString(account, password))) {
+            throw new SecurityException("current request duangframework is not allowed access!");
+        }
+        return true;
+    }
+
+    public static String createBaseAuthHeaderString(String account, String password) {
+        String auth = account+":"+password;
+        return "Basic " + Encodes.encodeBase64(auth.getBytes()); //Charset.forName("US-ASCII")
+    }
 }
