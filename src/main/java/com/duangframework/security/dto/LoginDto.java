@@ -11,6 +11,12 @@ import com.duangframework.vtor.annotation.Pattern;
 @Bean
 public class LoginDto  {
 
+    public static final String ACCOUNT_FIELD = "account";
+    public static final String PASSWORD_FIELD = "password";
+    public static final String CAPTCHA_FIELD = "captcha";
+    public static final String PROJECT_ID_FIELD = "projectId";
+    public static final String SECURITY_SERVICE_URL_FIELD = "securityServiceUrl";
+
     @NotEmpty(message = "帐号不能为空")
     private String account;
 

@@ -103,7 +103,13 @@ public class SecurityKit {
             throw new NullPointerException("key is null");
         }
         try {
-            return securityHelperClass.getout(key);
+            if(securityHelperClass.getout(key)) {
+                SecurityUser tmpUser = SECURITY_USER_MAP.get(key);
+                SECURITY_USER_MAP.remove(key);
+                TOKENID_USERID_MAP.remove(tmpUser.getTokenId());
+                tmpUser = null;
+            }
+            return true;
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
             throw new SecurityException(e.getMessage());

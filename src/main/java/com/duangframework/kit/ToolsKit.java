@@ -551,11 +551,11 @@ public final class ToolsKit {
 
 
     /***
-     * 新增记录时，添加基本数据到对象中
+     * 新增记录时，填充基本数据到对象中
      *
      * @param obj 需要反射的对象
      */
-    public static void addIdEntityData(Object obj) throws Exception {
+    public static void addEntityData(Object obj) throws Exception {
         Map<String,String> map = getRequestUserIdTerminal();
         addIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
@@ -605,7 +605,7 @@ public final class ToolsKit {
      * 修改记录时，修改更新时间，更新人ID到对象中
      *@param obj 要修改的对象
      */
-    public static void updateIdEntityData(Object obj) throws Exception {
+    public static void updateEntityData(Object obj) throws Exception {
         Map<String,String> map = getRequestUserIdTerminal();
         updateIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),

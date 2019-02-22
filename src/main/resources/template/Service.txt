@@ -7,8 +7,11 @@ import com.duangframework.mvc.annotation.Service;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.generate.curd.CurdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ${basePackage}.cache.${entityVarName}.${entityName}CacheService;
 import ${entityClassName};
+
 
 /**
  *  ${entityName} 业务层
@@ -19,6 +22,8 @@ import ${entityClassName};
  */
 @Service
 public class ${entityName}Service extends CurdService<${entityName}> {
+
+    private static final Logger logger = LoggerFactory.getLogger(${entityName}Service.class);
 
     @Import
     private ${entityName}CacheService ${entityVarName}CacheService;

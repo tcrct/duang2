@@ -28,6 +28,13 @@ public abstract  class CurdService<T> {
     public T save(T vo, MongoDao<T> mongoDao, ICacheService cacheService) {
         try {
             VtorKit.validate(vo);
+            if(ToolsKit.isNotEmpty(vo) && vo instanceof IdEntity) {
+                if(ToolsKit.isNotEmpty(((IdEntity)vo).getId())){
+                    ToolsKit.addEntityData(vo);
+                } else {
+                    ToolsKit.updateEntityData(vo);
+                }
+            }
             T entity = mongoDao.save(vo);
             cacheService.save(entity);
             return entity;
