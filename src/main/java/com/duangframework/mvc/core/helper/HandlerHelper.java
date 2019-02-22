@@ -1,6 +1,7 @@
 package com.duangframework.mvc.core.helper;
 
 import com.duangframework.exception.MvcException;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.handler.DuangHeadHandle;
@@ -21,14 +22,28 @@ public class HandlerHelper {
      */
     private static final List<IHandler> beforeHandlerList = new ArrayList<>();
 
+    private static List<IHandler> initStartHandlerList = null;
+
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList.clear();
-        beforeHandlerList.add(new DuangHeadHandle());
         HandlerHelper.beforeHandlerList.addAll(beforeHandlerList);
     }
 
     public static List<IHandler> getBeforeHandlerList() {
+        setInitStartHandlerList();
         return beforeHandlerList;
+    }
+
+    /**
+     * 设置启动处理器，注意添加顺序
+     */
+    private static void setInitStartHandlerList() {
+        if(ToolsKit.isEmpty(initStartHandlerList)) {
+            initStartHandlerList = new ArrayList<>();
+            // 添加Head处理器
+            initStartHandlerList.add(new DuangHeadHandle());
+            beforeHandlerList.addAll(initStartHandlerList);
+        }
     }
 
     /**
@@ -54,7 +69,7 @@ public class HandlerHelper {
      * @throws MvcException
      */
     public static void doBeforeChain(String target, IRequest request, IResponse response) throws MvcException {
-        for (Iterator<IHandler> it = beforeHandlerList.iterator(); it.hasNext(); ) {
+        for (Iterator<IHandler> it = getBeforeHandlerList().iterator(); it.hasNext(); ) {
             it.next().doHandler(target, request, response);
         }
     }
@@ -68,7 +83,7 @@ public class HandlerHelper {
      * @throws MvcException
      */
     public static void doAfterChain(String target, IRequest request, IResponse response) throws MvcException {
-        for (Iterator<IHandler> it = afterHandlerList.iterator(); it.hasNext(); ) {
+        for (Iterator<IHandler> it = getAfterHandlerList().iterator(); it.hasNext(); ) {
             it.next().doHandler(target, request, response);
         }
     }

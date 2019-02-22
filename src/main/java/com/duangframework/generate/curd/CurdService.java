@@ -29,7 +29,7 @@ public abstract  class CurdService<T> {
         try {
             VtorKit.validate(vo);
             if(ToolsKit.isNotEmpty(vo) && vo instanceof IdEntity) {
-                if(ToolsKit.isNotEmpty(((IdEntity)vo).getId())){
+                if(ToolsKit.isEmpty(((IdEntity)vo).getId())){
                     ToolsKit.addEntityData(vo);
                 } else {
                     ToolsKit.updateEntityData(vo);

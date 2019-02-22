@@ -2,6 +2,7 @@ package com.duangframework.vtor.core.template;
 
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.kit.PatternKit;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.vtor.annotation.Email;
 import com.duangframework.vtor.annotation.Pattern;
 import com.duangframework.vtor.annotation.Phone;
@@ -22,6 +23,10 @@ public class PhoneValidator extends AbstractValidatorTemplate<Phone> {
 
     @Override
     public void handle(Phone annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
+
+        if(ToolsKit.isEmpty(paramValue)) {
+            return;
+        }
 
         boolean isPhone =  false;
         if(!".*".equals(annonation.regexp())) {

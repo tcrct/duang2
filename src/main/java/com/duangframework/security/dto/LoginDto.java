@@ -21,7 +21,7 @@ public class LoginDto  {
     private String account;
 
     @NotEmpty(message = "密码不能为空")
-    @Pattern(regexp = "^[a-zA-Z0-9]{32}$", message = "密码格式错误")
+    @Pattern(regexp = "^[a-zA-Z0-9]{6}$", message = "密码格式错误")
     private String password;
 
     @NotEmpty(message = "验证码不能为空")

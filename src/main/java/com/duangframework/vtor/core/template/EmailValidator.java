@@ -23,7 +23,8 @@ public class EmailValidator extends AbstractValidatorTemplate<Email> {
     public void handle(Email annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
         if(ToolsKit.isEmpty(paramValue)) {
-            throw new ValidatorException(paramName + "不能为空");
+//            throw new ValidatorException(paramName + "不能为空");
+            return;
         }
 
         boolean isEmail = false;

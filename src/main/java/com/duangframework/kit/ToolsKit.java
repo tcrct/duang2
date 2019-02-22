@@ -574,12 +574,12 @@ public final class ToolsKit {
             throw new ServiceException("自动填充IdEntity数据时出错,需要填充对象为空或创建/更新用户ID为空");
         }
         Date currentDate = new Date();
-        Field createTimeField = IdEntity.class.getField(IdEntity.CREATETIME_FIELD);
-        Field updateTimeField = IdEntity.class.getField(IdEntity.UPDATETIME_FIELD);
-        Field statusField = IdEntity.class.getField(IdEntity.STATUS_FIELD);
-        Field createUserIdField = IdEntity.class.getField(IdEntity.CREATEUSERID_FIELD);
-        Field updateUserIdField = IdEntity.class.getField(IdEntity.UPDATEUSERID_FIELD);
-        Field sourceField = IdEntity.class.getField(IdEntity.SOURCE_FIELD);
+        Field createTimeField = IdEntity.class.getDeclaredField(IdEntity.CREATETIME_FIELD);
+        Field updateTimeField = IdEntity.class.getDeclaredField(IdEntity.UPDATETIME_FIELD);
+        Field statusField = IdEntity.class.getDeclaredField(IdEntity.STATUS_FIELD);
+        Field createUserIdField = IdEntity.class.getDeclaredField(IdEntity.CREATEUSERID_FIELD);
+        Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
+        Field sourceField = IdEntity.class.getDeclaredField(IdEntity.SOURCE_FIELD);
         Object value;
         value = ObjectKit.getFieldValue(obj, createTimeField);
         if (isEmpty(value)) {
@@ -618,8 +618,8 @@ public final class ToolsKit {
      * @param obj 要修改的对象
      */
     private static void updateIdEntityData(Object obj, String userId, String source) throws Exception {
-        Field updateTimeField = IdEntity.class.getField(IdEntity.UPDATETIME_FIELD);
-        Field updateUserIdField = IdEntity.class.getField(IdEntity.UPDATEUSERID_FIELD);
+        Field updateTimeField = IdEntity.class.getDeclaredField(IdEntity.UPDATETIME_FIELD);
+        Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
         Field sourceField = IdEntity.class.getField(IdEntity.SOURCE_FIELD);
         ObjectKit.setField(obj, updateTimeField, new Date());
         ObjectKit.setField(obj, updateUserIdField, userId);
