@@ -18,4 +18,6 @@ public @interface URL {
 
     String defaultValue() default "";
 
+    boolean isEmpty() default true;
+
 }

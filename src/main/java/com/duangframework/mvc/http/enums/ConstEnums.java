@@ -31,6 +31,7 @@ public enum ConstEnums {
     REQUEST_ID_FIELD("requestid", "duang框架的请求ID，每一个请求都应该包含有该ID, 该值先取header头"),
     TERMINAL_FIELD("duang-x-terminal", "请求终端标识， 即请求来源，一般是指pc请求，phone请求之类的， 在请求头里应包含，默认为console"),
     DUANG_ENCRYPT("encrypt-param", "是否开启参数加密"),
+    TOKENID_FIELD("tokenId", "令牌字段名称"),
     ;
 
 

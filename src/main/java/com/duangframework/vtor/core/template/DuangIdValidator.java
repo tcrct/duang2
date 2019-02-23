@@ -21,7 +21,7 @@ public class DuangIdValidator extends AbstractValidatorTemplate<DuangId> {
     @Override
     public void handle(DuangId annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
-        if(ToolsKit.isEmpty(paramValue)) {
+        if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
         if(!ToolsKit.isValidDuangId(paramValue.toString())) {

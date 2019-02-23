@@ -20,4 +20,6 @@ public @interface Email {
 
     String defaultValue() default "";
 
+    boolean isEmpty() default true;
+
 }

@@ -22,9 +22,13 @@ public class KvItem implements java.io.Serializable {
     }
 
     public KvItem(String key, Object value) {
-        this.key = key;
-        this.value = value;
+        this(key, null, value);
+    }
 
+    public KvItem(String key, String operator, Object value) {
+        this.key = key;
+        this.operator = operator;
+        this.value = value;
     }
 
     public String getKey() {

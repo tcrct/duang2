@@ -16,4 +16,6 @@ public @interface DuangId {
 
     String defaultValue() default "";
 
+    boolean isEmpty() default true;
+
 }

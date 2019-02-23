@@ -18,4 +18,6 @@ public @interface Ymd {
 
     String defaultValue() default "yyyy-MM-dd HH:mm:ss";
 
+    boolean isEmpty() default true;
+
 }

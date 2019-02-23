@@ -18,4 +18,5 @@ public @interface Pattern {
 
     String defaultValue() default "";
 
+    boolean isEmpty() default true;
 }

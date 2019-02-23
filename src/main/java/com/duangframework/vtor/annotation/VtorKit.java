@@ -23,7 +23,9 @@ public class VtorKit {
      * @since [产品/模块版本](可选)
      */
     public static <T> T validate(T obj) throws Exception{
-
+        if(null == obj) {
+            throw new NullPointerException("validate object is fail : obj is null");
+        }
         if(obj instanceof IdEntity || obj instanceof java.io.Serializable || obj.getClass().isAnnotationPresent(Bean.class) || obj.getClass().isAnnotationPresent(Entity.class)) {
             VtorFactory.validator(obj);
         } else if(obj instanceof Map){

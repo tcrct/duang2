@@ -51,7 +51,7 @@ public class DuangHeadHandle implements IHandler {
         headDto.setClientIp(request.getRemoteIp());
         headDto.setHeaderMap(request.getHeaderMap());
         headDto.setMethod(request.getMethod());
-        headDto.setToken(tokenId);
+        headDto.setTokenId(tokenId);
         headDto.setUri(target);
         headDto.setRequestId(request.getRequestId());
         ToolsKit.setThreadLocalDto(headDto);

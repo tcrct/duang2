@@ -552,7 +552,8 @@ public abstract class BaseController {
     /**
      * 返回JSON格式字符串
      *
-     * @param obj
+     * @param obj           对象
+     * @param fieldSet	不返回的字段集合
      */
     private void returnJson(Object obj, Set<String> fieldSet) {
         render = new JsonRender(obj, fieldSet);

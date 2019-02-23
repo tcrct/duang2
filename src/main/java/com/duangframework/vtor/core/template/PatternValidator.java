@@ -23,6 +23,10 @@ public class PatternValidator extends AbstractValidatorTemplate<Pattern> {
     @Override
     public void handle(Pattern annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
+        if(!annonation.isEmpty() &&  ToolsKit.isEmpty(paramValue)) {
+            throw new ValidatorException(paramName + "不能为空");
+        }
+
         boolean isPattern = false;
         if(!".*".equals(annonation.regexp())) {
             isPattern = PatternKit.isMatch(annonation.regexp(), paramValue.toString());

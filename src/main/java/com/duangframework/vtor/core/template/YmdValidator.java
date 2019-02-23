@@ -23,9 +23,8 @@ public class YmdValidator extends AbstractValidatorTemplate<Ymd> {
     @Override
     public void handle(Ymd annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
-        if(ToolsKit.isEmpty(paramValue)) {
-            //throw new ValidatorException(paramName + "不能为空");
-            return;
+        if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
+            throw new ValidatorException(paramName + "不能为空");
         }
 
         try {

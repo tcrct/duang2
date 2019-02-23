@@ -21,9 +21,11 @@ public class UrlValidator extends AbstractValidatorTemplate<URL> {
 
     @Override
     public void handle(URL annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
-        if(ToolsKit.isEmpty(paramValue)) {
+
+        if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
+
         boolean isUrl = false;
         if("*".equals(annonation.regexp())) {
             isUrl = PatternKit.isURL(paramValue+"");

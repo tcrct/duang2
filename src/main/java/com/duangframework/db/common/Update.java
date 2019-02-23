@@ -1,5 +1,6 @@
 package com.duangframework.db.common;
 
+import com.duangframework.db.IdEntity;
 import com.duangframework.db.mongodb.common.Operator;
 import com.duangframework.db.mongodb.utils.MongoUtils;
 import com.duangframework.kit.ToolsKit;
@@ -28,6 +29,8 @@ public class Update<T> {
 
     public Update() {
         updateObj = new LinkedHashMap();
+        // 默认更新审核通过的数据
+        updateObj.put(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
     }
 
     public Map getUpdate() {

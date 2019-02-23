@@ -24,8 +24,8 @@ public class PhoneValidator extends AbstractValidatorTemplate<Phone> {
     @Override
     public void handle(Phone annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
-        if(ToolsKit.isEmpty(paramValue)) {
-            return;
+        if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
+            throw new ValidatorException(paramName + "不能为空");
         }
 
         boolean isPhone =  false;

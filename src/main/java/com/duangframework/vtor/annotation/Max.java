@@ -16,4 +16,6 @@ public @interface Max {
 
     String message() default "不能大于[${value}]！";
 
+    boolean isEmpty() default true;
+
 }

@@ -7,6 +7,7 @@ import com.duangframework.mvc.annotation.Service;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.generate.curd.CurdService;
+import com.duangframework.db.mysql.common.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ${basePackage}.cache.${entityVarName}.${entityName}CacheService;
@@ -57,6 +58,21 @@ public class ${entityName}Service extends CurdService<${entityName}> {
             throw new ServiceException("findById for ${entityName} is fail: "+ e.getMessage(), e);
         }
     }
+
+    /**
+    * 根据条件查找${entityName}对象记录
+    * @param kvItems    kvItem数据对象
+    *
+    * @since 1.0
+    * @return 查找成功返回${entityName}对象, 否则抛出异常
+    */
+   public ${entityName} findByKey(KvItem... kvItems) {
+       try {
+           return super.findByKey(${entityVarName}Dao, ${entityVarName}CacheService, kvItems);
+       } catch (Exception e) {
+           throw new ServiceException("findByKey for ${entityName} is fail: "+ e.getMessage(), e);
+       }
+   }
 
     /**
      *  根据ID删除${entityName}对象记录

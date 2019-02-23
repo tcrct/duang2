@@ -1,7 +1,5 @@
 package com.duangframework.vtor.annotation;
 
-import com.duangframework.kit.PatternKit;
-
 import java.lang.annotation.*;
 
 /**
@@ -20,4 +18,5 @@ public @interface Phone {
 
     String defaultValue() default "";
 
+    boolean isEmpty() default true;
 }

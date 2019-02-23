@@ -367,6 +367,10 @@ public final class ToolsKit {
             head.setRet(exception.getCode());
             head.setMsg(exception.getMessage());
         }
+        HeadDto threadLocalHeadDto = ToolsKit.getThreadLocalDto();
+        if(ToolsKit.isNotEmpty(threadLocalHeadDto) && ToolsKit.isNotEmpty(threadLocalHeadDto.getTokenId())) {
+            head.setTokenId(threadLocalHeadDto.getTokenId());
+        }
         dto.setHead(head);
         dto.setData(obj);
         return dto;
@@ -638,7 +642,7 @@ public final class ToolsKit {
             HeadDto headDto = ToolsKit.getThreadLocalDto();
             if(ToolsKit.isNotEmpty(headDto)) {
                 terminal = headDto.getHeaderMap().get(ConstEnums.TERMINAL_FIELD);
-                String tokenId = headDto.getToken();
+                String tokenId = headDto.getTokenId();
                 if(ToolsKit.isNotEmpty(tokenId)) {
                     userId = getSecurityUser(tokenId).getUserId();
                 }

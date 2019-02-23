@@ -22,4 +22,6 @@ public @interface Range {
 
     String defaultValue() default "";
 
+    boolean isEmpty() default true;
+
 }

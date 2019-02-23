@@ -14,6 +14,8 @@ public @interface Min {
 
     double value() default 0;
 
-    String message() default "不能小于[${value}]！";
+    String message() default "不能小于[${value}]!";
+
+    boolean isEmpty() default true;
 
 }

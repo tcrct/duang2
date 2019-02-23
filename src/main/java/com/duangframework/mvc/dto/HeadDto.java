@@ -8,48 +8,48 @@ import java.util.Map;
  *	手机访问后返回的信息头,每一个dto对象须包含
  */
 public class HeadDto implements java.io.Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private int ret;
 	private String msg;
     private String uri;
     private String method;
     private String clientIp;
-	private String token;
+	private String tokenId;
 	private String timestamp = ToolsKit.getCurrentDateString();
 	private String requestId;
     private Map<String, String> headerMap ;
-	
+
 	public HeadDto(){
-		
+
 	}
-	
+
 	public HeadDto(int ret, String msg){
 		this.ret = ret;
 		this.msg = msg;
 	}
-	
-	public HeadDto(int ret, String msg, String token){
+
+	public HeadDto(int ret, String msg, String tokenId){
 		this.ret = ret;
 		this.msg = msg;
-		this.token = token;
+		this.tokenId = tokenId;
 	}
-	
-	public HeadDto(int ret, String msg, String token, String uri){
+
+	public HeadDto(int ret, String msg, String tokenId, String uri){
 		this.ret = ret;
 		this.msg = msg;
-		this.token = token;
+		this.tokenId = tokenId;
 		this.uri = uri;
 	}
 
-    public HeadDto(int ret, String msg, String uri, String method, String clientIp, String token, String timestamp, String requestId, Map<String, String> headerMap) {
+    public HeadDto(int ret, String msg, String uri, String method, String clientIp, String tokenId, String timestamp, String requestId, Map<String, String> headerMap) {
         this.ret = ret;
         this.msg = msg;
         this.uri = uri;
         this.method = method;
         this.clientIp = clientIp;
-        this.token = token;
+        this.tokenId = tokenId;
         this.timestamp = timestamp;
         this.requestId = requestId;
         this.headerMap = headerMap;
@@ -67,12 +67,12 @@ public class HeadDto implements java.io.Serializable {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
-	public String getToken() {
-		return token;
+	public String getTokenId() {
+		return tokenId;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setTokenId(String tokenId) {
+		this.tokenId = tokenId;
 	}
 
 	public String getTimestamp() {

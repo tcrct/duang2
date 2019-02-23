@@ -43,6 +43,9 @@ public class Query<T> {
         fieldObj = new Field();
         hintObj = new LinkedHashMap();
         pageObj = new PageDto<T>(0, 1);
+
+        // 默认查询审核通过的数据
+        queryObj.put(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
     }
 
     public Query(DBCollection coll, Class<T> clazz, LinkedHashMap keys) {

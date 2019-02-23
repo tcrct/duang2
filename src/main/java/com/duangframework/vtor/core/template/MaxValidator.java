@@ -20,7 +20,7 @@ public class MaxValidator extends AbstractValidatorTemplate<Max> {
 
     @Override
     public void handle(Max annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
-        if(ToolsKit.isEmpty(paramValue)) {
+        if(!annonation.isEmpty() &&  ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
         try {
