@@ -23,7 +23,7 @@ public class DuangHeadHandle implements IHandler {
 
     private static Logger logger = LoggerFactory.getLogger(DuangHeadHandle.class);
     private static String TOKENID_FIELD_NAME;
-    private Set<String> FILTER_TARGET_SET = new HashSet<>();
+    public static final Set<String> FILTER_TARGET_SET = new HashSet<>();
 
     public DuangHeadHandle() {
         List<String> tmpList = PropKit.getList(ConstEnums.PROPERTIES.FILTER_URI_FIELD.getValue());
@@ -35,7 +35,7 @@ public class DuangHeadHandle implements IHandler {
     @Override
     public void doHandler(String target, IRequest request, IResponse response) throws MvcException {
         if(ToolsKit.isEmpty(TOKENID_FIELD_NAME)) {
-            TOKENID_FIELD_NAME = PropKit.get(ConstEnums.PROPERTIES.TOKENID_FIELD.getValue(), ConstEnums.PROPERTIES.TOKENID_FIELD.getValue());
+            TOKENID_FIELD_NAME = PropKit.get(ConstEnums.PROPERTIES.TOKENID_FIELD.getValue(), ConstEnums.TOKENID_FIELD.getValue());
         }
         String tokenId = request.getHeader(TOKENID_FIELD_NAME);
         if(ToolsKit.isEmpty(tokenId)) {

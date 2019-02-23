@@ -7,7 +7,7 @@ import com.duangframework.mvc.annotation.Service;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.generate.curd.CurdService;
-import com.duangframework.db.mysql.common.Operator;
+import com.duangframework.db.convetor.KvItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ${basePackage}.cache.${entityVarName}.${entityName}CacheService;

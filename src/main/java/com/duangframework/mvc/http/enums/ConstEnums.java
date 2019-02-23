@@ -125,7 +125,7 @@ public enum ConstEnums {
         TOKEN_TIMEOUT_FIELD("token.timeout", "令牌过期时间"),
         BASE_AUTH_USERNAME("base.auth.username", "HTTP基本认证，即请求头参数authorization，Basic Auth的用户名，默认为duang"),
         BASE_AUTH_PASSWORD("base.auth.password", "HTTP基本认证， 即请求头参数authorization，Basic Auth的密码，默认为duangduangduang"),
-
+        SECURIT_REALM_CLASS("security.realm", "安全验证处理实现类，全路径，包括包名"),
 
         /**mongodb*/
         MONGODB_USERNAME("mongodb.username", "用户名"),

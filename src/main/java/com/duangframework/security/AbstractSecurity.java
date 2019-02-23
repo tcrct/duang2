@@ -5,10 +5,7 @@ import com.duangframework.exception.SecurityException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.security.dto.LoginDto;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by laotang on 2018/11/26.
@@ -56,4 +53,11 @@ public abstract class AbstractSecurity implements ISecurity {
      @return
      */
     public abstract boolean logout(Object key) throws SecurityException;
+
+    /**
+     * 子类实现
+     *   key为tokenId
+     @return
+     */
+    public abstract SecurityUser getSecurityUser(String tokenId) throws SecurityException;
 }

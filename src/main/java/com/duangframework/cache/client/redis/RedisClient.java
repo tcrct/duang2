@@ -782,11 +782,16 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
         return call(new JedisAction<Long >(){
             @Override
             public Long  execute(Jedis jedis) {
+                long isok = 0l;
                 if(value instanceof String){
-                    return jedis.hset(options.getKey(), field, (String)value);
+                    isok = jedis.hset(options.getKey(), field, (String)value);
                 } else {
-                    return jedis.hset(SafeEncoder.encode(options.getKey()), SafeEncoder.encode(field), SerializableUtils.serialize(value));
+                    isok = jedis.hset(SafeEncoder.encode(options.getKey()), SafeEncoder.encode(field), SerializableUtils.serialize(value));
                 }
+                if(isok >0) {
+                    expire(options);
+                }
+                return isok;
             }
         });
     }

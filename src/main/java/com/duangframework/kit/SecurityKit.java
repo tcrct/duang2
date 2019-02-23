@@ -1,5 +1,7 @@
 package com.duangframework.kit;
 
+import com.duangframework.mvc.core.helper.ClassHelper;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.AbstractSecurity;
 import com.duangframework.security.dto.LoginDto;
 import com.duangframework.security.SecurityUser;
@@ -34,12 +36,14 @@ public class SecurityKit {
     }
     public static final SecurityKit duang() {
         clear();
+        realm();
         return SecurityKit.Holder.INSTANCE;
     }
 
     public static void clear() {
         securityUser = null;
         key = "";
+
     }
 
     /**
@@ -62,17 +66,34 @@ public class SecurityKit {
         return this;
     }
 
+//    /**
+//     * 自定义的realm方法，用于自行扩展
+//     * @param securityClass
+//     * @return
+//     */
+//    public SecurityKit realm(Class<? extends AbstractSecurity> securityClass) {
+//        this.securityHelperClass = ObjectKit.newInstance(securityClass);
+//        return this;
+//    }
+
     /**
-     * 自定义的realm方法，用于自行扩展
-     * @param securityClass
-     * @return
+     * 自定义的realm方法，用于自行扩展, 在配置文件里设置security.realm
      */
-    public SecurityKit realm(Class<? extends AbstractSecurity> securityClass) {
+    private static void realm() {
         if(ToolsKit.isEmpty(securityHelperClass)) {
-            this.securityHelperClass = ObjectKit.newInstance(securityClass);
+            String realmClassPath = PropKit.get(ConstEnums.PROPERTIES.SECURIT_REALM_CLASS.getValue());
+            if(ToolsKit.isEmpty(realmClassPath)) {
+                throw new SecurityException("security realm is not exist");
+            }
+            try {
+                securityHelperClass = ObjectKit.newInstance(realmClassPath);
+            } catch (Exception e) {
+                throw new SecurityException(e.getMessage(), e);
+            }
         }
-        return this;
     }
+
+
 
     /**
      * 登录
@@ -129,6 +150,17 @@ public class SecurityKit {
         if(ToolsKit.isNotEmpty(userId)) {
             key = userId;
         }
-        return SECURITY_USER_MAP.get(key);
+        SecurityUser securityUser =  SECURITY_USER_MAP.get(key);
+        if(ToolsKit.isEmpty(securityUser)) {
+            securityUser = securityHelperClass.getSecurityUser(key.toString());
+            if(ToolsKit.isEmpty(securityUser)) {
+                throw new SecurityException("token已经过期, 请重新登录!");
+            }
+            String tokenId = securityUser.getTokenId();
+            userId = securityUser.getUserId();
+            TOKENID_USERID_MAP.put(tokenId, userId);
+            SECURITY_USER_MAP.put(userId, securityUser);
+        }
+        return securityUser;
     }
 }
