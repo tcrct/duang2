@@ -11,7 +11,6 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.utils.DuangId;
-import com.duangframework.utils.GenericsUtils;
 import com.duangframework.vtor.annotation.VtorKit;
 
 /**

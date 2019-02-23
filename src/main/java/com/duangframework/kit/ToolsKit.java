@@ -11,6 +11,7 @@ import com.duangframework.db.annotation.ConvertField;
 import com.duangframework.db.common.Query;
 import com.duangframework.encrypt.core.HttpHeaderNames;
 import com.duangframework.exception.IException;
+import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ServiceException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.mvc.annotation.Bean;
@@ -648,7 +649,7 @@ public final class ToolsKit {
                 }
             }
         } catch (Exception e) {
-            logger.warn("updateIdEntityData is fail: " + e.getMessage(), e);
+            throw new MvcException(e.getMessage(), e);
         }
         userId = ToolsKit.isEmpty(userId) ? "admin" : userId;
         terminal = ToolsKit.isEmpty(terminal) ? "console" : terminal;
@@ -665,11 +666,15 @@ public final class ToolsKit {
      * @Exception SecurityUser对象不存在，则抛出空指针异常
      */
     public static SecurityUser getSecurityUser(String key) {
-        SecurityUser securityUser = SecurityKit.duang().id(key).get();
-        if(ToolsKit.isEmpty(securityUser)) {
-            throw new NullPointerException("根据["+key+"]取SecurityUser时失败,SecurityUser对象为null,请确定是否已登录!");
+        try {
+            SecurityUser securityUser = SecurityKit.duang().id(key).get();
+            if (ToolsKit.isEmpty(securityUser)) {
+                throw new NullPointerException("根据[" + key + "]取SecurityUser时失败,SecurityUser对象为null,请确定是否已登录!");
+            }
+            return securityUser;
+        } catch (Exception e) {
+            throw new MvcException(e.getMessage(), e);
         }
-        return securityUser;
     }
 
     // 定义一个请求对象安全线程类
