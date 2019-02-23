@@ -64,7 +64,9 @@ public abstract  class CurdService<T> {
             }
             Query<T> query = new Query<>();
             query.eq(IdEntity.ID_FIELD, new DuangId(id));
-            return (T)mongoDao.findOne(query);
+            T obj =  (T)mongoDao.findOne(query);
+            cacheService.save(obj);
+            return obj;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage(), e);
         }
