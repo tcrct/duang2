@@ -94,7 +94,10 @@ public class BeanHelper {
 
     public static List<Object> getWebSocketBeanList() {
         return returnBeanList(beanMap.get(ConstEnums.ANNOTATION_CLASS.WEBSOCKET_ANNOTATION.getName()));
+    }
 
+    public static List<Object> getListenerBeanList() {
+        return returnBeanList(beanMap.get(ConstEnums.ANNOTATION_CLASS.LISTENER_ANNOTATION.getName()));
     }
 
     private static List<Object> returnBeanList(List<Object> objectList) {
