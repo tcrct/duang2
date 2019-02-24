@@ -2,12 +2,11 @@ package com.duangframework.event;
 
 
 import com.duangframework.event.core.Event;
-import com.duangframework.event.core.EventListener;
 import com.duangframework.event.core.EventModel;
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
-import com.duangframework.mvc.annotation.Listener;
+import com.duangframework.mvc.annotation.EventListener;
 import com.duangframework.mvc.core.helper.BeanHelper;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EventFactory {
 
 	private static EventFactory eventFactory;
-	private static ConcurrentHashMap<String, EventListener> eventListenerMap = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<String, com.duangframework.event.core.EventListener> eventListenerMap = new ConcurrentHashMap<>();
 
 	public static EventFactory getInstance() {
 		if(null == eventFactory) {
@@ -33,13 +32,13 @@ public class EventFactory {
 		if(ToolsKit.isNotEmpty(listenetBeanList)) {
 			try {
 				for (Object listener : listenetBeanList) {
-					EventListener eventListener = (EventListener) listener;
-					Listener listenerAnnot = eventListener.getClass().getAnnotation(Listener.class);
-					String key = listenerAnnot.key();
+					com.duangframework.event.core.EventListener eventEventListener = (com.duangframework.event.core.EventListener) listener;
+					EventListener eventListenerAnnot = eventEventListener.getClass().getAnnotation(EventListener.class);
+					String key = eventListenerAnnot.key();
 					if(ToolsKit.isEmpty(key)) {
-						key = eventListener.getClass().getName();
+						key = eventEventListener.getClass().getName();
 					}
-					eventListenerMap.put(key, eventListener);
+					eventListenerMap.put(key, eventEventListener);
 				}
 			} catch (Exception e) {
 				throw new MvcException(e.getMessage(), e);
@@ -48,26 +47,26 @@ public class EventFactory {
 	}
 	public <T> T executeEvent(EventModel model){
 		String key = model.getKey();
-		EventListener listener = eventListenerMap.get(key);
-		if(ToolsKit.isEmpty(listener)){
-			throw new NullPointerException("find listener["+key+"] is null");
+		com.duangframework.event.core.EventListener eventListener = eventListenerMap.get(key);
+		if(ToolsKit.isEmpty(eventListener)){
+			throw new NullPointerException("find eventListener["+key+"] is null");
 		}
 		Event event = new Event(model.getModel());
-		return exceute(listener,event, model.isAsync());
+		return exceute(eventListener,event, model.isAsync());
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T> T exceute(final EventListener listener, final Event event, final boolean aync) {
-//		Type type = ((ParameterizedType) listener.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[1];
+	private <T> T exceute(final com.duangframework.event.core.EventListener eventListener, final Event event, final boolean aync) {
+//		Type type = ((ParameterizedType) eventListener.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[1];
 		if(aync){
 			ThreadPoolKit.execute(new Thread(){
 				public void run() {
-					listener.onEvent(event);
+					eventListener.onEvent(event);
 				}
 			});
 			return (T)null;		//如果是异步的话，就直接返回null;
 		} else {
-			return (T)listener.onEvent(event);
+			return (T) eventListener.onEvent(event);
 		}
 	}
 }
