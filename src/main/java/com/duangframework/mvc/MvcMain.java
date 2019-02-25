@@ -68,14 +68,13 @@ public class MvcMain {
      * @throws MvcException
      */
     public static void doHttpTask(IRequest request, IResponse response) throws MvcException {
+        String target = "";
         try {
-            String target = getResourcePath(request);
+            target = getResourcePath(request);
             // 请求访问处理器前的处理器链，可以对请求进行过滤
             HandlerHelper.doBeforeChain(target, request, response);
             // 请求访问处理器
             RequestAccessHandler.doHandler(target, request, response);
-            //返回结果处理器链，可以对返回结果进行提交日志，二次包装等操作
-            HandlerHelper.doAfterChain(target, request, response);
         } catch (InvocationTargetException ite) {
             logger.warn(ite.getMessage(), ite);
             WebKit.builderExceptionResponse(request, response, new ServiceException(ite.getCause().getMessage(), ite.getCause()));
@@ -83,6 +82,12 @@ public class MvcMain {
             logger.warn(e.getMessage(), e);
             WebKit.builderExceptionResponse(request, response, e);
         }
+        /**
+        * 返回结果处理器链，可以对返回结果进行提交日志，二次包装等操作
+         * 不能对该处理器链接进行异常捕捉，当发生异常时，打印异常信息后，
+         * 仍继续返回结果到客户端
+         */
+        HandlerHelper.doAfterChain(target, request, response);
     }
 
 }

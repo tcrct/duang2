@@ -7,6 +7,8 @@ import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.handler.DuangHeadHandle;
 import com.duangframework.mvc.http.handler.IHandler;
 import com.duangframework.websocket.IWebSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -16,6 +18,8 @@ import java.util.*;
  * @date createed in 2018/6/12.
  */
 public class HandlerHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(HandlerHelper.class);
 
     /**
      * 前置处理器集合
@@ -80,11 +84,14 @@ public class HandlerHelper {
      * @param target   请求的URI地址
      * @param request  请求对象
      * @param response 响应对象
-     * @throws MvcException
      */
-    public static void doAfterChain(String target, IRequest request, IResponse response) throws MvcException {
-        for (Iterator<IHandler> it = getAfterHandlerList().iterator(); it.hasNext(); ) {
-            it.next().doHandler(target, request, response);
+    public static void doAfterChain(String target, IRequest request, IResponse response)  {
+        try {
+            for (Iterator<IHandler> it = getAfterHandlerList().iterator(); it.hasNext(); ) {
+                it.next().doHandler(target, request, response);
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
         }
     }
 
