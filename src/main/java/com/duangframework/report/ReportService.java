@@ -5,6 +5,8 @@ import com.duangframework.mvc.annotation.Service;
 import com.duangframework.mvc.core.helper.RouteHelper;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.route.Route;
+import com.duangframework.report.dto.FrameworkInfoDto;
+import com.duangframework.report.dto.MappingDto;
 import com.duangframework.server.common.BootStrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,8 @@ import java.util.*;
 
 
 /**
+ * 提供基于duang框架的项目信息报告
+ *
  * @author Created by laotang
  * @date createed in 2018/1/31.
  */
@@ -20,14 +24,13 @@ import java.util.*;
 public class ReportService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
-    private static final Map<String, Route> actionMapping = new HashMap<>();
+    private static FrameworkInfoDto infoDto;
 
 
     private Map<String, Route> getActionMapping() {
-        if(actionMapping.isEmpty()) {
-            actionMapping.putAll(RouteHelper.getRouteMap());
-            actionMapping.putAll(RouteHelper.getRestfulRouteMap());
-        }
+        Map<String, Route> actionMapping = new HashMap<>();
+        actionMapping.putAll(RouteHelper.getRouteMap());
+        actionMapping.putAll(RouteHelper.getRestfulRouteMap());
         return actionMapping;
     }
 
@@ -37,7 +40,7 @@ public class ReportService {
         return allActionKeys;
     }
 
-    public Map<String, Route> actions() {
+    private Map<String, Route> actions() {
         List<String> keyList = getAllActionKeys();
         Map<String, Route> treeMap = new TreeMap<>();
         for (String key : keyList) {
@@ -49,7 +52,7 @@ public class ReportService {
         return treeMap;
     }
 
-    public Map<String, Map> treeActions() {
+    private List<MappingDto> treeActions() {
         List<String> keyList = getAllActionKeys();
         Map<String, Route> treeMap = new TreeMap<>();
         Map<String, List<Route>> treeItemMap = new TreeMap<>();
@@ -73,32 +76,52 @@ public class ReportService {
             }
         }
         Map<String, Map> mapList = new TreeMap();
-        mapList.put("controller", treeMap);
-        mapList.put("method", treeItemMap);
-        return mapList;
+        List<MappingDto> mappingDtoList = new ArrayList<>(mapList.size());
+        for(Iterator<Map.Entry<String, Route>> iterator = treeMap.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry<String, Route> entry = iterator.next();
+            String controllerMappingKey = entry.getKey();
+            Route controllerMapping = entry.getValue();
+            List<Route> actionsMappingList = treeItemMap.get(controllerMappingKey);
+            MappingDto mappingDto = new MappingDto(controllerMappingKey, controllerMapping, actionsMappingList);
+            mappingDtoList.add(mappingDto);
+        }
+//        mapList.put("controller", treeMap);
+//        mapList.put("method", treeItemMap);
+        return mappingDtoList;
     }
 
-    public Map<String, Object> info() {
-        Map<String, Object> computerInfoMap = new HashMap<>();
-        computerInfoMap.put("compute", ComputerInfo.getInstance());
+    /**
+     *  项目信息报告汇总
+     * @return  FrameworkInfoDto
+     */
+    public FrameworkInfoDto info() {
+        if(ToolsKit.isNotEmpty(infoDto)){
+            return infoDto;
+        }
+        infoDto = new FrameworkInfoDto();
+        infoDto.setComputerInfo(ComputerInfo.getInstance());
         BootStrap bootStrap = BootStrap.getInstants();
         if(ToolsKit.isNotEmpty(bootStrap)) {
-            computerInfoMap.put("host", bootStrap.getHost());
-            computerInfoMap.put("prot", bootStrap.getPort());
-            computerInfoMap.put("ssl", bootStrap.isSslEnabled());
+            infoDto.setHost(bootStrap.getHost());
+            infoDto.setProt(bootStrap.getPort());
+            infoDto.setSsl(bootStrap.isSslEnabled());
         }
-        Map<String, Map> treeActions = treeActions();
-        if(ToolsKit.isNotEmpty(treeActions)) {
-            computerInfoMap.put("controllerCount", ToolsKit.isEmpty(treeActions.get("controller")) ? 0 : treeActions.get("controller").size());
-            computerInfoMap.put("methodCount", ToolsKit.isEmpty(getActionMapping()) ? 0 : getActionMapping().size());
+        List<MappingDto> mappingDtoList = treeActions();
+        if(ToolsKit.isNotEmpty(mappingDtoList)) {
+            infoDto.setControllerCount(ToolsKit.isEmpty(mappingDtoList) ? 0 : mappingDtoList.size());
+            int actionsCount = 0;
+            for(MappingDto dto : mappingDtoList) {
+                List<Route> actionsList = dto.getActionsMappingList();
+                if(ToolsKit.isEmpty(actionsList)) {
+                    continue;
+                }
+                actionsCount += actionsList.size();
+            }
+            infoDto.setActionCount(actionsCount);
         }
-        computerInfoMap.put("author", ConstEnums.FRAMEWORK_OWNER.getValue());
-
-        Map<String, Object> infoMap = new HashMap<>();
-        infoMap.put("info", computerInfoMap); //服务器信息
-        infoMap.put("api", treeActions);// api接口信息
-
-        return infoMap;
+        infoDto.setAuthor(ConstEnums.FRAMEWORK_OWNER.getValue());
+        infoDto.setMappingDtoList(mappingDtoList); // 所有api接口信息
+        return infoDto;
     }
 
 
