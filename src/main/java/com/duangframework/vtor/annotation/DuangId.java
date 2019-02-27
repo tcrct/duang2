@@ -16,6 +16,6 @@ public @interface DuangId {
 
     String defaultValue() default "";
 
-    boolean isEmpty() default true;
+    boolean isEmpty() default false;        // 默认为不允许为空
 
 }

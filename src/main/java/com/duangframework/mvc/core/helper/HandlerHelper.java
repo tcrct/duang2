@@ -26,15 +26,13 @@ public class HandlerHelper {
      */
     private static final List<IHandler> beforeHandlerList = new ArrayList<>();
 
-    private static List<IHandler> initStartHandlerList = null;
-
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList.clear();
+        setInitStartHandlerList();
         HandlerHelper.beforeHandlerList.addAll(beforeHandlerList);
     }
 
     public static List<IHandler> getBeforeHandlerList() {
-        setInitStartHandlerList();
         return beforeHandlerList;
     }
 
@@ -42,12 +40,7 @@ public class HandlerHelper {
      * 设置启动处理器，注意添加顺序
      */
     private static void setInitStartHandlerList() {
-        if(ToolsKit.isEmpty(initStartHandlerList)) {
-            initStartHandlerList = new ArrayList<>();
-            // 添加Head处理器
-            initStartHandlerList.add(new DuangHeadHandle());
-            beforeHandlerList.addAll(initStartHandlerList);
-        }
+        beforeHandlerList.add(new DuangHeadHandle());  //检验tokenId及是否允许访问
     }
 
     /**

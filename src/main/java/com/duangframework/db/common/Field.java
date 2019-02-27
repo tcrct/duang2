@@ -10,11 +10,14 @@ import java.util.Collection;
 public class Field {
 
 	private Collection<String> fields = null;
-	
+
 	public Field() {
-		fields = new ArrayList<String>();
+		fields = new ArrayList<>();
 	}
-	
+	public Field(Collection<String> collection) {
+		fields = new ArrayList<>(collection);
+	}
+
 	/**
 	 * 添加查询返回字段
 	 * @param fieldName		字段名
@@ -24,12 +27,12 @@ public class Field {
 		fields.add(fieldName);
 		return this;
 	}
-	
+
 //	public DBObject getDBFields() {
 //		DBObject fieldObj = MongoUtils.convert2DBFields(fields);
 //		return ToolsKit.isEmpty(fieldObj) ? new BasicDBObject() : fieldObj;
 //	}
-	
+
 	public Collection<String> getFields(){
 		return fields;
 	}

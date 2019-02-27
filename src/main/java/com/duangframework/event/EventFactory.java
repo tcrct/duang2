@@ -6,7 +6,7 @@ import com.duangframework.event.core.EventModel;
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
-import com.duangframework.mvc.annotation.EventListener;
+import com.duangframework.mvc.annotation.Listener;
 import com.duangframework.mvc.core.helper.BeanHelper;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,8 +33,8 @@ public class EventFactory {
 			try {
 				for (Object listener : listenetBeanList) {
 					com.duangframework.event.core.EventListener eventEventListener = (com.duangframework.event.core.EventListener) listener;
-					EventListener eventListenerAnnot = eventEventListener.getClass().getAnnotation(EventListener.class);
-					String key = eventListenerAnnot.key();
+					Listener listenerAnnot = eventEventListener.getClass().getAnnotation(Listener.class);
+					String key = listenerAnnot.key();
 					if(ToolsKit.isEmpty(key)) {
 						key = eventEventListener.getClass().getName();
 					}
@@ -54,7 +54,7 @@ public class EventFactory {
 		Event event = new Event(model.getModel());
 		return exceute(eventListener,event, model.isAsync());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private <T> T exceute(final com.duangframework.event.core.EventListener eventListener, final Event event, final boolean aync) {
 //		Type type = ((ParameterizedType) eventListener.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[1];

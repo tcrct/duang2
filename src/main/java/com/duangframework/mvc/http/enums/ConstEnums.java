@@ -66,7 +66,7 @@ public enum ConstEnums {
         WEBSOCKET_ANNOTATION(WebSocket.class, true,"所有WebSocket类的注解，必须在类添加该注解否则框架忽略扫描"),
         PLUGIN_ANNOTATION(Plugin.class, false, "所有Plugin类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
         HANDLER_ANNOTATION(Handler.class, false, "所有Handler类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
-        LISTENER_ANNOTATION(EventListener.class, true, "所有Listener类的注解，必须在类添加该注解否则框架忽略扫描"),
+        LISTENER_ANNOTATION(Listener.class, true, "所有Listener类的注解，必须在类添加该注解否则框架忽略扫描"),
         ;
 
         Class<? extends Annotation> clazz;
@@ -120,7 +120,7 @@ public enum ConstEnums {
         JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
         SERVER_HOST("server.host", "服务器地址"),
         SERVER_PORT("server.port", "服务器端口"),
-        TOKENID_FIELD("token", "令牌字段key"),
+        TOKENID_FIELD("token.key", "令牌ID字段名称"),
         TOKEN_TIMEOUT_FIELD("token.timeout", "令牌过期时间"),
         BASE_AUTH_USERNAME("base.auth.username", "HTTP基本认证，即请求头参数authorization，Basic Auth的用户名，默认为duang"),
         BASE_AUTH_PASSWORD("base.auth.password", "HTTP基本认证， 即请求头参数authorization，Basic Auth的密码，默认为duangduangduang"),

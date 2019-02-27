@@ -60,15 +60,30 @@ public class ${entityName}Service extends CurdService<${entityName}> {
     }
 
     /**
+     * 根据id查找泛型对象记录
+     *@param  mongoDao Dao对象
+     *@param  cacheService Cache对象
+     @param  kvItems kvItem数据对象
+
+     * @return 查找成功返回泛型对象, 否则抛出异常
+     */
+    public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, KvItem... kvItems) {
+        return findByKey(null , kvItems);
+    }
+
+    /**
     * 根据条件查找${entityName}对象记录
-    * @param kvItems    kvItem数据对象
+    *@param  mongoDao Dao对象
+    *@param  cacheService Cache对象
+    *@param  fieldList 查询返回字段
+    *@param  kvItems kvItem数据对象
     *
     * @since 1.0
     * @return 查找成功返回${entityName}对象, 否则抛出异常
     */
-   public ${entityName} findByKey(KvItem... kvItems) {
+   public ${entityName} findByKey(List<String> fieldList, KvItem... kvItems) {
        try {
-           return super.findByKey(${entityVarName}Dao, ${entityVarName}CacheService, kvItems);
+           return super.findByKey(${entityVarName}Dao, ${entityVarName}CacheService, fieldList, kvItems);
        } catch (Exception e) {
            throw new ServiceException("findByKey for ${entityName} is fail: "+ e.getMessage(), e);
        }

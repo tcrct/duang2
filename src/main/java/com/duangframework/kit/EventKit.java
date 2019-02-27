@@ -67,7 +67,7 @@ public class EventKit {
      * @return
      */
     public EventKit listener(Class<?> listenerClass) {
-        if(ToolsKit.isEmpty(_key)) {
+        if(ToolsKit.isNotEmpty(_key)) {
             throw new IllegalArgumentException("key is exist");
         }
         _key = listenerClass.getName();

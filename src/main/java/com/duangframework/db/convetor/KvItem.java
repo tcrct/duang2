@@ -6,6 +6,7 @@ import com.mongodb.DBObject;
 import org.bson.Document;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,9 +15,9 @@ import java.util.Map;
  */
 public class KvItem implements java.io.Serializable {
 
-    private String key;
-    private String operator; //操作符， =，like, >=,<=之类
-    private Object value;
+    private String key;                         // 查询字段
+    private String operator;                // 操作符， =，like, >=,<=之类
+    private Object value;                    // 查询值
 
     public KvItem() {
     }

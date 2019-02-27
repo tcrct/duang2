@@ -11,11 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 定义 EventListener 类注解
+ * 定义 Listener 类注解
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EventListener {
+public @interface Listener {
     // 执行顺序，数字越小，优先级越高
 //    int order()  default Integer.MAX_VALUE;
     // 该监听器的标识符

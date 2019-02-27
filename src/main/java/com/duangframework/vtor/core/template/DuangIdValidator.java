@@ -24,8 +24,10 @@ public class DuangIdValidator extends AbstractValidatorTemplate<DuangId> {
         if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
-        if(!ToolsKit.isValidDuangId(paramValue.toString())) {
-            throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message());
+        if(ToolsKit.isNotEmpty(paramValue)) {
+            if (!ToolsKit.isValidDuangId(paramValue.toString())) {
+                throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message());
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.duangframework.utils;
 
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.dto.ReturnDto;
@@ -33,6 +34,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class WebKit {
 
     private static final Logger logger = LoggerFactory.getLogger(WebKit.class);
+    private static String TOKENID_FIELD_NAME; // 请求tokenId字段名称
 
     /**
      * 将请求结果返回到客户端
@@ -186,6 +188,16 @@ public class WebKit {
         returnDto.setData("ERROR");
         returnDto.setParams(request.getParameterMap());
         returnDto.setHead(headDto);
+        builderExceptionResponse(request, response, returnDto);
+    }
+
+    /**
+     *  构建返回对象，异常信息部份
+     * @param request
+     * @param response
+     * @param returnDto
+     */
+    public static void builderExceptionResponse(IRequest request, IResponse response, ReturnDto returnDto) {
         response.write(returnDto);
     }
 
@@ -194,4 +206,22 @@ public class WebKit {
         String requestId = headers.get(requestIdFieldName);
         return ToolsKit.isEmpty(requestId) ? params.getOrDefault(requestIdFieldName, new DuangId().toString())+"" : requestId;
     }
+
+    /**
+     * 取请求里的tokenId， 先取head头部分，再取参数部份
+     * @param request      请求
+     * @return      tokenId字符串，不存在返回空字符串
+     */
+    public static String getRequestTokenId(IRequest request) {
+        if(ToolsKit.isEmpty(TOKENID_FIELD_NAME)) {
+            TOKENID_FIELD_NAME = PropKit.get(ConstEnums.PROPERTIES.TOKENID_FIELD.getValue(), ConstEnums.TOKENID_FIELD.getValue());
+        }
+        // 由于框架里将所有header头里的key全都换成小写了，所以这里取header头时，要toLowerCase()
+        String tokenId = request.getHeader(TOKENID_FIELD_NAME.toLowerCase());
+        if(ToolsKit.isEmpty(tokenId)) {
+            tokenId = request.getParameter(TOKENID_FIELD_NAME);
+        }
+        return ToolsKit.isEmpty(tokenId) ? "" : tokenId;
+    }
+
 }

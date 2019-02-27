@@ -16,6 +16,7 @@ import com.duangframework.exception.ServiceException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.*;
+import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.SecurityUser;
 import com.duangframework.utils.*;
@@ -727,6 +728,12 @@ public final class ToolsKit {
         return true;
     }
 
+    /**
+     * 创建HTTP基本认证头信息
+     * @param account       用户名
+     * @param password     密码
+     * @return
+     */
     public static String createBaseAuthHeaderString(String account, String password) {
         String auth = account+":"+password;
         return "Basic " + Encodes.encodeBase64(auth.getBytes()); //Charset.forName("US-ASCII")

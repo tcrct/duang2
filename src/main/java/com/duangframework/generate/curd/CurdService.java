@@ -1,6 +1,7 @@
 package com.duangframework.generate.curd;
 
 import com.duangframework.db.IdEntity;
+import com.duangframework.db.common.Field;
 import com.duangframework.db.common.Query;
 import com.duangframework.db.common.Update;
 import com.duangframework.db.convetor.KvItem;
@@ -12,6 +13,8 @@ import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
+
+import java.util.List;
 
 /**
  * CURD 操作公用类
@@ -72,18 +75,35 @@ public abstract  class CurdService<T> {
     }
 
     /**
+     * 根据id查找泛型对象记录
+     *@param  mongoDao Dao对象
+     *@param  cacheService Cache对象
+     @param  kvItems kvItem数据对象
+
+     * @return 查找成功返回泛型对象, 否则抛出异常
+     */
+    public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, KvItem... kvItems) {
+        return findByKey(mongoDao, cacheService, null , kvItems);
+    }
+    /**
      * 根据条件查找泛型对象记录
-     * @param kvItems    kvItem数据对象
+     *@param  mongoDao Dao对象
+     *@param  cacheService Cache对象
+     *@param  fieldList   返回字段
+     *@param  kvItems kvItem数据对象
      *
      * @since 1.0
      * @return 查找成功返回泛型对象, 否则抛出异常
      */
-    public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, KvItem... kvItems) {
+    public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, List<String> fieldList, KvItem... kvItems) {
         if(ToolsKit.isEmpty(kvItems)) {
             throw new ServiceException("findByKey for ${entityName} is fail: kvItems is null");
         }
         try {
             Query query = new Query();
+            if(ToolsKit.isNotEmpty(fieldList)) {
+                query.fields(new Field(fieldList));
+            }
             for(KvItem kvItem : kvItems) {
                 if(Operator.EQ.equals(kvItem.getOperator())) {
                     query.eq(kvItem.getKey(), kvItem.getValue());

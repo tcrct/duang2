@@ -8,6 +8,7 @@ import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.utils.WebKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +17,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * 检验该请求是否存在tokenId参数
+ * 如果存在则验证，验证通过后继续执行后续代码
+ * 如果不存在，则判断该请求URI是否允许的，如果是属于不允许不存在的URI，则抛出异常结束请求访问
+ *
  * @author Created by laotang
  * @date createed in 2018/6/8.
  */
 public class DuangHeadHandle implements IHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(DuangHeadHandle.class);
-    private static String TOKENID_FIELD_NAME;
     public static final Set<String> FILTER_TARGET_SET = new HashSet<>();
 
     public DuangHeadHandle() {
@@ -34,13 +37,7 @@ public class DuangHeadHandle implements IHandler {
 
     @Override
     public void doHandler(String target, IRequest request, IResponse response) throws MvcException {
-        if(ToolsKit.isEmpty(TOKENID_FIELD_NAME)) {
-            TOKENID_FIELD_NAME = PropKit.get(ConstEnums.PROPERTIES.TOKENID_FIELD.getValue(), ConstEnums.TOKENID_FIELD.getValue());
-        }
-        String tokenId = request.getHeader(TOKENID_FIELD_NAME);
-        if(ToolsKit.isEmpty(tokenId)) {
-            tokenId = request.getParameter(TOKENID_FIELD_NAME);
-        }
+       String tokenId = WebKit.getRequestTokenId(request);
         // 如果不存在tokenId,则判断该请求URI是否允许访问，如果不允许，则抛出异常返回
         if(ToolsKit.isEmpty(tokenId)) {
             if (!FILTER_TARGET_SET.contains(target)) {

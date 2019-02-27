@@ -66,7 +66,8 @@ public final class VtorFactory {
 	 */
 	public static void validator(Collection<Object> beanCollections) throws Exception {
 		if(ToolsKit.isEmpty(beanCollections)) {
-			throw new NullPointerException("collection is null");
+			logger.warn("collection is null, so exit validator!");
+			return;
 		}
 		init();
 		boolean isValidator = false;
@@ -87,7 +88,8 @@ public final class VtorFactory {
 	 */
 	public static void validator(Map<String, Object> beanMap) throws Exception {
 		if(ToolsKit.isEmpty(beanMap)) {
-			throw new NullPointerException("map is null");
+			logger.warn("map is null, so exit validator!");
+			return;
 		}
 		init();
 		boolean isValidator = false;
