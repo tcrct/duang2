@@ -1,5 +1,8 @@
 package com.duangframework.utils;
 
+import com.duangframework.exception.AbstractDuangException;
+import com.duangframework.exception.Exceptions;
+import com.duangframework.exception.IException;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.HeadDto;
@@ -181,11 +184,18 @@ public class WebKit {
         headDto.setClientIp(request.getRemoteIp());
         headDto.setMethod(request.getMethod());
         headDto.setRequestId(request.getRequestId());
-        headDto.setRet(1);
+        IException ie = Exceptions.getDuangException(e);
+        int code = 1;
+        String message = e.getMessage();
+        if(null != ie) {
+            code = ie.getCode();
+            message = ie.getMessage();
+        }
+        headDto.setRet(code);
         headDto.setUri(request.getRequestURI());
         headDto.setTimestamp(ToolsKit.getCurrentDateString());
-        headDto.setMsg(e.getMessage());
-        returnDto.setData("ERROR");
+        headDto.setMsg(message);
+        returnDto.setData("error");
         returnDto.setParams(request.getParameterMap());
         returnDto.setHead(headDto);
         builderExceptionResponse(request, response, returnDto);

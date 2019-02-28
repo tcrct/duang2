@@ -1,6 +1,7 @@
 package com.duangframework.mvc.route;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.duangframework.db.enums.LevelEnums;
 import com.duangframework.kit.PathKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
@@ -56,6 +57,7 @@ public class Route {
             if(ToolsKit.isNotEmpty(controllerMapping)) {
                 this.requestMapping = new RequestMapping(controllerKey,
                         controllerMapping.desc(),
+                        (controllerMapping.level()).getValue(),
                         controllerMapping.order(),
                         controllerMapping.timeout(),
                         "");
@@ -71,6 +73,7 @@ public class Route {
             }
             this.requestMapping = new RequestMapping(controllerKey+"/"+actionMethod.getName().toLowerCase(),
                     actionMethod.getName(),
+                    0,
                     0,
                     Integer.parseInt(ConstEnums.PROPERTIES.REQUEST_TIMEOUT.getValue()),
                     httpMethodString);
@@ -91,6 +94,7 @@ public class Route {
         routeKey = PathKit.fixPath(routeKey);
         this.requestMapping = new RequestMapping(routeKey.toLowerCase(),
                 methodMapping.desc(),
+                (methodMapping.level()).getValue(),
                 methodMapping.order(),
                 methodMapping.timeout(),
                 httpMethodString);

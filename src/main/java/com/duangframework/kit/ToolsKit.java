@@ -627,7 +627,7 @@ public final class ToolsKit {
     private static void updateIdEntityData(Object obj, String userId, String source) throws Exception {
         Field updateTimeField = IdEntity.class.getDeclaredField(IdEntity.UPDATETIME_FIELD);
         Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
-        Field sourceField = IdEntity.class.getField(IdEntity.SOURCE_FIELD);
+        Field sourceField = IdEntity.class.getDeclaredField(IdEntity.SOURCE_FIELD);
         ObjectKit.setField(obj, updateTimeField, new Date());
         ObjectKit.setField(obj, updateUserIdField, userId);
         ObjectKit.setField(obj, sourceField, source);

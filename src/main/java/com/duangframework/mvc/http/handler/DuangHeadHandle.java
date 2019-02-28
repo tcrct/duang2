@@ -26,24 +26,13 @@ import java.util.Set;
  */
 public class DuangHeadHandle implements IHandler {
 
-    public static final Set<String> FILTER_TARGET_SET = new HashSet<>();
-
     public DuangHeadHandle() {
-        List<String> tmpList = PropKit.getList(ConstEnums.PROPERTIES.FILTER_URI_FIELD.getValue());
-        System.err.println("filter tokenId url: " + ToolsKit.toJsonString(tmpList));
-        FILTER_TARGET_SET.addAll(tmpList);
     }
 
 
     @Override
     public void doHandler(String target, IRequest request, IResponse response) throws MvcException {
        String tokenId = WebKit.getRequestTokenId(request);
-        // 如果不存在tokenId,则判断该请求URI是否允许访问，如果不允许，则抛出异常返回
-        if(ToolsKit.isEmpty(tokenId)) {
-            if (!FILTER_TARGET_SET.contains(target)) {
-                throw new MvcException("current request[ " + target + " ] is not exist tokenid, access is not allowed so exit...");
-            }
-        }
         HeadDto headDto = new HeadDto();
         headDto.setClientIp(request.getRemoteIp());
         headDto.setHeaderMap(request.getHeaderMap());

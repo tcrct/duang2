@@ -7,7 +7,7 @@ package com.duangframework.exception;
 public abstract class AbstractDuangException extends RuntimeException implements IException {
 
     protected int code = IException.FAIL_CODE;
-    protected String message = IException.FAIL_MESSAGE;
+    protected String message = ""; //IException.FAIL_MESSAGE;
 
     AbstractDuangException() {
         super();

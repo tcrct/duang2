@@ -2,10 +2,12 @@ package com.duangframework.exception;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 关于异常的工具类.
- * 
+ *
  */
 public class Exceptions {
 
@@ -19,6 +21,16 @@ public class Exceptions {
 			return new RuntimeException(e);
 		}
 	}
+
+	public static IException getDuangException(Exception e) {
+		if(e instanceof IException) {
+			IException ie = (IException) e;
+			return  null == ie ? null : ie;
+		}
+		return null;
+	}
+
+
 
 	/**
 	 * 将ErrorStack转化为String.
@@ -44,6 +56,6 @@ public class Exceptions {
 		}
 		return false;
 	}
-	
-	
+
+
 }

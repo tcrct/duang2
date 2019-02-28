@@ -28,8 +28,8 @@ public class HandlerHelper {
 
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList.clear();
-        setInitStartHandlerList();
         HandlerHelper.beforeHandlerList.addAll(beforeHandlerList);
+        addDefaultHandler2BeforeHandlerList();
     }
 
     public static List<IHandler> getBeforeHandlerList() {
@@ -38,8 +38,9 @@ public class HandlerHelper {
 
     /**
      * 设置启动处理器，注意添加顺序
+     * 在所有处理器之后添加
      */
-    private static void setInitStartHandlerList() {
+    private static void addDefaultHandler2BeforeHandlerList() {
         beforeHandlerList.add(new DuangHeadHandle());  //检验tokenId及是否允许访问
     }
 

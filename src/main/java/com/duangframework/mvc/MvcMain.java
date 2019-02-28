@@ -2,6 +2,7 @@ package com.duangframework.mvc;
 
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ServiceException;
+import com.duangframework.exception.TokenException;
 import com.duangframework.mvc.core.RequestAccessHandler;
 import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.http.IRequest;
@@ -78,7 +79,12 @@ public class MvcMain {
         } catch (InvocationTargetException ite) {
             logger.warn(ite.getMessage(), ite);
             WebKit.builderExceptionResponse(request, response, new ServiceException(ite.getCause().getMessage(), ite.getCause()));
-        } catch (Exception e) {
+        }
+//        catch (TokenException e) {
+//            logger.warn(e.getMessage(), e);
+//            WebKit.builderExceptionResponse(request, response, e);
+//        }
+        catch (Exception e) {
             logger.warn(e.getMessage(), e);
             WebKit.builderExceptionResponse(request, response, e);
         }

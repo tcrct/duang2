@@ -31,7 +31,7 @@ public class TokenException extends AbstractDuangException implements IException
         if(ToolsKit.isEmpty(super.getMessage())) {
             return ExceptionEnums.TOKEN_EXPIRE.getMessage();
         } else {
-            return ExceptionEnums.TOKEN_EXPIRE.getMessage() + ": " + super.getMessage();
+            return super.getMessage();
         }
     }
 }

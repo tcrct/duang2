@@ -24,7 +24,6 @@ import java.util.*;
 public class ReportService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
-    private static FrameworkInfoDto infoDto;
 
 
     private Map<String, Route> getActionMapping() {
@@ -95,10 +94,7 @@ public class ReportService {
      * @return  FrameworkInfoDto
      */
     public FrameworkInfoDto info() {
-        if(ToolsKit.isNotEmpty(infoDto)){
-            return infoDto;
-        }
-        infoDto = new FrameworkInfoDto();
+        FrameworkInfoDto infoDto = new FrameworkInfoDto();
         infoDto.setComputerInfo(ComputerInfo.getInstance());
         BootStrap bootStrap = BootStrap.getInstants();
         if(ToolsKit.isNotEmpty(bootStrap)) {

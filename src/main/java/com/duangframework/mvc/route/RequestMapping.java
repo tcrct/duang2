@@ -15,6 +15,7 @@ public class RequestMapping {
     private String value;       // action映射的路径值
     private String desc;        // action的简要说明
     private int order;            // 排序
+    private int level;             // 层级
     private long timeout = 0L; //请求过期时间
     private String method;  // 请求方式
 
@@ -22,9 +23,10 @@ public class RequestMapping {
 
     }
 
-    public RequestMapping(String value, String desc, int order, long timeout, String method) {
+    public RequestMapping(String value, String desc, int level, int order, long timeout, String method) {
         this.value = value;
         this.desc = desc;
+        this.level = level;
         this.order = order;
         this.timeout = timeout;
         this.method = method;
@@ -40,6 +42,14 @@ public class RequestMapping {
 
     public int getOrder() {
         return order;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public long getTimeout() {

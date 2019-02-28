@@ -4,6 +4,7 @@ package com.duangframework.mvc.annotation;
  * Created by laotang on 2017/11/5.
  */
 
+import com.duangframework.db.enums.LevelEnums;
 import com.duangframework.mvc.http.enums.HttpMethod;
 
 import java.lang.annotation.*;
@@ -40,7 +41,7 @@ import java.lang.annotation.*;
 public @interface Mapping {
     String value() default "";
     String desc() default "";
-    int level () default 0;
+    LevelEnums level () default LevelEnums.BUTTON;
     int order() default 0;
     long timeout() default 3000L;
     HttpMethod[] method() default {};
