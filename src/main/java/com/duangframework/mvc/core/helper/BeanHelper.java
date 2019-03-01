@@ -125,8 +125,16 @@ public class BeanHelper {
      */
     public static <T> T getBean(Class<?> clazz) {
         String key = getBeanClassName(clazz);
+        return getBean(key);
+    }
+
+    /**
+     *  根据key取出对应的Ioc Bean
+     * @param  key  类的全名，包含包路径，如： Class.getName()
+     */
+    public static <T> T getBean(String key) {
         if (!iocBeanMap.containsKey(key)) {
-            throw new MvcException("无法根据类名["+clazz.getName()+"]获取实例 , 请检查！");
+            throw new MvcException("无法根据类名["+key+"]获取实例 , 请检查！");
         }
         return (T)iocBeanMap.get(key);
     }

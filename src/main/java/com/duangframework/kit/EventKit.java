@@ -42,15 +42,6 @@ public class EventKit {
     }
 
     /**
-     *  监听器注解里设置的key参数
-     * @return
-     */
-    public EventKit key(String key) {
-        _key = key;
-        return this;
-    }
-
-    /**
      * 是否同步处理，默认为同步，当值为true时为异步
      * @param async
      * @return
@@ -61,16 +52,12 @@ public class EventKit {
     }
 
     /**
-     *  Listener注解里没有设置key值时，可以根据 监听器类全名作key
-     *  若设置了key, 则抛出异常，不同时指定两个， 以key值为准
-     * @param listenerClass
+     *  Listener注解设置的key值
+     * @param key
      * @return
      */
-    public EventKit listener(Class<?> listenerClass) {
-        if(ToolsKit.isNotEmpty(_key)) {
-            throw new IllegalArgumentException("key is exist");
-        }
-        _key = listenerClass.getName();
+    public EventKit listenerKey(String key) {
+        _key = key;
         return this;
     }
 
