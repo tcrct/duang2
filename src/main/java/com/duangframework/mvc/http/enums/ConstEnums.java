@@ -163,8 +163,14 @@ public enum ConstEnums {
         CORS_ORIGINS("cors.origins", "允许跨域的域名，如有多个以小写,号分隔"),
         CORS_ALLOW_HEADERS("cors.allow.headers", "允许跨域的header头信息，如有多个以小写,号分隔"),
 
-        /**uploadfile*/
+        /** uploadfile */
         UPLOADFILE_DIRECTORY ("uploadfile.directory", "上传文件存放目录，相对于根路径"),
+
+        /** email */
+        SMTP_HOST("smtp.host", "邮箱SMTP服务器地址"),
+        SMTP_PROT("smtp.prot", "邮箱SMTP服务器端口"),
+        EMAIL_ACCOUNT("email.account","发送人邮箱帐号"),
+        EMAIL_PASSWORD("email.password","发送人邮箱密码"),
 
         ;
 
