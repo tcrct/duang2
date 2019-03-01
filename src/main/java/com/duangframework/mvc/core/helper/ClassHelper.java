@@ -96,7 +96,7 @@ public class ClassHelper {
     }
 
     /**
-     * 返回所有Plugin类
+     * 返回所有类集合
      * @return
      */
     public static List<Class<?>> getClassList (Class<? extends Annotation> annotationClass) {

@@ -79,6 +79,7 @@ public abstract class ClassTemplate {
         try {
             while (urlEnumeration.hasMoreElements()) {
                 URL classUrl = urlEnumeration.nextElement();
+                logger.info("scan class path: " + classUrl);
                 if (ToolsKit.isEmpty(classUrl)) {
                     continue;
                 }

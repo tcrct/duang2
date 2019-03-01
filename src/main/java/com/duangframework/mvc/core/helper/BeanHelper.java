@@ -151,6 +151,7 @@ public class BeanHelper {
                     this.addAll(getControllerBeanList());
                     this.addAll(getServiceBeanList());
                     this.addAll(getWebSocketBeanList());
+                    this.addAll(getListenerBeanList());
                 }
             };
 
