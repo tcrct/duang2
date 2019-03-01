@@ -83,7 +83,11 @@ public abstract  class CurdService<T> {
      * @return 查找成功返回泛型对象, 否则抛出异常
      */
     public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, KvItem... kvItems) {
-        return findByKey(mongoDao, cacheService, null , kvItems);
+        try {
+            return findByKey(mongoDao, cacheService, null, kvItems);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
     /**
      * 根据条件查找泛型对象记录

@@ -7,7 +7,8 @@ package com.duangframework.cache;
  */
 public interface ICacheKeyEnums {
 
-    int DEFAULT_TTL = 60*30;
+    int DEFAULT_TTL = 60*30;  // 默认的过期时间，30钟为单位
+    int NEVER_TTL = -1; // 永不过期
 
     /**
      *取出缓存Key的前缀

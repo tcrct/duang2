@@ -30,7 +30,7 @@ public class Update<T> {
     public Update() {
         updateObj = new LinkedHashMap();
         // 默认更新审核通过的数据
-        updateObj.put(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
+        set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
     }
 
     public Map getUpdate() {

@@ -21,10 +21,19 @@ public class CacheModelOptions {
         private int ttl;
         private String keyDesc;
 
+        public Builder() {
+
+        }
+
         public Builder(ICacheKeyEnums enums) {
             this.keyPrefix = enums.getKeyPrefix();
             this.ttl = enums.getKeyTTL();
             this.keyDesc = enums.getKeyDesc();
+        }
+
+        public Builder keyPrefix(String keyPrefix) {
+            this.keyPrefix = keyPrefix;
+            return this;
         }
 
         public Builder customKey(String customKey) {

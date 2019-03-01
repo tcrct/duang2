@@ -48,8 +48,8 @@ public class BootStrap implements Closeable {
     private String host;
     /** 应用端口*/
     private int port;
-    /** 开发模式，默认为dev*/
-    private EnvEnum envModel = EnvEnum.DEV;
+    /** 开发模式*/
+    private EnvEnum envModel;
     /** boss线程数*/
     private int bossThreadGroupCount = ServerConfig.MAX_BOSS_EXECUTORS_NUMBER;
     /** worker线程数*/

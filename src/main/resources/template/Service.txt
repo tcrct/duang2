@@ -8,6 +8,7 @@ import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.generate.curd.CurdService;
 import com.duangframework.db.convetor.KvItem;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ${basePackage}.cache.${entityVarName}.${entityName}CacheService;
@@ -60,24 +61,23 @@ public class ${entityName}Service extends CurdService<${entityName}> {
     }
 
     /**
-     * 根据id查找泛型对象记录
-     *@param  mongoDao Dao对象
-     *@param  cacheService Cache对象
-     @param  kvItems kvItem数据对象
-
-     * @return 查找成功返回泛型对象, 否则抛出异常
+     * 根据条件查找${entityName}对象记录, 返回所有字段
+     *@param  kvItems kvItem数据对象
+     *@since 1.0
+     *@return 查找成功返回泛型对象, 否则抛出异常
      */
-    public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, KvItem... kvItems) {
-        return findByKey(null , kvItems);
+    public ${entityName} findByKey(KvItem... kvItems) {
+        try {
+            return findByKey(null , kvItems);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
 
     /**
-    * 根据条件查找${entityName}对象记录
-    *@param  mongoDao Dao对象
-    *@param  cacheService Cache对象
+    * 根据条件查找${entityName}对象记录，返回指定字段
     *@param  fieldList 查询返回字段
-    *@param  kvItems kvItem数据对象
-    *
+    *@param  kvItems kvItem数据对象    *
     * @since 1.0
     * @return 查找成功返回${entityName}对象, 否则抛出异常
     */
@@ -106,7 +106,8 @@ public class ${entityName}Service extends CurdService<${entityName}> {
      /**
      * 根据搜索对象搜索符合条件的User对象记录
      * @param searchListDto     搜索对象
-     * @return
+     * @since 1.0
+     * @return  PageDto<${entityName}> 分页对象
      */
     public PageDto<${entityName}> search(SearchListDto searchListDto) {
         try {

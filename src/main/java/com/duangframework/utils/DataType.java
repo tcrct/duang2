@@ -1,6 +1,7 @@
 package com.duangframework.utils;
 
 import com.duangframework.db.IdEntity;
+import com.duangframework.db.annotation.Entity;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
 
@@ -11,79 +12,79 @@ import java.util.Date;
 
 @SuppressWarnings("rawtypes")
 public final class DataType {
-    
+
 	public static boolean isString(Class type){
         return type.equals(String.class);
     }
-    
+
     public static boolean isInteger(Class type){
         return type.equals(int.class);
     }
-    
+
     public static boolean isIntegerObject(Class type){
         return type.equals(Integer.class);
     }
-    
+
     public static boolean isLong(Class type){
         return type.equals(long.class);
     }
-    
+
     public static boolean isLongObject(Class type){
         return type.equals(Long.class);
     }
-    
+
     public static boolean isShort(Class type){
         return type.equals(short.class);
     }
-    
+
     public static boolean isShortObject(Class type){
         return type.equals(Short.class);
     }
-    
+
     public static boolean isByte(Class type){
         return type.equals(byte.class);
     }
-    
+
     public static boolean isByteObject(Class type){
         return type.equals(Byte.class);
     }
-    
+
     public static boolean isFloat(Class type){
         return type.equals(float.class);
     }
-    
+
     public static boolean isFloatObject(Class type){
         return type.equals(Float.class);
     }
-    
+
     public static boolean isDouble(Class type){
         return type.equals(double.class);
     }
-    
+
     public static boolean isDoubleObject(Class type){
         return type.equals(Double.class);
     }
-    
+
     public static boolean isBoolean(Class type){
         return type.equals(boolean.class);
     }
-    
+
     public static boolean isBooleanObject(Class type){
         return type.equals(Boolean.class);
     }
-    
+
     public static boolean isChar(Class type){
         return type.equals(char.class);
     }
-    
+
     public static boolean isCharObject(Class type){
         return type.equals(Character.class);
     }
-    
+
     public static boolean isDate(Class type){
         return type.equals(java.util.Date.class);
     }
-    
+
     public static boolean isTimestamp(Class type){
         return type.equals(java.sql.Timestamp.class);
     }
@@ -91,11 +92,11 @@ public final class DataType {
     public static boolean isArray(Class type){
         return type.isArray();
     }
-    
+
     /**
      * 判断是否为List集合
      * @param type
-     * @return 
+     * @return
      */
     public static boolean isListType(Class type){
         boolean isList = type.equals(java.util.List.class) || type.equals(java.util.ArrayList.class);
@@ -108,11 +109,11 @@ public final class DataType {
         }
         return isList;
     }
-    
+
     /**
      * 判断是否为Set集合
      * @param type
-     * @return 
+     * @return
      */
     public static boolean isSetType(Class type){
         boolean isSet =  type.equals(java.util.Set.class) || type.equals(java.util.HashSet.class);
@@ -125,11 +126,11 @@ public final class DataType {
         }
         return isSet;
     }
-    
+
     /**
      * 判断是否为Map集合
      * @param type
-     * @return 
+     * @return
      */
     public static boolean isMapType(Class type){
         boolean isMap = type.equals(java.util.Map.class) || type.equals(java.util.HashMap.class);
@@ -142,11 +143,11 @@ public final class DataType {
         }
         return isMap;
     }
-    
+
     /**
      * Queue, Deque and LinkedList is supported now.
      * @param type
-     * @return 
+     * @return
      */
     public static boolean isQueueType(Class type){
         boolean isQueue =  type.equals(java.util.Queue.class) || type.equals(java.util.Deque.class) || type.equals(java.util.LinkedList.class);
@@ -179,7 +180,8 @@ public final class DataType {
 
     public static boolean isBeanType(Class type){
         return DataType.isIdEntityType(type)
-                ||  type.isAnnotationPresent(Bean.class);
+                ||  type.isAnnotationPresent(Bean.class)
+                ||  type.isAnnotationPresent(Entity.class);
     }
 
     /**
@@ -188,15 +190,15 @@ public final class DataType {
      * @return
      */
     public static boolean isBaseType(Class<?> type) {
-		if (DataType.isString(type) 
+		if (DataType.isString(type)
 				|| DataType.isInteger(type) || DataType.isIntegerObject(type)
-				|| DataType.isLong(type) || DataType.isLongObject(type) 
-				|| DataType.isDouble(type) || DataType.isDoubleObject(type) 
+				|| DataType.isLong(type) || DataType.isLongObject(type)
+				|| DataType.isDouble(type) || DataType.isDoubleObject(type)
 				|| DataType.isFloat(type) || DataType.isFloatObject(type)
-				|| DataType.isShort(type) || DataType.isShortObject(type) 
-				|| DataType.isByte(type) || DataType.isByteObject(type) 
+				|| DataType.isShort(type) || DataType.isShortObject(type)
+				|| DataType.isByte(type) || DataType.isByteObject(type)
 				|| DataType.isBoolean(type) || DataType.isBooleanObject(type)
-				|| DataType.isChar(type) || DataType.isCharObject(type) 
+				|| DataType.isChar(type) || DataType.isCharObject(type)
 				|| DataType.isDate(type)
 				|| DataType.isTimestamp(type)) {
 			return true;
@@ -263,5 +265,5 @@ public final class DataType {
         }
         return value;
     }
-    
+
 }

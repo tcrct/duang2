@@ -230,7 +230,11 @@ public class WebKit {
         String tokenId = request.getHeader(TOKENID_FIELD_NAME.toLowerCase());
         if(ToolsKit.isEmpty(tokenId)) {
             tokenId = request.getParameter(TOKENID_FIELD_NAME);
+            if(ToolsKit.isEmpty(tokenId)) {
+                tokenId = request.getParameter(ConstEnums.TOKENID_FIELD.getValue());
+            }
         }
+
         return ToolsKit.isEmpty(tokenId) ? "" : tokenId;
     }
 
