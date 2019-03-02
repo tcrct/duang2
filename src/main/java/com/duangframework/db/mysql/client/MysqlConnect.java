@@ -44,7 +44,7 @@ public class MysqlConnect extends DBConnect {
                     .append("&characterEncoding=").append(ConstEnums.DEFAULT_CHAR_ENCODE.getValue().toLowerCase().replace("-",""))
                     .append("&useUnicode=true&autoReconnect=true&failOverReadOnly=false");
 //                    .append("&useSSL=true");
-//            return "jdbc:mysql://" + host + ":" + getPort() + "/" + getDatabase() +"?user="+getAccount()+"&password="+getPassword()+"&useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false";
+//            return "jdbc:mysql://" + host + ":" + getPort() + "/" + getDatabase() +"?user="+getUsername()+"&password="+getPassword()+"&useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false";
             url = jdbc.toString();
         }
         return url;

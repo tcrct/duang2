@@ -9,6 +9,9 @@ import com.duangframework.kit.PatternKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.sun.mail.util.MailSSLSocketFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -21,6 +24,8 @@ import java.util.Set;
  * Created by laotang on 2019/3/1.
  */
 public class EmailClient implements IEmall {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailClient.class);
 
     private final static String SMTP_AUTH = "mail.smtp.auth";
     private final static String TRANSPORT_PROTOCOL = "mail.transport.protocol";
@@ -78,9 +83,9 @@ public class EmailClient implements IEmall {
         try {
             Transport.send( makeMail(session, model.getSubject(), model.getBody(), model.getFrom(), model.getReceivers(), false));
         } catch (MessagingException e) {
-            throw new ServiceException(e.getMessage(), e);
+            logger.warn("send mail is fail: " + e.getMessage(), e);
         } catch (Exception e){
-            throw new ServiceException(e.getMessage(), e);
+            logger.warn("send mail is fail: " + e.getMessage(), e);
         }
     }
 
@@ -88,9 +93,9 @@ public class EmailClient implements IEmall {
         try {
             Transport.send( makeMail(session, model.getSubject(), model.getBody(), model.getFrom(), model.getReceivers(), true));
         } catch (MessagingException e) {
-            throw new ServiceException(e.getMessage(), e);
+            logger.warn("send mail is fail: " + e.getMessage(), e);
         } catch (Exception e){
-            throw new ServiceException(e.getMessage(), e);
+            logger.warn("send mail is fail: " + e.getMessage(), e);
         }
     }
 

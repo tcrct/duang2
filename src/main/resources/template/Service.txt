@@ -113,7 +113,6 @@ public class ${entityName}Service extends CurdService<${entityName}> {
         try {
             return super.search(searchListDto, ${entityVarName}Dao, ${entityVarName}CacheService);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ServiceException("search for ${entityName} is fail: "+ e.getMessage(), e);
         }
     }

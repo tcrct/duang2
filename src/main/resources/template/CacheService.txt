@@ -61,6 +61,6 @@ public class ${entityName}CacheService implements ICacheService<${entityName}> {
             throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
         }
         CacheModelOptions options = new CacheModelOptions.Builder(${entityName}CacheKeyEnum.${entityUpperCaseName}).customKey(id).builder();
-        return 0 != CacheManager.getRedisClient().del(options.getKey());
+        return 0 < CacheManager.getRedisClient().del(options.getKey());
     }
 }

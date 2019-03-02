@@ -31,7 +31,7 @@ public class EmailKit {
         clear();
         return EmaillKitHolder.INSTANCE;
     }
-    public static void clear() {
+    private static void clear() {
         receivers.clear();
         subject = null;
         from = null;
