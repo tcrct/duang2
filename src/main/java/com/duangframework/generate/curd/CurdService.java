@@ -20,7 +20,7 @@ import java.util.List;
  * CURD 操作公用类
  * @param <T> 泛型对象
  */
-public abstract  class CurdService<T> {
+public abstract  class CurdService<T> implements IService {
 
     /**
      * 保存泛型对象

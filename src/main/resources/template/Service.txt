@@ -104,7 +104,7 @@ public class ${entityName}Service extends CurdService<${entityName}> {
     }
 
      /**
-     * 根据搜索对象搜索符合条件的User对象记录
+     * 根据搜索对象搜索符合条件的${entityName}对象记录
      * @param searchListDto     搜索对象
      * @since 1.0
      * @return  PageDto<${entityName}> 分页对象
