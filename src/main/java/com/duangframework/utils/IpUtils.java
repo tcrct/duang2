@@ -1,6 +1,8 @@
 package com.duangframework.utils;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.IRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -113,5 +115,31 @@ public class IpUtils {
             }
         } catch (SocketException localSocketException) {}
         return candidate;
+    }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    public static String getRealIp(IRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("proxy-client-ip");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("wl-proxy-client-ip");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+
+    public static String getRealIpV2(IRequest request) {
+        String accessIP = request.getHeader("x-forwarded-for");
+        if (null == accessIP)
+            return request.getRemoteAddr();
+        return accessIP;
     }
 }

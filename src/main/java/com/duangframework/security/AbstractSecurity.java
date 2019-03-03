@@ -4,6 +4,7 @@ import com.duangframework.exception.ExceptionEnums;
 import com.duangframework.exception.SecurityException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.security.dto.LoginDto;
+import com.duangframework.security.dto.RelationDto;
 
 import java.util.*;
 
@@ -34,13 +35,17 @@ public abstract class AbstractSecurity implements ISecurity {
     public abstract  SecurityUser realm(LoginDto loginDto) throws SecurityException;
 
     @Override
-    public Set<String> getRoles() throws SecurityException{
-        return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(securityUser.getRoles())) ? securityUser.getRoles() : new HashSet<>();
+    public Map<String, String> getRoles() throws SecurityException{
+        RelationDto relationDto = securityUser.getRelationDto();
+        return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(relationDto) && ToolsKit.isNotEmpty(relationDto.getRoleMap()))
+                ? relationDto.getRoleMap() : new HashMap<>();
     }
 
     @Override
     public Map<String, String> getResources() throws SecurityException{
-        return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(securityUser.getAuthoritys())) ? securityUser.getAuthoritys() : new HashMap<>();
+        RelationDto relationDto = securityUser.getRelationDto();
+        return (ToolsKit.isNotEmpty(securityUser) && ToolsKit.isNotEmpty(relationDto) && ToolsKit.isNotEmpty(relationDto.getAuthorityMap()))
+                ? relationDto.getAuthorityMap() : new HashMap<>();
     }
 
     public boolean getout(Object key) throws SecurityException {

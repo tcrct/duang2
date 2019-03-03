@@ -24,7 +24,7 @@ public interface ISecurity {
      * 取出指定用户的所有角色
      * @return
      */
-    Set<String> getRoles() throws SecurityException;
+    Map<String, String> getRoles() throws SecurityException;
 
     /**
      * 取出指定用户的所有资源
