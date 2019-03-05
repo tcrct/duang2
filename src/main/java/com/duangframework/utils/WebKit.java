@@ -214,6 +214,9 @@ public class WebKit {
     public static String getRequestId(Map<String, String> headers, Map<String,Object> params) {
         String requestIdFieldName = ConstEnums.REQUEST_ID_FIELD.getValue();
         String requestId = headers.get(requestIdFieldName);
+        if(ToolsKit.isEmpty(requestId)) {
+            requestId = params.get(ConstEnums.REQUEST_ID_FIELD2.getValue())+"";
+        }
         return ToolsKit.isEmpty(requestId) ? params.getOrDefault(requestIdFieldName, new DuangId().toString())+"" : requestId;
     }
 
