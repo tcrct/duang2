@@ -213,7 +213,7 @@ public class ParameterInvokeMethod {
             entity = ToolsKit.jsonParseObject(json, parameterType);
         }
         if(ToolsKit.isEmpty(entity)) {
-            logger.warn("invokeBean: json字符串转换为Object时出错，json字符串可能是空，所以返回null退出...");
+            logger.warn("invokeBean: json字符串转换为Object时出错，json字符串可能是空或请求没有参数体，所以返回null退出...");
             return null;
         }
         boolean isBean = DataType.isBeanType(parameterType)

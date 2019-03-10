@@ -64,7 +64,7 @@ public class ${entityName}Service extends CurdService<${entityName}> {
      * 根据条件查找${entityName}对象记录, 返回所有字段
      *@param  kvItems kvItem数据对象
      *@since 1.0
-     *@return 查找成功返回泛型对象, 否则抛出异常
+     *@return 查找成功返回${entityName}对象, 否则抛出异常
      */
     public ${entityName} findByKey(KvItem... kvItems) {
         try {
@@ -114,6 +114,22 @@ public class ${entityName}Service extends CurdService<${entityName}> {
             return super.search(searchListDto, ${entityVarName}Dao, ${entityVarName}CacheService);
         } catch (Exception e) {
             throw new ServiceException("search for ${entityName} is fail: "+ e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 根据条件查找所有${entityName}对象记录, 如fieldList有指定时，返回指定字段
+     * @param fieldList  查询后需要返回的字段
+     *@param  kvItems kvItem数据对象
+     *@since 1.0
+     *@return 查找成功返回${entityName}对象集合, 否则抛出异常
+     */
+    @Override
+    public List<${entityName}> findAllByKey(List<String> fieldList, KvItem... kvItems) {
+        try {
+            return super.findAllByKey(${entityVarName}Dao, ${entityVarName}CacheService, fieldList, kvItems);
+        } catch (Exception e) {
+            throw new ServiceException("findAllByKey for ${entityName} is fail: "+ e.getMessage(), e);
         }
     }
 

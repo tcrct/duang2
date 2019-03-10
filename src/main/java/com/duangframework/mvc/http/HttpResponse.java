@@ -2,6 +2,7 @@ package com.duangframework.mvc.http;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.utils.DuangId;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -39,7 +40,10 @@ public class HttpResponse implements IResponse {
         headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString()));
         headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString()));
         headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString()));
-        headers.put(HttpHeaderNames.CONTENT_TYPE.toString(), request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString()));
+        String contentType = request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString());
+        if(ToolsKit.isNotEmpty(contentType)) {
+            headers.put(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
+        }
         headers.put(ConstEnums.REQUEST_ID_FIELD.getValue(), request.getRequestId());
 
         request.getHeaderMap().remove(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString());

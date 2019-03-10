@@ -31,16 +31,25 @@ public abstract  class CurdService<T> implements IService<T> {
      * @return  保存成功返回泛型对象， 否则抛出异常
      */
     public T save(T vo, MongoDao<T> mongoDao, ICacheService cacheService) {
+        boolean isUpdate = false;
         try {
             VtorKit.validate(vo);
+            String id = "";
             if(ToolsKit.isNotEmpty(vo) && vo instanceof IdEntity) {
-                if(ToolsKit.isEmpty(((IdEntity)vo).getId())){
+                id = ((IdEntity)vo).getId();
+                if(ToolsKit.isEmpty(id)){
                     ToolsKit.addEntityData(vo);
                 } else {
+                    isUpdate = true;
                     ToolsKit.updateEntityData(vo);
                 }
             }
             T entity = mongoDao.save(vo);
+            if(isUpdate && ToolsKit.isNotEmpty(id)) {
+                Query query = new Query();
+                query.eq(IdEntity.ID_FIELD, id);
+                entity = mongoDao.findOne(query);
+            }
             cacheService.save(entity);
             return entity;
         } catch (Exception e) {
@@ -104,16 +113,7 @@ public abstract  class CurdService<T> implements IService<T> {
             throw new ServiceException("findByKey for ${entityName} is fail: kvItems is null");
         }
         try {
-            Query query = new Query();
-            if(ToolsKit.isNotEmpty(fieldList)) {
-                query.fields(new Field(fieldList));
-            }
-            for(KvItem kvItem : kvItems) {
-                if(Operator.EQ.equals(kvItem.getOperator())) {
-                    query.eq(kvItem.getKey(), kvItem.getValue());
-                }
-            }
-            return (T)mongoDao.findOne(query);
+            return (T)mongoDao.findOne(createQuery(fieldList, kvItems));
         } catch (Exception e) {
             throw new ServiceException("findByKey for ${entityName} is fail: "+ e.getMessage(), e);
         }
@@ -161,6 +161,61 @@ public abstract  class CurdService<T> implements IService<T> {
             e.printStackTrace();
             throw new ServiceException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 根据条件查找所有泛型对象记录
+     *@param  mongoDao Dao对象
+     *@param  cacheService Cache对象
+     *@param  fieldList   返回字段
+     *@param  kvItems kvItem数据对象
+     *
+     * @since 1.0
+     * @return 查找成功返回泛型对象列表集合, 否则抛出异常
+     */
+    public List<T> findAllByKey(MongoDao<T> mongoDao, ICacheService cacheService, List<String> fieldList, KvItem... kvItems) {
+        if(ToolsKit.isEmpty(kvItems)) {
+            throw new ServiceException("findAllByKey for ${entityName} is fail: kvItems is null");
+        }
+        try {
+            return mongoDao.findList(createQuery(fieldList, kvItems));
+        } catch (Exception e) {
+            throw new ServiceException("findAllByKey for ${entityName} is fail: "+ e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 创建查询对象
+     * @param fieldList     查询返回字段
+     * @param kvItems     查询条件
+     * @return
+     */
+    private Query createQuery(List<String> fieldList, KvItem... kvItems) {
+        Query query = new Query();
+        if(ToolsKit.isNotEmpty(fieldList)) {
+            query.fields(new Field(fieldList));
+        }
+        for(KvItem kvItem : kvItems) {
+            if(Operator.EQ.equals(kvItem.getOperator())) {
+                query.eq(kvItem.getKey(), kvItem.getValue());
+            }
+            else if(Operator.LIKE.equals(kvItem.getOperator())) {
+                query.like(kvItem.getKey(), kvItem.getValue());
+            }
+            else if(Operator.GTE.equals(kvItem.getOperator())) {
+                query.gte(kvItem.getKey(), kvItem.getValue());
+            }
+            else if(Operator.LTE.equals(kvItem.getOperator())) {
+                query.lte(kvItem.getKey(), kvItem.getValue());
+            }
+            else if(Operator.GT.equals(kvItem.getOperator())) {
+                query.gt(kvItem.getKey(), kvItem.getValue());
+            }
+            else if(Operator.LT.equals(kvItem.getOperator())) {
+                query.lt(kvItem.getKey(), kvItem.getValue());
+            }
+        }
+        return query;
     }
 
 }

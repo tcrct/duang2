@@ -58,19 +58,19 @@ public class KvItem implements java.io.Serializable {
                     if (Operator.REGEX.equalsIgnoreCase(entry.getKey())) {
                         operator = com.duangframework.db.mysql.common.Operator.LIKE;
                     }
-                    if (Operator.GTE.equalsIgnoreCase(entry.getKey())) {
+                    else if (Operator.GTE.equalsIgnoreCase(entry.getKey())) {
                         operator = com.duangframework.db.mysql.common.Operator.GTE;
                     }
-                    if (Operator.GT.equalsIgnoreCase(entry.getKey())) {
+                    else if (Operator.GT.equalsIgnoreCase(entry.getKey())) {
                         operator = com.duangframework.db.mysql.common.Operator.GT;
                     }
-                    if (Operator.LTE.equalsIgnoreCase(entry.getKey())) {
+                    else if (Operator.LTE.equalsIgnoreCase(entry.getKey())) {
                         operator = com.duangframework.db.mysql.common.Operator.LTE;
                     }
-                    if (Operator.LT.equalsIgnoreCase(entry.getKey())) {
+                    else if (Operator.LT.equalsIgnoreCase(entry.getKey())) {
                         operator = com.duangframework.db.mysql.common.Operator.LT;
                     }
-                    if (Operator.NE.equalsIgnoreCase(entry.getKey())) {
+                    else if (Operator.NE.equalsIgnoreCase(entry.getKey())) {
                         operator = com.duangframework.db.mysql.common.Operator.NE;
                     }
                 }

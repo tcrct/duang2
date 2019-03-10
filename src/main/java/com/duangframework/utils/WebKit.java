@@ -76,7 +76,11 @@ public class WebKit {
 
         for(Iterator<Map.Entry<String, String>> iterator = response.getHeaders().entrySet().iterator(); iterator.hasNext();) {
             Map.Entry<String, String> entry = iterator.next();
-            responseHeaders.set(entry.getKey(), entry.getValue());
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if(ToolsKit.isNotEmpty(key) && ToolsKit.isNotEmpty(value)) {
+                responseHeaders.set(entry.getKey(), entry.getValue());
+            }
         }
 
         responseHeaders.set(HttpHeaderNames.DATE.toString(), ToolsKit.getCurrentDateString());

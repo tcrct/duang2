@@ -26,4 +26,7 @@ public interface IService<T> {
 
     /**根据搜索对象搜索符合条件的泛型对象记录*/
     PageDto<T> search(SearchListDto searchListDto);
+
+    /**根据条件查找所有泛型对象记录*/
+    List<T> findAllByKey(List<String> fieldList, KvItem... kvItems);
 }

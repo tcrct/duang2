@@ -295,7 +295,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         options.upsert(false); //为true则新增记录
         document.remove(IdEntity.ENTITY_ID_FIELD);
         BasicDBObject updateDbo = new BasicDBObject(Operator.SET, document);
-        return collection.updateOne(query, updateDbo, options).isModifiedCountAvailable();
+        return collection.updateMany(query, updateDbo, options).isModifiedCountAvailable();
 
     }
 
@@ -342,8 +342,8 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
     @SuppressWarnings("static-access")
     public double max(String key, Query query) {
         List<Bson> pipeline = new ArrayList<>();
-        BasicDBObject orderObj = (BasicDBObject)MongoUtils.convert2DBOrder(query.getOrderObj());
-        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, orderObj);		//查询条件
+        BasicDBObject queryObj = new BasicDBObject(query.getQuery());
+        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, queryObj);		//查询条件
         BasicDBObject maxTmp = new BasicDBObject();
         maxTmp.put("_id", null);
         DBObject max = new BasicDBObject();
@@ -375,8 +375,8 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
     public double min(String key, Query query) {
         List<BasicDBObject> pipeline = new ArrayList<>();
         //查询条件
-        BasicDBObject orderObj = (BasicDBObject)MongoUtils.convert2DBOrder(query.getOrderObj());
-        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, orderObj);
+        BasicDBObject queryObj = new BasicDBObject(query.getQuery());
+        BasicDBObject matchDbo = new BasicDBObject(Operator.MATCH, queryObj);
         BasicDBObject minTmp = new BasicDBObject();
         minTmp.put("_id", null);
         DBObject min = new BasicDBObject();
