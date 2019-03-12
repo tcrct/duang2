@@ -32,7 +32,7 @@
         <common.version>3.4</common.version>
         <codec.version>1.10</codec.version>
         <encrypt.version>1.0-SNAPSHOT</encrypt.version>
-        <mail.version>1.4.7</mail.version>
+        <ext.version>1.0-SNAPSHOT</ext.version>
     </properties>
 
     <build>
@@ -87,11 +87,11 @@
     <distributionManagement>
         <repository>
             <id>nexus</id>
-            <url>http://dev.signetz.com:7071/repository/maven-releases/</url>
+            <url>http://192.168.100.100:7071/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>nexus</id>
-            <url>http://dev.signetz.com:7071/repository/maven-snapshots/</url>
+            <url>http://192.168.100.100:7071/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -220,18 +220,17 @@
             <artifactId>duang-encrypt</artifactId>
             <version>${encrypt.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${mail.version}</version>
+            <groupId>com.duangframework.ext</groupId>
+            <artifactId>duang-ext</artifactId>
+            <version>${ext.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.qiniu</groupId>
-            <artifactId>qiniu-java-sdk</artifactId>
-            <version>7.2.99</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.qiniu</groupId>-->
+            <!--<artifactId>qiniu-java-sdk</artifactId>-->
+            <!--<version>7.2.99</version>-->
+        <!--</dependency>-->
 
 
         <!--&lt;!&ndash; JWT &ndash;&gt;-->

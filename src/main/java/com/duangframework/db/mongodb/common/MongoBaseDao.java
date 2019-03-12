@@ -13,10 +13,7 @@ import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.PageDto;
 import com.mongodb.*;
-import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
@@ -357,8 +354,12 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
             return 0d;
         }
         try{
-            Document result = out.iterator().next();
-            return Double.parseDouble(result.get("_max").toString());
+            MongoCursor<Document> cursor = out.iterator();
+            if(ToolsKit.isNotEmpty(cursor)) {
+                Document result = cursor.next();
+                return Double.parseDouble(result.get("_max").toString());
+            }
+            return 0d;
         }catch(Exception ex){
             logger.error(ex.getMessage(), ex);
             return 0d;
@@ -387,8 +388,12 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         pipeline.add(groupDbo);
         AggregateIterable<Document> out = collection.aggregate(pipeline);
         try{
-            Document result = out.iterator().next();
-            return Double.parseDouble(result.get("_min").toString());
+            MongoCursor<Document> cursor = out.iterator();
+            if(ToolsKit.isNotEmpty(cursor)) {
+                Document result = cursor.next();
+                return Double.parseDouble(result.get("_min").toString());
+            }
+            return 0d;
         }catch(Exception ex){
             logger.error(ex.getMessage(), ex);
             return 0d;
