@@ -358,7 +358,7 @@ public final class ToolsKit {
      */
     public static ReturnDto<Object> buildReturnDto(IException exception, Object obj) {
         ReturnDto<Object> dto = new ReturnDto<Object>();
-        HeadDto head = new HeadDto();
+        HeadDto head = ToolsKit.getThreadLocalDto();
         if(isEmpty(head)) {
             head = new HeadDto();
         }
@@ -368,10 +368,6 @@ public final class ToolsKit {
         } else {
             head.setRet(exception.getCode());
             head.setMsg(exception.getMessage());
-        }
-        HeadDto threadLocalHeadDto = ToolsKit.getThreadLocalDto();
-        if(ToolsKit.isNotEmpty(threadLocalHeadDto) && ToolsKit.isNotEmpty(threadLocalHeadDto.getTokenId())) {
-            head.setTokenId(threadLocalHeadDto.getTokenId());
         }
         dto.setHead(head);
         dto.setData(obj);

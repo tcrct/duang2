@@ -184,7 +184,7 @@ public class WebKit {
      */
     public static void builderExceptionResponse(IRequest request, IResponse response, Exception e) {
         ReturnDto<String> returnDto = new ReturnDto<>();
-        HeadDto headDto = new HeadDto();
+        HeadDto headDto = ToolsKit.getThreadLocalDto();
         headDto.setClientIp(request.getRemoteIp());
         headDto.setMethod(request.getMethod());
         headDto.setRequestId(request.getRequestId());
@@ -226,7 +226,7 @@ public class WebKit {
 
     /**
      * 取请求里的tokenId， 先取head头部分，再取参数部份
-     * @param request      请求
+     * @param request      请求对象
      * @return      tokenId字符串，不存在返回空字符串
      */
     public static String getRequestTokenId(IRequest request) {
@@ -243,6 +243,28 @@ public class WebKit {
         }
 
         return ToolsKit.isEmpty(tokenId) ? "" : tokenId;
+    }
+
+    /**
+     * 更新令牌
+     * @param tokenId   令牌ID
+     * @param request    请求对象
+     * @param response  返回对象
+     */
+    public static void updateTokenId(String tokenId, IRequest request, IResponse response) {
+        if(ToolsKit.isEmpty(tokenId)) {
+            return;
+        }
+        if(ToolsKit.isEmpty(TOKENID_FIELD_NAME)) {
+            TOKENID_FIELD_NAME = PropKit.get(ConstEnums.PROPERTIES.TOKENID_FIELD.getValue(), ConstEnums.TOKENID_FIELD.getValue());
+        }
+        String tokenIdFieldName = TOKENID_FIELD_NAME.toLowerCase();
+        // 由于框架里将所有header头里的key全都换成小写了，所以这里取header头时，要toLowerCase()
+        Map<String,String> headerMap = request.getHeaderMap();
+        if(ToolsKit.isEmpty(headerMap)) {
+            headerMap.put(tokenIdFieldName, tokenId);
+        }
+        response.setHeader(tokenIdFieldName, tokenId);
     }
 
 }
