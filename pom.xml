@@ -219,11 +219,23 @@
             <groupId>com.duangframework.encrypt</groupId>
             <artifactId>duang-encrypt</artifactId>
             <version>${encrypt.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.duangframework</groupId>
+                    <artifactId>duang</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.duangframework.ext</groupId>
             <artifactId>duang-ext</artifactId>
             <version>${ext.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.duangframework</groupId>
+                    <artifactId>duang</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--<dependency>-->
