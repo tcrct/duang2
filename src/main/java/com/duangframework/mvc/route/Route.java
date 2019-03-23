@@ -71,7 +71,7 @@ public class Route {
             if(ToolsKit.isEmpty(controllerKey)) {
                 controllerKey = getControllerMapperKey();
             }
-            this.requestMapping = new RequestMapping(controllerKey+"/"+actionMethod.getName().toLowerCase(),
+            this.requestMapping = new RequestMapping(controllerKey+"/"+ actionMethod.getName().toLowerCase(),
                     actionMethod.getName(),
                     0,
                     0,
@@ -79,7 +79,6 @@ public class Route {
                     httpMethodString);
             return;
         }
-
         this.httpMethod = methodMapping.method();
         String methodKey = methodMapping.value();
         if(ToolsKit.isNotEmpty(methodKey)) {
@@ -92,7 +91,10 @@ public class Route {
             routeKey = controllerKey + methodKey;
         }
         routeKey = PathKit.fixPath(routeKey);
-        this.requestMapping = new RequestMapping(routeKey.toLowerCase(),
+        if( methodMapping.lowerCase()) {
+            routeKey = routeKey.toLowerCase();
+        }
+        this.requestMapping = new RequestMapping(routeKey,
                 methodMapping.desc(),
                 (methodMapping.level()).getValue(),
                 methodMapping.order(),
@@ -133,7 +135,8 @@ public class Route {
         String controllerKey = "/"+getControllerClass().getSimpleName().replace(Controller.class.getSimpleName(), "").toLowerCase();
         Mapping controllerMapping = getControllerClass().getAnnotation(Mapping.class);
         if(ToolsKit.isNotEmpty(controllerMapping)) {
-            controllerKey = ToolsKit.isEmpty(controllerMapping.value()) ? controllerKey : controllerMapping.value().toLowerCase();
+            controllerKey = ToolsKit.isEmpty(controllerMapping.value()) ? controllerKey :
+                    (controllerMapping.lowerCase() ? controllerMapping.value().toLowerCase():controllerMapping.value());
         }
         return new Route(controllerClass, null, controllerKey, null);
     }
@@ -147,13 +150,13 @@ public class Route {
             if(ToolsKit.isEmpty(controllerKey)) {
                 String productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_URI_PREFIX.getValue());
                 if(ToolsKit.isEmpty(productCode)) {
-                   productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).toLowerCase().replace("-", "").replace("_", "");
+                   productCode = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue()).replace("-", "").replace("_", "");
                 }
                 productCode = productCode.startsWith("/") ? productCode.substring(1) : productCode;
                 controllerKey = "/"+productCode + (controllerKey.startsWith("/") ? controllerKey : "/" + controllerKey);
             }
         }
-        return controllerKey.toLowerCase();
+        return controllerMapping.lowerCase() ? controllerKey.toLowerCase() : controllerKey;
     }
 
 }

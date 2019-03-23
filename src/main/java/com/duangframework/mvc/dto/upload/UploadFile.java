@@ -77,7 +77,7 @@ public class UploadFile {
 		if (serverDirectory == null || fileName == null) {
 			return null;
 		} else {
-			String path = PathKit.getWebRootPath()+"/"+ serverDirectory + "/" + fileName;
+			String path = serverDirectory + "/" + fileName;
 			return new File(path);
 		}
 	}

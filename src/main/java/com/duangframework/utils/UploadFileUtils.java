@@ -22,7 +22,7 @@ public class UploadFileUtils {
      * @return
      */
     public static String builderServerFileDir(String saveDir) {
-        String rootDir = PathKit.getPath("/");
+        String rootDir = PathKit.getWebRootPath();
         rootDir = checkDirString(rootDir);
         if(rootDir.endsWith("classes")) {
             rootDir = rootDir.substring(0, rootDir.length() - 7);

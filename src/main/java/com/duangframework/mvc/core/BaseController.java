@@ -601,6 +601,7 @@ public abstract class BaseController {
     public List<UploadFile> getUploadFiles(String saveDirectory,  boolean isUUIDName) {
         Enumeration<String> enumeration = request.getAttributeNames();
         List<UploadFile> uploadFileList = new ArrayList<>();
+        saveDirectory = saveDirectory.equals("/") ? "" : saveDirectory;
         while (enumeration.hasMoreElements()) {
             String key = enumeration.nextElement();
             Object requestAttribute = request.getAttribute(key);

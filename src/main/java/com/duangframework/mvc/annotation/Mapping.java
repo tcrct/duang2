@@ -45,5 +45,6 @@ public @interface Mapping {
     int order() default 0;
     long timeout() default 3000L;
     HttpMethod[] method() default {};
+    boolean lowerCase() default true; //是否全小写，默认是全小写
     Validation[] vtor() default {};
 }

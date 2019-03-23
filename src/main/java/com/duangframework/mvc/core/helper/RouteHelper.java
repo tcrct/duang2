@@ -83,7 +83,8 @@ public class RouteHelper {
                 mappingKey = "/"+mappingKey.substring(0, mappingKey.length() - "controller".length());
             }
         }
-        String uri = mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1).toLowerCase() : mappingKey.toLowerCase();
+        String uri = mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1) : mappingKey;
+        uri = mapping.lowerCase() ? uri.toLowerCase() : uri;
         return  ToolsKit.isEmpty(productUriPrefix)
                 ? uri : productUriPrefix + uri;
     }

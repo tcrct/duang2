@@ -292,7 +292,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         options.upsert(false); //为true则新增记录
         document.remove(IdEntity.ENTITY_ID_FIELD);
         BasicDBObject updateDbo = new BasicDBObject(Operator.SET, document);
-        return collection.updateMany(query, updateDbo, options).isModifiedCountAvailable();
+        return collection.updateOne(query, updateDbo, options).isModifiedCountAvailable();
 
     }
 
@@ -326,7 +326,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         //查询记录不存在时，不新增记录
         UpdateOptions options = new UpdateOptions();
         options.upsert(false);
-        UpdateResult updateResult = collection.updateOne(queryBson, updateBson, options);
+        UpdateResult updateResult = collection.updateMany(queryBson, updateBson, options);
         return updateResult.isModifiedCountAvailable() ? updateResult.getModifiedCount() : 0L;
     }
 

@@ -15,6 +15,7 @@ public class LoginDto  {
     public static final String ACCOUNT_FIELD = "account";
     public static final String PASSWORD_FIELD = "password";
     public static final String CAPTCHA_FIELD = "captcha";
+    public static final String COMPANY_ID_FIELD = "companyId";
     public static final String PROJECT_ID_FIELD = "projectId";
     public static final String SECURITY_SERVICE_URL_FIELD = "securityServiceUrl";
 
@@ -33,20 +34,33 @@ public class LoginDto  {
 
     @NotEmpty(message = "项目标识不能为空")
     private String projectId;
+
+    private String companyId;
+
     //第三方权限服务地址
     private String securityServiceUrl;
 
     public LoginDto() {
     }
 
-    public LoginDto(String account, String password, String captcha, String phone, String projectId) {
-        this(account,password,captcha, phone, projectId, null);
+
+    public LoginDto(String account, String password, String companyId) {
+        this(account,password,companyId, null);
     }
 
-    public LoginDto(String account, String password, String captcha, String projectId, String phone, String securityServiceUrl) {
+    public LoginDto(String account, String password, String companyId, String projectId) {
+        this(account,password,null, null, companyId, projectId);
+    }
+
+    public LoginDto(String account, String password, String captcha, String phone, String companyId, String projectId) {
+        this(account,password,captcha, phone, companyId, projectId, null);
+    }
+
+    public LoginDto(String account, String password, String captcha, String companyId, String projectId, String phone, String securityServiceUrl) {
         this.account = account;
         this.password = password;
         this.captcha = captcha;
+        this.companyId = companyId;
         this.projectId = projectId;
         this.securityServiceUrl = securityServiceUrl;
         this.phone = phone;
@@ -84,6 +98,14 @@ public class LoginDto  {
         this.securityServiceUrl = securityServiceUrl;
     }
 
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
+    }
+
     public String getProjectId() {
         return projectId;
     }
@@ -107,6 +129,7 @@ public class LoginDto  {
                 ", password='" + password + '\'' +
                 ", captcha='" + captcha + '\'' +
                 ", phone='" + phone + '\'' +
+                ", companyId='" + companyId + '\'' +
                 ", projectId='" + projectId + '\'' +
                 ", securityServiceUrl='" + securityServiceUrl + '\'' +
                 '}';
