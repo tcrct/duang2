@@ -56,7 +56,8 @@ public abstract class AbstractNettyServer implements IServer {
         if(isUse()){
             throw new NettyStartUpException("server startup fail: " + bootStrap.getPort() + " is use!");
         }
-       // 添加ResourceLeakDetector，内存泄露检测
+       //   添加ResourceLeakDetector，内存泄露检测
+        //  https://netty.io/wiki/reference-counted-objects.html#leak-detection-levels
         if(EnvEnum.DEV.equals(bootStrap.getEnvModel())) {
             //对每一个对象都进行检测，并且打印内存泄露的地方，负载较高，适合测试模式
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);

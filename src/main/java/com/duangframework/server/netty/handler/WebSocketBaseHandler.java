@@ -4,6 +4,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
+import com.duangframework.utils.DataType;
 import com.duangframework.websocket.IWebSocket;
 import com.duangframework.websocket.WebSocketContext;
 import com.duangframework.websocket.WebSocketSession;
@@ -66,8 +67,14 @@ public class WebSocketBaseHandler {
             throw new NullPointerException("request message is empty");
         }
         socketSession.setMessage(requestMessage);
-        ReturnDto returnDto = webSocket.onReceive(socketSession);
-        webSocketContext.push(ToolsKit.toJsonString(returnDto)); //推送到客户端
+        Object returnDto = webSocket.onReceive(socketSession);
+        String pushString = "";
+        if(returnDto instanceof String || DataType.isBaseType(returnDto.getClass())) {
+            pushString = returnDto+"";
+        } else {
+            pushString = ToolsKit.toJsonString(returnDto);
+        }
+        webSocketContext.push(pushString); //推送到客户端
     }
 
     /**
@@ -91,7 +98,7 @@ public class WebSocketBaseHandler {
             if (channelFuture.isSuccess()) {
                 boolean isQueryParams = target.contains("?");
                 String uri =isQueryParams ? target.substring(0, target.indexOf("?")) : target;
-                System.out.println(uri + "###############: " + handshaker.uri());
+                logger.warn("###############uri: " +uri +"                    handshaker.uri: "+ handshaker.uri());
                 WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, uri);
                 ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).set(webSocketContext);// 路由设置
                 WebSocketSession socketSession = webSocketContext.getWebSocketSession();

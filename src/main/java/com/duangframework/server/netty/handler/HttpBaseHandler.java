@@ -17,6 +17,7 @@ import com.duangframework.utils.WebKit;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,8 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
             if(null != request && null != response) {
                 WebKit.recoverClient(ctx, request, response);
             }
+            // 释放对象
+            ReferenceCountUtil.release(request);
         }
     }
 

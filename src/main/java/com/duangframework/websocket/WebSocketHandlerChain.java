@@ -1,11 +1,6 @@
 package com.duangframework.websocket;
 
-import com.duangframework.kit.ClassKit;
-import com.duangframework.mvc.http.handler.IHandler;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

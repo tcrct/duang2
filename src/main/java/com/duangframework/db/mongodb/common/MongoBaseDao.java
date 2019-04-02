@@ -146,11 +146,11 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
      * @throws Exception
      */
     @Override
-    public <T> T findList(Query mongoQuery) throws Exception {
+    public List<T> findList(Query mongoQuery) throws Exception {
         if(ToolsKit.isEmpty(mongoQuery)) {
             throw new MongodbException("Mongodb findList is Fail: mongoQuery is null");
         }
-        return (T)findAll(mongoQuery);
+        return findAll(mongoQuery);
     }
 
     /**

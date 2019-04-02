@@ -19,7 +19,7 @@ public interface IWebSocket<T> {
      * 接收消息，执行任务, 如需要任务分发，则在ctx.getMessage里带个标识作区分
      * @param ctx
      */
-    ReturnDto<T> onReceive(WebSocketSession session);
+    T onReceive(WebSocketSession session);
 
     /**
      * 断开链接
