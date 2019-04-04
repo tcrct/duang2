@@ -60,7 +60,7 @@ public class WebSocketSession {
     public String toString() {
         return "WebSocketSession{" +
                 "message='" + message + '\'' +
-                ", cause=" + cause.getMessage() +
+                ", cause=" + cause +
                 ", uri='" + uri + '\'' +
                 ", id='" + id + '\'' +
                 '}';

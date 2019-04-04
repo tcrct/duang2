@@ -8,11 +8,16 @@ import com.duangframework.utils.DataType;
 import com.duangframework.websocket.IWebSocket;
 import com.duangframework.websocket.WebSocketContext;
 import com.duangframework.websocket.WebSocketSession;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,23 +63,56 @@ public class WebSocketBaseHandler {
             return;
         }
         // 目前仅支持文本消息传递
-        if (!(frame instanceof TextWebSocketFrame)) {
+        if (!(frame instanceof TextWebSocketFrame) && !(frame instanceof BinaryWebSocketFrame)) {
             throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass().getName()));
         }
 
-        String requestMessage = ((TextWebSocketFrame) frame).text();
-        if(ToolsKit.isEmpty(requestMessage)) {
-            throw new NullPointerException("request message is empty");
+
+        if(frame instanceof  BinaryWebSocketFrame) {
+            byte[] bytes = ByteBufUtil.getBytes(((BinaryWebSocketFrame) frame).content());
+            ProtobufVarint32FrameDecoder decoder = new ProtobufVarint32FrameDecoder();
+            decoder.channelRead(ctx, frame);
+            String requestMessage = new String(bytes);
+            System.out.println(requestMessage);
+            requestMessage = new String(bytes, ConstEnums.DEFAULT_CHAR_ENCODE.getValue());
+            System.out.println(requestMessage);
+//            System.out.println("####################:  " + requestMessage);
+//            BinaryWebSocketFrame binaryWebSocketFrame = (BinaryWebSocketFrame) frame;
+//            byte[] by = new byte[frame.content().readableBytes()];
+//            binaryWebSocketFrame.content().readBytes(by);
+//            ByteBuf bytebuf = Unpooled.buffer();
+//            bytebuf.writeBytes(by);
+//            ctx.writeAndFlush(new BinaryWebSocketFrame(bytebuf));
+
+//            ByteBuf result = Unpooled.buffer();
+//            result.writeBytes(frame.content());
+//            ctx.writeAndFlush(new BinaryWebSocketFrame(result));
+
+//            System.out.println("服务器：接收到你的BinaryWebSocketFrame消息，内容是 ");
+//            ByteBuf content = frame.content();
+//            byte[] result = new byte[content.readableBytes()];
+//            content.readBytes(result);
+//            for (byte b : result) {
+//                System.out.print(b);
+//                System.out.print(",");
+//            }
+//            System.out.println();
+            ctx.writeAndFlush("success");
+        } else if(frame instanceof  TextWebSocketFrame) {
+            String requestMessage = ((TextWebSocketFrame) frame).text();
+            if (ToolsKit.isEmpty(requestMessage)) {
+                throw new NullPointerException("request message is empty");
+            }
+            socketSession.setMessage(requestMessage);
+            Object returnDto = webSocket.onReceive(socketSession);
+            String pushString = "";
+            if (returnDto instanceof String || DataType.isBaseType(returnDto.getClass())) {
+                pushString = returnDto + "";
+            } else {
+                pushString = ToolsKit.toJsonString(returnDto);
+            }
+            webSocketContext.push(pushString); //推送到客户端
         }
-        socketSession.setMessage(requestMessage);
-        Object returnDto = webSocket.onReceive(socketSession);
-        String pushString = "";
-        if(returnDto instanceof String || DataType.isBaseType(returnDto.getClass())) {
-            pushString = returnDto+"";
-        } else {
-            pushString = ToolsKit.toJsonString(returnDto);
-        }
-        webSocketContext.push(pushString); //推送到客户端
     }
 
     /**
@@ -87,8 +125,10 @@ public class WebSocketBaseHandler {
             bootStrap = bs;
         }
         String target  = request.uri();
-        String location = ConstEnums.SOCKET.WEBSOCKET_SCHEME_FIELD.getValue() + request.headers().get(HttpHeaderNames.HOST.toString()) + target;
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(location, null, true);
+        HttpHeaders headers = request.headers();
+        String location = ConstEnums.SOCKET.WEBSOCKET_SCHEME_FIELD.getValue() + headers.get(HttpHeaderNames.HOST.toString()) + target;
+        String secWsProtocol = headers.get(HttpHeaderNames.SEC_WEBSOCKET_PROTOCOL.toString());
+        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(location, ToolsKit.isNotEmpty(secWsProtocol) ? secWsProtocol : null, true);
         WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(request);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
@@ -114,6 +154,7 @@ public class WebSocketBaseHandler {
     }
 
     public static void onException(BootStrap bootStrap, ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
         if(bootStrap.isEnableWebSocket()) {
             WebSocketContext webSocketContext = (WebSocketContext) ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).get();
             if(ToolsKit.isEmpty(webSocketContext)) {
