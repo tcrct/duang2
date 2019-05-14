@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+/**
+ * @author laotang
+ */
 public class MqttFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(MqttFactory.class);
@@ -31,7 +34,27 @@ public class MqttFactory {
             context.getCtx().writeAndFlush(publishMessage);
         } else {
             // TODO 这个时候可以考虑进行持久化
-            logger.warn("publish message to client[" + clientId + "] is fail, MQTT Context is null, please connect!");
+            logger.warn("publish message to client[" + clientId + "] is fail: MQTT Context is null, please connect!");
+        }
+    }
+
+    public static boolean heartbeat(String clientId) {
+        MqttContext context = MqttPoolFactory.getMqttContext(clientId);
+        if(ToolsKit.isEmpty(context)) {
+            logger.warn("sned heartbeat to client["+clientId+"] is fall: MQTT Context is null, please reconnect!");
+        }
+        MqttFixedHeader mqttFixedHeader=new MqttFixedHeader(MqttMessageType.PINGREQ, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+        MqttPublishVariableHeader variableHeader = new MqttPublishVariableHeader(clientId, 1);
+        ByteBuf payload = Unpooled.wrappedBuffer(clientId.getBytes(CharsetUtil.UTF_8));
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setClientId(clientId);
+        try {
+            context.getCtx().writeAndFlush(new io.netty.handler.codec.mqtt.MqttMessage(mqttFixedHeader, variableHeader, payload));
+            return true;
+        } catch (Exception e) {
+            // 抛出异常，则说明设备不在线
+            logger.warn(e.getMessage(), e);
+            return false;
         }
     }
 

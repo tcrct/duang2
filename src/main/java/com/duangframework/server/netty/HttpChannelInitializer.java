@@ -12,9 +12,12 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLEngine;
 
 /**
  *
@@ -64,6 +67,14 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 //            channelPipeline.addLast(new WebSocketServerProtocolHandler(bootStrap.getWebSocketPath(), null, true));
 //            channelPipeline.addLast(new WebSocketBaseHandler_bak(bootStrap));
 //        }
+        if (bootStrap.isSslEnabled()) {
+            SSLEngine sslEngine = sslContext.newEngine(socketChannel.alloc());
+            // 服务端模式
+            sslEngine.setUseClientMode(false);
+            // 不需要验证客户端
+            sslEngine.setNeedClientAuth(false);
+            channelPipeline.addLast("ssl", new SslHandler(sslEngine));
+        }
         // 真正处理业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
         channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
     }

@@ -28,6 +28,11 @@ public class MqttClient implements IMqttClient {
     }
 
     @Override
+    public boolean heartbeat(String clientId) {
+        return MqttFactory.heartbeat(clientId);
+    }
+
+    @Override
     public void publish(MqttMessage messageDto, String... clientId ) {
         if(ToolsKit.isEmpty(clientId)) {
             clientId[0] = this.clientId;
@@ -41,6 +46,8 @@ public class MqttClient implements IMqttClient {
     public void subscribe(String clientId, String topic, IMqttMessageListener<MqttMessage> mqttMessageListener) {
         MqttFactory.subscribe(clientId, topic, mqttMessageListener);
     }
+
+
 
     @Override
     public void unsubscribe(String clientId, String topic) {

@@ -546,7 +546,7 @@ public abstract class BaseController {
                 iException = new ServiceException(exception.getMessage()+"", exception);
             }
         }
-        returnJson(ToolsKit.buildReturnDto(iException, obj), null);
+        returnJson(ToolsKit.buildReturnDto(iException, obj));
     }
 
     /**
@@ -555,8 +555,17 @@ public abstract class BaseController {
      * @param obj           对象
      * @param fieldSet	不返回的字段集合
      */
-    private void returnJson(Object obj, Set<String> fieldSet) {
+    public void returnJson(Object obj, Set<String> fieldSet) {
         render = new JsonRender(obj, fieldSet);
+    }
+
+    /**
+     * 返回JSON格式字符串
+     *
+     * @param obj           对象
+     */
+    public void returnJson(Object obj) {
+        returnJson(obj, null);
     }
 
     /**

@@ -68,6 +68,9 @@ public class CacheModelOptions {
     }
 
     public Integer getKeyTTL() {
+        if(ttl <= 0 ) {
+            ttl = ICacheKeyEnums.NEVER_TTL;
+        }
         return ttl;
     }
 

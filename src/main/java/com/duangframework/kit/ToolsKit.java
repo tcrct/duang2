@@ -61,6 +61,7 @@ public final class ToolsKit {
 
     private static SerializerFeature[] serializerFeatureArray2 = {
             SerializerFeature.QuoteFieldNames,
+            SerializerFeature.UseISO8601DateFormat,
             SerializerFeature.WriteNonStringKeyAsString,
             SerializerFeature.DisableCircularReferenceDetect,
             SerializerFeature.WriteNullListAsEmpty,

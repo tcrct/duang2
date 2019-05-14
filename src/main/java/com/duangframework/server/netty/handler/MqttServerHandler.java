@@ -5,13 +5,13 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mqtt.core.IMqttMessageListener;
 import com.duangframework.mqtt.core.MqttContext;
 import com.duangframework.mqtt.core.MqttOptions;
-import com.duangframework.mqtt.core.MqttProts;
 import com.duangframework.mqtt.pool.MqttPoolFactory;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -20,7 +20,6 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -59,6 +57,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     //连接成功后调用的方法
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String msg = ToolsKit.formatDate(new Date(), ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue()) + " connection mqtt is success: " + InetAddress.getLocalHost().getHostName();
+        printContext("channelActive", ctx);
         logger.warn("channelActive:" + msg);
         ReturnDto dto = ToolsKit.buildReturnDto(null, msg);
         ctx.writeAndFlush(ToolsKit.toJsonString(dto));
@@ -111,12 +110,16 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         }
     }
 
+    /**
+     *  客户端主动断开链接
+     * @param ctx
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx)
     {
-        logger.warn(ctx.channel().remoteAddress().toString().substring(1,ctx.channel().remoteAddress().toString().lastIndexOf(":")) + " is close!");
-        //清理缓存
         String clientId = getClientId(ctx);
+        printContext("channelInactive",ctx);
+        //清理缓存
         ctx.channel().attr(CLIENTID_ATTRIBUTE).remove();
         MqttPoolFactory.removeMqttContext(clientId);
     }
@@ -133,18 +136,32 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
             IdleStateEvent event = (IdleStateEvent)evt;
             String clientId = getClientId(ctx);
             if (event.state().equals(IdleState.READER_IDLE)) {
+                printContext("userEventTriggered[READER_IDLE]",ctx);
                 logger.warn(clientId + " heartbeat timeout, so close!");
                  MqttPoolFactory.removeMqttContext(clientId);
                 ctx.fireChannelInactive();
                 ctx.close();
             }else if(event.state().equals(IdleState.ALL_IDLE)) {
-            	logger.debug("send heartbeat to client["+clientId+"]");
-                MqttFixedHeader mqttFixedHeader=new MqttFixedHeader(MqttMessageType.PINGREQ, false, MqttQoS.AT_LEAST_ONCE, false, 0);
-                ctx.writeAndFlush(new MqttMessage(mqttFixedHeader));
+                printContext("userEventTriggered[ALL_IDLE]",ctx);
+            	doSendHeartbeat(ctx, clientId);
             }
         }
         super.userEventTriggered(ctx, evt);
     }
+
+    /**
+     * 主动发送心跳
+     * @param ctx
+     */
+    private void doSendHeartbeat(ChannelHandlerContext ctx, String clientId) {
+        MqttFixedHeader mqttFixedHeader=new MqttFixedHeader(MqttMessageType.PINGREQ, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+        MqttPublishVariableHeader variableHeader = new MqttPublishVariableHeader(clientId, 1);
+        ByteBuf payload = Unpooled.wrappedBuffer(clientId.getBytes(CharsetUtil.UTF_8));
+        printContext("doSendHeartbeat", ctx);
+        logger.info("send heartbeat to client["+clientId+"]");
+        ctx.writeAndFlush(new MqttMessage(mqttFixedHeader, variableHeader, payload));
+    }
+
 
     /**
      * 心跳响应
@@ -152,14 +169,16 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
      * @param request
      */
     private void doPingreo(ChannelHandlerContext ctx, Object request) {
-        logger.debug("received client[" + getClientId(ctx) + "] heartbeat");
         MqttFixedHeader header = new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0);
+        printContext("doPingreo", ctx);
+        logger.warn("received client[" + getClientId(ctx) + "] heartbeat");
         ctx.writeAndFlush(new MqttMessage(header));
     }
 
     private void doPingresp(ChannelHandlerContext ctx, Object request)  {
         MqttMessage mqttMessage = (MqttMessage)request;
-        logger.debug("收到心跳请求: " + ToolsKit.toJsonString(mqttMessage));
+        printContext("doPingresp", ctx);
+        logger.warn("received heartbeat: " + ToolsKit.toJsonString(mqttMessage));
     }
 
     /**
@@ -180,7 +199,8 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         if(sb.length() > 1) {
             sb.deleteCharAt(sb.length()-1);
         }
-        logger.warn(clientId + "["+sb+ "] unsubscribe success");
+        printContext("doUnSubscribe", ctx);
+        logger.warn("["+sb+ "] unsubscribe success");
     }
 
     /**
@@ -194,7 +214,6 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         MqttConnAckMessage connAckMessage = new MqttConnAckMessage(CONNACK_HEADER, variableheader);
         MqttConnectPayload connectPayload = message.payload();
         String clientId = connectPayload.clientIdentifier();
-        logger.debug("connect ,clientId is :" + clientId);
         //将用户信息写入变量
         if (!ctx.channel().hasAttr(CLIENTID_ATTRIBUTE)) {
             ctx.channel().attr(CLIENTID_ATTRIBUTE).set(clientId);
@@ -215,7 +234,10 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         options.setVersion(variableHeader.version());
         options.setDup(message.fixedHeader().isDup());
         MqttPoolFactory.setMqttContext(ctx, clientId, "", options);
+        printContext("doConnect", ctx);
+        logger.warn("connect is success");
         ctx.writeAndFlush(connAckMessage);
+
     }
 
     /**
@@ -240,7 +262,8 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         if(sb.length() > 1) {
             sb.deleteCharAt(sb.length()-1);
         }
-        logger.warn(clientId + "["+  sb +"] subscribe success");
+        printContext("doSubscribe", ctx);
+        logger.warn("["+  sb +"] subscribe success");
         ctx.writeAndFlush(suback);
     }
 
@@ -250,7 +273,11 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
      * @param request
      */
     private void doPubAck(ChannelHandlerContext ctx, Object request) {
+        String clientId = getClientId(ctx);
         MqttPubAckMessage message = (MqttPubAckMessage)request;
+        printContext("doPubAck", ctx);
+        logger.info("doPubAck :" +clientId +"            message: "+ ToolsKit.toJsonString(message));
+
     }
 
     /**
@@ -263,11 +290,12 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
         MqttPublishMessage message = (MqttPublishMessage)request;
         ByteBuf buf = message.payload();
         String clientId = getClientId(ctx);
-        logger.debug("client publish message id："+clientId+"   message："+new String(ByteBufUtil.getBytes(buf)));
         int packetId = message.variableHeader().packetId();
         if (packetId <= -1) {
             packetId = 1;
         }
+        printContext("doPublish", ctx);
+        logger.info("client publish message id："+clientId+"   message："+new String(ByteBufUtil.getBytes(buf)));
         //主题, 需要保证唯一性
         String topic = message.variableHeader().topicName();
         // 取出上下文对象
@@ -306,6 +334,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.warn(cause.getMessage(), cause);
+        printContext("exceptionCaught", ctx);
         ctx.close();
     }
 
@@ -315,5 +344,23 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<Object>
             return ctx.channel().attr(CLIENTID_ATTRIBUTE).get();
         }
         return "";
+    }
+
+    /**
+     * 打印ChannelHandlerContext部份信息
+     * @param ctx
+     */
+    private void printContext(String actionName, ChannelHandlerContext ctx) {
+        if(!logger.isInfoEnabled()) {
+            return;
+        }
+        Map<String,Object> infoMap = new HashMap<String,Object>(4){{
+            this.put("clientId", getClientId(ctx));
+            this.put("contextName", ctx.name());
+            this.put("channelId", ctx.channel().id().asShortText());
+            this.put("isOpen", ctx.channel().isOpen());
+            this.put("remoteAddress", ctx.channel().remoteAddress().toString().substring(1,ctx.channel().remoteAddress().toString().lastIndexOf(":")));
+        }};
+        logger.info("#########: " + actionName + " ######### ChannelHandlerContext : " + ToolsKit.toJsonString(infoMap));
     }
 }

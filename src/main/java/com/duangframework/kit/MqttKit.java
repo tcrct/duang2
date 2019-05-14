@@ -81,6 +81,13 @@ public class MqttKit {
     }
 
     /**
+     * 发送心跳到指定的客户端
+     */
+    public boolean heartbeat() {
+        return mqttClient.heartbeat(clientId);
+    }
+
+    /**
      * 根据主题订阅消息
      */
     public void subscribe() {

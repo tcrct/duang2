@@ -9,6 +9,12 @@ import java.util.Set;
  */
 public interface IMqttClient {
 
+    /**
+     * 发送心跳
+     * @param clientId
+     * @return 返回true，说明设备在线
+     */
+    boolean heartbeat(String clientId);
 
     /**
      * 发布

@@ -6,9 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 要发布的信息对象
+ * @author laotang
  */
+
 public class MqttMessage implements java.io.Serializable {
 
+    private String clientId;
     private String topic;
     private Integer messageId; // = new AtomicInteger().intValue();
     private String message;
@@ -20,11 +23,16 @@ public class MqttMessage implements java.io.Serializable {
 
     public MqttMessage() {}
 
-    public MqttMessage( String topic, String message) {
-        this(topic, message, MqttQoS.AT_LEAST_ONCE.value());
+    public MqttMessage( String clientId) {
+        this(clientId, "", "success", MqttQoS.AT_LEAST_ONCE.value());
     }
 
-    public MqttMessage(String topic, String message, int qos) {
+    public MqttMessage(String topic, String message) {
+        this("", topic, message, MqttQoS.AT_LEAST_ONCE.value());
+    }
+
+    public MqttMessage(String clientId, String topic, String message, int qos) {
+        this.clientId = clientId;
         this.topic = topic;
         this.messageId = getMessageId();
         this.message = message;
@@ -39,6 +47,14 @@ public class MqttMessage implements java.io.Serializable {
         this.mutable = mutable;
         this.retained = retained;
         this.dup = dup;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public String getTopic() {

@@ -1,5 +1,6 @@
 package com.duangframework.kit;
 
+import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.net.http.HttpRequest;
 import com.duangframework.net.http.HttpResult;
 
@@ -28,13 +29,15 @@ public class HttpKit {
     private static Map<String, Object> _paramMap = new HashMap<>();
     private static String _url;
     private static boolean _encode;
+    private static boolean _isAppend;
     private static String _body;
 
     private static void clear() {
         _headerMap.clear();
         _paramMap.clear();
-        _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, HttpRequest.CONTENT_TYPE_FORM);
+        _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, HttpRequest.CONTENT_TYPE_JSON);
         _encode = false;
+        _isAppend = false;
         _body = "";
     }
 
@@ -114,15 +117,26 @@ public class HttpKit {
     /**
      * 请求URL地址
      * @param url
-     * @param encode       是否对url进行URL.ENCODE编码
+     * @param isAppend    是否将params参数追加到url
      * @return
      */
-    public HttpKit url(String url, boolean encode) {
-        _url = url;
-        _encode = encode;
-        return this;
+    public HttpKit url(String url, boolean isAppend) {
+        return url(url, isAppend, false);
     }
 
+    /**
+     * 请求URL地址
+     * @param url
+     * @param encode       是否对url进行URL.ENCODE编码
+     * @param isAppend    是否将params参数追加到url
+     * @return
+     */
+    public HttpKit url(String url, boolean isAppend, boolean encode) {
+        _url = url;
+        _encode = encode;
+        _isAppend = isAppend;
+        return this;
+    }
 
     /**
      * GET请求
@@ -138,8 +152,15 @@ public class HttpKit {
      * @return
      */
     public HttpResult post() {
-        HttpRequest httpRequest = _body.isEmpty() ? HttpRequest.post(_url,  _encode).headers(_headerMap).form(_paramMap)
-                : HttpRequest.post(_url,  _encode).headers(_headerMap).send(_body.getBytes());
+        HttpRequest httpRequest = null;
+        if (_isAppend) {
+            httpRequest = HttpRequest.post(_url, _paramMap, _encode);
+        } else {
+            httpRequest = HttpRequest.post(_url, _encode);
+        }
+
+        httpRequest = _body.isEmpty() ? httpRequest.headers(_headerMap).form(_paramMap)
+                : httpRequest.headers(_headerMap).send(_body.getBytes());
         return new HttpResult(httpRequest);
     }
 

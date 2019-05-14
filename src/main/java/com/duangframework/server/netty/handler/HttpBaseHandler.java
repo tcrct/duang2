@@ -72,8 +72,10 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
             if(null != request && null != response) {
                 WebKit.recoverClient(ctx, request, response);
             }
-            // 释放对象
-            ReferenceCountUtil.release(request);
+//            if(request instanceof FullHttpRequest) {
+//                // 释放对象
+//                ReferenceCountUtil.release(request);
+//            }
         }
     }
 
