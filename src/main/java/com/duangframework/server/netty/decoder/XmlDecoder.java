@@ -36,6 +36,13 @@ public class XmlDecoder extends AbstractDecoder<Map<String, Object>> {
             requestParamsMap.putAll(getMapFromXML(xml));
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), Collections.singletonList(xml));
         }
+        // 如果URI里存在参数，则提取参数值到request里
+        if(request.uri().contains("?")) {
+            Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
+            GetDecoder getDecoder = new GetDecoder(request);
+            paramsMap.putAll(getDecoder.decoder());
+            return paramsMap;
+        }
         return requestParamsMap;
     }
 

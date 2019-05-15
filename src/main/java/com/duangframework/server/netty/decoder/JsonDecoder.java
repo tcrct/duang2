@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.duangframework.encrypt.core.EncryptFactory;
 import com.duangframework.encrypt.core.EncryptUtils;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Mapping;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -55,6 +56,13 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         }
         if(ToolsKit.isNotEmpty(json)) {
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
+        }
+        // 如果URI里存在参数，则提取参数值到request里
+        if(request.uri().contains("?")) {
+            Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
+            GetDecoder getDecoder = new GetDecoder(request);
+            paramsMap.putAll(getDecoder.decoder());
+            return paramsMap;
         }
         return requestParamsMap;
     }

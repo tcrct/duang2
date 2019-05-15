@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,6 +47,13 @@ public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
         if(ToolsKit.isNotEmpty(requestParamsMap)) {
             Map<String,Object> tmpMap = new ConcurrentHashMap<>(requestParamsMap);
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
+        }
+        // 如果URI里存在参数，则提取参数值到request里
+        if(request.uri().contains("?")) {
+            Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
+            GetDecoder getDecoder = new GetDecoder(request);
+            paramsMap.putAll(getDecoder.decoder());
+            return paramsMap;
         }
         return requestParamsMap;
     }
