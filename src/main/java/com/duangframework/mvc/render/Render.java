@@ -18,6 +18,7 @@ public abstract class Render implements Serializable {
     protected static String TEXT_PLAIN = HttpHeaderValues.TEXT_PLAIN.toString()+";charset=" + ENCODING;
 	protected static String JSON_PLAIN = HttpHeaderValues.APPLICATION_JSON.toString()+";charset=" + ENCODING;
 	protected static String XML_PLAIN = "text/xml;charset=" +ENCODING;
+	protected static String HTML_PLAIN = "text/html;charset=" +ENCODING;
 
 	protected IRequest request;
 	protected IResponse response;
@@ -61,6 +62,7 @@ public abstract class Render implements Serializable {
 		response.setHeader(HttpHeaderNames.EXPIRES.toString(), HttpHeaderValues.ZERO.toString());
 		response.setHeader(ConstEnums.FRAMEWORK_OWNER_FILED.getValue(), ConstEnums.FRAMEWORK_OWNER.getValue());
 		response.setHeader(ConstEnums.RESPONSE_STATUS.getValue(), HttpResponseStatus.OK.codeAsText().toString());
+		response.setHeader(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
 		response.setStatus(HttpResponseStatus.OK.code());
         response.setContentType(contentType);
         response.setCharacterEncoding(ENCODING);

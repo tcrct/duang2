@@ -113,6 +113,14 @@ public abstract class BaseController {
         render = new XmlRender(xml);
     }
 
+    /**
+     * 返回HTML格式
+     * @param html
+     */
+    public void returnHtml(String html) {
+        render = new HtmlRender(html);
+    }
+
     public BaseController setValue(String key, Object obj) {
         request.setAttribute(key, obj);
         return this;

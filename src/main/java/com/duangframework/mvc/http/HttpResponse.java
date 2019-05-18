@@ -128,7 +128,11 @@ public class HttpResponse implements IResponse {
     @Override
     public String toString() {
         if(null != returnObj) {
-            return ToolsKit.toJsonString(returnObj);
+            if(returnObj instanceof String) {
+                return (String)returnObj;
+            } else {
+                return ToolsKit.toJsonString(returnObj);
+            }
         } else{
             Map<String, String> map = new HashMap<>();
             map.put("hello", ConstEnums.FRAMEWORK_OWNER.getValue());
