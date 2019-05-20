@@ -11,11 +11,14 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface FieldName {
-
+    // name值，例如: name
     String name() default "";
-
+    // id值，例如：user_name
     String id() default "";
-
+    // 表单显示字段值，例如: 姓名
+    String lable() default "";
+    // 是否隐藏，默认为否
+    boolean isHidden() default false;
+    // 是否为空，默认为是
     boolean isEmpty() default true;
-
 }
