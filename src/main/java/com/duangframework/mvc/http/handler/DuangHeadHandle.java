@@ -2,12 +2,14 @@ package com.duangframework.mvc.http.handler;
 
 
 import com.duangframework.exception.MvcException;
+import com.duangframework.exception.ServiceException;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.HeadDto;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.token.TokenManager;
 import com.duangframework.utils.WebKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,5 +43,16 @@ public class DuangHeadHandle implements IHandler {
         headDto.setUri(target);
         headDto.setRequestId(request.getRequestId());
         ToolsKit.setThreadLocalDto(headDto);
+
+        try {
+            boolean isValidate = TokenManager.validateToken(request, TokenManager.TOKEN_KEY_FIELD);
+            if(!isValidate) {
+                throw new ServiceException("开启表单令牌验证，" +
+                        "验证不通过, 请先设置header["+TokenManager.TOKEN_KEY_HEAD_FIELD+"]值为: "
+                        + TokenManager.TOKEN_KEY_HEAD_VALUE +",并且打开表单页时，须请求/{flag}/duangframework/token/create获取表单token");
+            }
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
 }

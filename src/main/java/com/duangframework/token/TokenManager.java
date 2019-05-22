@@ -2,6 +2,8 @@ package com.duangframework.token;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.BaseController;
+import com.duangframework.mvc.http.IRequest;
+import com.duangframework.server.common.BootStrap;
 
 import java.util.*;
 
@@ -16,7 +18,10 @@ public class TokenManager {
 	private static Random random = new Random();
 	/**300 seconds ---> 5 minutes */
 	private static int MIN_SECONDS_OF_TOKEN_TIME_OUT = 300;
-	public static final String TOKEN_KEY_FIELD = "tokenHtml";
+	public static final String TOKEN_KEY_FIELD = "htmlTokenId";
+	public static final String TOKEN_KEY_HEAD_FIELD = "htmlToken";
+	public static final String TOKEN_KEY_HEAD_VALUE = "duang-htmlToken";
+
 
 
 	private TokenManager() {
@@ -40,13 +45,17 @@ public class TokenManager {
 				},halfTimeOut,halfTimeOut);
 	}
 
-	public static void createToken(String tokenName, int secondsOfTimeOut) {
+	public static String createToken(String tokenName) {
+		return createToken(tokenName, 0);
+	}
+
+	public static String createToken(String tokenName, int secondsOfTimeOut) {
 		if (null == tokenCache) {
 			String tokenId = String.valueOf(random.nextLong());
-			createTokenHiddenField(tokenName, tokenId);
+			return createTokenHiddenField(tokenName, tokenId);
 		}
 		else {
-			createTokenUseTokenIdGenerator(tokenName, secondsOfTimeOut);
+			return createTokenUseTokenIdGenerator(tokenName, secondsOfTimeOut);
 		}
 	}
 
@@ -104,9 +113,31 @@ public class TokenManager {
 		tokenCache.put(token);
 		if(null != controller) {
 			controller.setValue(tokenName, tokenId);
-			createTokenHiddenField(controller, tokenName, tokenId);
 		}
-		return tokenId;
+		return createTokenHiddenField(controller, tokenName, tokenId);
+	}
+
+	public static boolean validateToken(IRequest request, String tokenName) {
+		String headValue = request.getHeader(TOKEN_KEY_HEAD_FIELD);
+		String clientTokenId = request.getHeader(tokenName);
+		if(ToolsKit.isEmpty(clientTokenId)) {
+			clientTokenId = request.getParameter(tokenName);
+			if(ToolsKit.isEmpty(clientTokenId)) {
+				clientTokenId = request.getAttribute(tokenName)+"";
+			}
+		}
+		if (tokenCache == null) {
+			throw new NullPointerException("请先实现ITokenCache接入，并调用init方法");
+		}
+		if(ToolsKit.isEmpty(clientTokenId) && BootStrap.getInstants().isTokenHtml() && !TOKEN_KEY_HEAD_VALUE.equalsIgnoreCase(headValue)) {
+			throw new NullPointerException("请先设置request header["+TOKEN_KEY_HEAD_FIELD+"]为: " + TOKEN_KEY_HEAD_VALUE);
+		} else {
+			Token token = new Token(clientTokenId);
+			boolean result = tokenCache.contains(token);
+			tokenCache.remove(token);
+			return result;
+		}
+
 	}
 	
 	/**
