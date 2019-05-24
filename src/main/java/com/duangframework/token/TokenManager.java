@@ -118,6 +118,9 @@ public class TokenManager {
 	}
 
 	public static boolean validateToken(IRequest request, String tokenName) {
+		if(!BootStrap.getInstants().isTokenHtml()) {
+			return true;
+		}
 		String headValue = request.getHeader(TOKEN_KEY_HEAD_FIELD);
 		String clientTokenId = request.getHeader(tokenName);
 		if(ToolsKit.isEmpty(clientTokenId)) {
