@@ -63,7 +63,7 @@ public class ClassHelper {
      * 返回所有Controller类
      * @return
      */
-    public static List<Class<?>> getClontrllerClassList () {
+    public static List<Class<?>> getControllerClassList() {
         return CLASS_MAP.get(ConstEnums.ANNOTATION_CLASS.CONTROLLER_ANNOTATION.getName());
     }
 

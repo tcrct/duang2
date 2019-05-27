@@ -6,6 +6,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.helper.BeanHelper;
 import com.duangframework.mvc.core.helper.ClassHelper;
 import com.duangframework.mvc.core.helper.IocHelper;
+import com.duangframework.mvc.core.helper.RouteHelper;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
 import org.slf4j.Logger;
@@ -63,6 +64,10 @@ public class ClassLoaderHelper {
             BeanHelper.clearIocBeanMap();
             // ioc
             IocHelper.iocBean4Map();
+            // route
+            RouteHelper.getRouteMap().clear();
+            RouteHelper.getRestfulRouteMap().clear();
+            RouteHelper.createRoute2Map();
             logger.warn("hotswap is success");
         } catch (Exception e) {
             logger.warn("hotswap is fail: " + e.getMessage(),e);

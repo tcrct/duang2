@@ -34,9 +34,13 @@ public class RouteHelper {
     private static Map<Class<? extends Interceptor>, Interceptor> intersMap = new HashMap<Class<? extends Interceptor>, Interceptor>();
 
     static {
+        createRoute2Map();
+    }
+
+    public static void createRoute2Map() {
         try {
             Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
-            List<Class<?>> clontrllerClassList = ClassHelper.getClontrllerClassList();
+            List<Class<?>> clontrllerClassList = ClassHelper.getControllerClassList();
             String productUriPrefix = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_URI_PREFIX.getValue());
             if(ToolsKit.isNotEmpty(productUriPrefix)) {
                 productUriPrefix = productUriPrefix.startsWith("/") ? productUriPrefix : "/" + productUriPrefix;
