@@ -34,24 +34,23 @@ public class ClassHelper {
     static {
         String packagePath = PropKit.get(ConstEnums.PROPERTIES.BASE_PACKAGE_PATH.getValue());
         List<String> jarNames = PropKit.getList(ConstEnums.PROPERTIES.JAR_PREFIX.getValue());
-        List<Class<?>> classList = ScanClassFactory.getAllClass(packagePath, jarNames);
-        for(Class<?> clazz : classList) {
+        setClass2Map(ScanClassFactory.getAllClass(packagePath, jarNames));
+    }
+
+    private static void setClass2Map(List<Class<?>> clazzList) {
+        for(Class<?> clazz : clazzList) {
             for(ConstEnums.ANNOTATION_CLASS classEnums : ConstEnums.ANNOTATION_CLASS.values()) {
                 if (clazz.isAnnotationPresent(classEnums.getClazz())) {
-                    setClass2Map(classEnums.getName(), clazz);
+                    String key = classEnums.getName();
+                    List<Class<?>> tmpList = CLASS_MAP.get(key);
+                    if(ToolsKit.isEmpty(tmpList)) {
+                        CLASS_MAP.put(key, new ArrayList<Class<?>>(){ { this.add(clazz);} });
+                    } else {
+                        tmpList.add(clazz);
+                    }
                     break;
                 }
             }
-        }
-    }
-
-
-    public static void setClass2Map(String key, Class<?> clazz) {
-        List<Class<?>> tmpList = CLASS_MAP.get(key);
-        if(ToolsKit.isEmpty(tmpList)) {
-            CLASS_MAP.put(key, new ArrayList<Class<?>>(){ { this.add(clazz);} });
-        } else {
-            tmpList.add(clazz);
         }
     }
 
@@ -101,6 +100,21 @@ public class ClassHelper {
      */
     public static List<Class<?>> getClassList (Class<? extends Annotation> annotationClass) {
         return CLASS_MAP.get(annotationClass.getName());
+    }
+
+    /**
+     *  取出所有业务类代码，一般用于热替换(热部署)功能
+     *  不包括jar包下的类，仅包括classes文件下的所有class文件，一般是业务代码class
+     *
+     * @param packagePath       包路径，在该路径下的所有Class会扫描
+     * @return
+     */
+    public static void reSetAllBizClass(String packagePath) {
+        // 取出所有业务类之前，先将原有的
+        CLASS_MAP.clear();
+        List<Class<?>> classList = ScanClassFactory.getAllBizClass(packagePath);
+        // 将业务类按枚举名称作key，分类存放到CLASS_MAP中
+        setClass2Map(classList);
     }
 
 }

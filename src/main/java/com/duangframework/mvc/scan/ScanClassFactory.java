@@ -52,4 +52,20 @@ public class ScanClassFactory {
         }.getList();
     }
 
+    /**
+     *  取出所有业务类代码，一般用于热替换(热部署)功能
+     *  不包括jar包下的类，仅包括classes文件下的所有class文件，一般是业务代码class
+     *
+     * @param packagePath       包路径，在该路径下的所有Class会扫描
+     * @return
+     */
+    public static List<Class<?>> getAllBizClass(String packagePath) {
+        return new ClassTemplate(packagePath){
+            @Override
+            public void checkAndAddClass(Class<?> clazz, List<Class<?>> classList) {
+                classList.add(clazz);
+            }
+        }.getList();
+    }
+
 }

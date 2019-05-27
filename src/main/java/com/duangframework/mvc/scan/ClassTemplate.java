@@ -43,6 +43,16 @@ public abstract class ClassTemplate {
         this.jarNames = jarNames;
     }
 
+    protected ClassTemplate(String packageName) {
+        if(ToolsKit.isEmpty(packageName)) {
+            throw new NullPointerException("package name is null");
+        }
+        this.packageName = packageName;
+        this.jarNames = new ArrayList<>();
+    }
+
+
+
     /**
      * 根据指定路径及jar文件前缀包名下的类对象集合
      * 如果类是抽象类或接口则不扫描到集合
@@ -102,8 +112,8 @@ public abstract class ClassTemplate {
                     }
                     jarFileName = jarFileName.substring(indexOf+1, jarFileName.length());
                     boolean isContains = false;
-                    for(String key : jarNameList) {
-                        if(jarFileName.startsWith(key)) {
+                    for (String key : jarNameList) {
+                        if (jarFileName.startsWith(key)) {
                             isContains = true;
                             break;
                         }
