@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Created by laotang
@@ -106,13 +103,13 @@ public class ClassHelper {
      *  取出所有业务类代码，一般用于热替换(热部署)功能
      *  不包括jar包下的类，仅包括classes文件下的所有class文件，一般是业务代码class
      *
-     * @param packagePath       包路径，在该路径下的所有Class会扫描
+     * @param classList       包路径，在该路径下的所有Class会扫描
      * @return
      */
-    public static void reSetAllBizClass(String packagePath) {
+    public static void reSetAllBizClass(List<Class<?>> classList) {
         // 取出所有业务类之前，先将原有的
         CLASS_MAP.clear();
-        List<Class<?>> classList = ScanClassFactory.getAllBizClass(packagePath);
+//        List<Class<?>> classList = ScanClassFactory.getAllBizClass(packagePath);
         // 将业务类按枚举名称作key，分类存放到CLASS_MAP中
         setClass2Map(classList);
     }

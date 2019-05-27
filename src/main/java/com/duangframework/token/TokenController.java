@@ -21,36 +21,9 @@ import java.util.List;
 @Controller
 @Mapping(value="/{flag}/duangframework/token",desc = "令牌管理", level = LevelEnums.DIR)
 public class TokenController extends BaseController {
-    // 是否已经初始化
-    private static boolean isInitTokenCache = false;
+
     public String create() {
         boolean isTokenHtml = BootStrap.getInstants().isTokenHtml();
-        if(!isInitTokenCache && isTokenHtml) {
-            TokenManager.init(new ITokenCache() {
-                List<Token> tokenList = new ArrayList<>();
-
-                @Override
-                public void put(Token token) {
-                    tokenList.add(token);
-                }
-
-                @Override
-                public void remove(Token token) {
-                    tokenList.remove(token);
-                }
-
-                @Override
-                public boolean contains(Token token) {
-                    return tokenList.contains(token);
-                }
-
-                @Override
-                public List<Token> getAll() {
-                    return tokenList;
-                }
-            });
-            isInitTokenCache = true;
-        }
         if(!isTokenHtml) {
             return "";
         }

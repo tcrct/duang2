@@ -46,6 +46,10 @@ public class BeanHelper {
     private static Map<String, FutureTask<List<Object>>> futureTaskMap = new HashMap<>();
 
     static {
+        createBean2Map();
+    }
+
+    public static void createBean2Map() {
         for (ConstEnums.ANNOTATION_CLASS annotationClass : ConstEnums.ANNOTATION_CLASS.values()) {
             // 如果需要实例化
             if (annotationClass.getInstance()) {
@@ -79,6 +83,10 @@ public class BeanHelper {
      */
     public static Map<String, List<Object>> getBeanMap() {
         return beanMap;
+    }
+
+    public static void clearIocBeanMap() {
+        iocBeanMap.clear();
     }
 
     public static List<Object> getControllerBeanList() {

@@ -118,6 +118,7 @@ public class TokenManager {
 	}
 
 	public static boolean validateToken(IRequest request, String tokenName) {
+		boolean result = false;
 		if(!BootStrap.getInstants().isTokenHtml()) {
 			return true;
 		}
@@ -130,17 +131,38 @@ public class TokenManager {
 			}
 		}
 		if (tokenCache == null) {
-			throw new NullPointerException("请先实现ITokenCache接入，并调用init方法");
+			TokenManager.init(new ITokenCache() {
+				List<Token> tokenList = new ArrayList<>();
+
+				@Override
+				public void put(Token token) {
+					tokenList.add(token);
+				}
+
+				@Override
+				public void remove(Token token) {
+					tokenList.remove(token);
+				}
+
+				@Override
+				public boolean contains(Token token) {
+					return tokenList.contains(token);
+				}
+
+				@Override
+				public List<Token> getAll() {
+					return tokenList;
+				}
+			});
 		}
 		if(ToolsKit.isEmpty(clientTokenId) && BootStrap.getInstants().isTokenHtml() && !TOKEN_KEY_HEAD_VALUE.equalsIgnoreCase(headValue)) {
 			throw new NullPointerException("请先设置request header["+TOKEN_KEY_HEAD_FIELD+"]为: " + TOKEN_KEY_HEAD_VALUE);
 		} else {
 			Token token = new Token(clientTokenId);
-			boolean result = tokenCache.contains(token);
+			result = tokenCache.contains(token);
 			tokenCache.remove(token);
-			return result;
 		}
-
+		return result;
 	}
 	
 	/**

@@ -17,6 +17,10 @@ import java.util.Map;
 public class IocHelper {
 
     static {
+        iocBean4Map();
+    }
+
+    public static void iocBean4Map() {
         try {
             Map<String, Object> iocBeanMap = BeanHelper.getIocBeanMap();
             if(ToolsKit.isNotEmpty(iocBeanMap)) {

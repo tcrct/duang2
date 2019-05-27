@@ -16,7 +16,7 @@ public @interface FieldName {
     // id值，例如：user_name
     String id() default "";
     // 表单显示字段值，例如: 姓名
-    String lable() default "";
+    String label() default "";
     // 是否隐藏，默认为否
     boolean isHidden() default false;
     // 是否为空，默认为是
