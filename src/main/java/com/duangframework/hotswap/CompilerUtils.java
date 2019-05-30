@@ -1,10 +1,13 @@
-package com.duangframework.utils;
+package com.duangframework.hotswap;
 
 import com.duangframework.kit.ToolsKit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.*;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +23,8 @@ import java.util.List;
  * https://blog.csdn.net/u014653197/article/details/52796006
  */
 public class CompilerUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(CompilerUtils.class);
 
     private static class CompilerKitHolder {
         private static final CompilerUtils INSTANCE = new CompilerUtils();
@@ -56,8 +61,6 @@ public class CompilerUtils {
      *            java源文件存放目录
      * @param targetDir
      *            编译后class类文件存放目录
-     * @param diagnostics
-     *            存放编译过程中的错误信息
      * @return
      * @throws Exception
      */
@@ -78,7 +81,7 @@ public class CompilerUtils {
             getSourceFiles(sourceFile, sourceFileList);
             // 没有java文件，直接返回
             if (ToolsKit.isEmpty(sourceFileList)) {
-                System.out.println(filePath + "目录下查找不到任何java文件");
+                logger.warn(filePath + "目录下查找不到任何java文件");
                 return false;
             }
             // 获取要编译的编译单元
@@ -91,7 +94,15 @@ public class CompilerUtils {
             Iterable<String> options = Arrays.asList("-d", targetDir, "-sourcepath", sourceDir);
             JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits);
             // 运行编译任务
-            return compilationTask.call();
+            boolean isCompiler =  compilationTask.call();
+            if (!isCompiler) {
+                StringWriter out = new StringWriter();
+                for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                    out.append("Error on line " + diagnostic.getLineNumber() + " in " + diagnostic).append('\n');
+                }
+                logger.warn(out.toString());
+            }
+            return isCompiler;
         } finally {
             fileManager.close();
         }
@@ -131,7 +142,5 @@ public class CompilerUtils {
             }
         }
     }
-
-
 }
 

@@ -48,6 +48,7 @@ public class DuangClassLoader extends ClassLoader {
 
     private static String getBasePackagePath(String packagePath){
         return PathKit.getWebRootPath() + File.separator + "target" + File.separator + "classes" + File.separator + packagePath.replace(".", File.separator);
+//        return PathKit.getWebRootPath() + File.separator+ "bin"+ File.separator + packagePath.replace(".", File.separator);
     }
 
     private void init() {
@@ -112,9 +113,8 @@ public class DuangClassLoader extends ClassLoader {
      */
     private void getClassData(File classPathFile) {
         try {
-            String classKey = getClassAbsolutePath(classPathFile);
-            loadClass(classKey,true);
-            /*
+//            String classKey = getClassAbsolutePath(classPathFile);
+//            loadClass(classKey,true);
             InputStream fin = new FileInputStream(classPathFile);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int bufferSize = 4096;
@@ -129,7 +129,6 @@ public class DuangClassLoader extends ClassLoader {
             if(!"com.signetz.openapi.dto.v2.python.BaseEntity".equalsIgnoreCase(classKey)) {
                 defineClass(classKey, classBytes, 0, classBytes.length);
             }
-            */
             CLASSLOADER_SET.add(classKey);
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
