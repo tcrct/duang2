@@ -112,6 +112,9 @@ public class DuangClassLoader extends ClassLoader {
      */
     private void getClassData(File classPathFile) {
         try {
+            String classKey = getClassAbsolutePath(classPathFile);
+            loadClass(classKey,true);
+            /*
             InputStream fin = new FileInputStream(classPathFile);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int bufferSize = 4096;
@@ -123,13 +126,15 @@ public class DuangClassLoader extends ClassLoader {
             byte[] classBytes = bos.toByteArray();
             String classKey = getClassAbsolutePath(classPathFile);
             System.out.println(classKey);
+            if(!"com.signetz.openapi.dto.v2.python.BaseEntity".equalsIgnoreCase(classKey)) {
+                defineClass(classKey, classBytes, 0, classBytes.length);
+            }
+            */
             CLASSLOADER_SET.add(classKey);
-            defineClass(classKey, classBytes, 0, classBytes.length);
-        } catch (FileNotFoundException e) {
-            logger.warn(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warn(e.getMessage(), e);
         }
+
     }
 
     /**

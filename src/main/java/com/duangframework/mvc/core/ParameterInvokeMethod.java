@@ -42,7 +42,7 @@ public class ParameterInvokeMethod {
      * @param paramNameArray 执行方法里的参数变量名
      * @return
      */
-    public static Object[] getParameterValues(BaseController controller, Method method, String[] paramNameArray) {
+    public static Object[] getParameterValues(BaseController controller, Method method, String[] paramNameArray) throws Exception {
         Parameter[] methodParams = method.getParameters();
         if (ToolsKit.isEmpty(methodParams)) {
             return  null;
@@ -57,7 +57,8 @@ public class ParameterInvokeMethod {
             Class<?> parameterType = methodParams[i].getType();
             // 取参数里的泛型
             Type type = methodParams[i].getParameterizedType();
-            Type genType = null;  // 泛型
+            // 泛型
+            Type genType = null;
             if(ToolsKit.isNotEmpty(type) && (type instanceof ParameterizedType)) {
                 Type[] typeParams = ((ParameterizedType) type).getActualTypeArguments();
                 if(typeParams.length > 0) {
@@ -65,31 +66,35 @@ public class ParameterInvokeMethod {
                 }
             }
             Annotation[] annotations = methodParams[i].getAnnotations();
-            String paramValue = request.getParameter(paramNameArray[i]);
             boolean isBean = DataType.isBeanType(parameterType);
+            Object paramValue = request.getParameter(paramNameArray[i]);
             if(isBean) {
                 requestParamValueObj[i] = invokeBean(request, parameterType, annotations, genType, i);
                 continue;
-            } else if(ToolsKit.isEmpty(paramValue)) { // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
-                requestParamValueObj[i]  = getDefualtValueOnType(parameterType);
+                // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
+            } else if(ToolsKit.isEmpty(paramValue)) {
+                requestParamValueObj[i] = getDefualtValueOnType(parameterType);
                 continue;
-            } else if (DataType.isString(parameterType)) {
-                requestParamValueObj[i] = paramValue;
-            } else if (DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
-                requestParamValueObj[i] = Integer.parseInt(paramValue);
-            } else if (DataType.isLong(parameterType) || DataType.isLongObject(parameterType)) {
-                requestParamValueObj[i] =Long.parseLong(paramValue);
-            } else if (DataType.isDouble(parameterType) || DataType.isDoubleObject(parameterType)) {
-                requestParamValueObj[i] = Double.parseDouble(paramValue);
-            } else if (DataType.isDate(parameterType)) {
-                requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-            } else if (DataType.isTimestamp(parameterType)) {
-                requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-            } else if(DataType.isListType(parameterType) || DataType.isSetType(parameterType) || DataType.isQueueType(parameterType)) {
-                requestParamValueObj[i] = invokeCollention(request, parameterType);
-            } else if(DataType.isMapType(parameterType) ) {
-                requestParamValueObj[i] = invokeMap(request);
+            } else {
+                requestParamValueObj[i] = TypeConverter.convert(parameterType, paramValue);
             }
+//            } else if (DataType.isString(parameterType)) {
+//                requestParamValueObj[i] = paramValue;
+//            } else if (DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
+//                requestParamValueObj[i] = Integer.parseInt(paramValue);
+//            } else if (DataType.isLong(parameterType) || DataType.isLongObject(parameterType)) {
+//                requestParamValueObj[i] =Long.parseLong(paramValue);
+//            } else if (DataType.isDouble(parameterType) || DataType.isDoubleObject(parameterType)) {
+//                requestParamValueObj[i] = Double.parseDouble(paramValue);
+//            } else if (DataType.isDate(parameterType)) {
+//                requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+//            } else if (DataType.isTimestamp(parameterType)) {
+//                requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+//            } else if(DataType.isListType(parameterType) || DataType.isSetType(parameterType) || DataType.isQueueType(parameterType)) {
+//                requestParamValueObj[i] = invokeCollention(request, parameterType);
+//            } else if(DataType.isMapType(parameterType) ) {
+//                requestParamValueObj[i] = invokeMap(request);
+//            }
 
             //返回前，根据验证注解，进行参数数据验证
             if (ToolsKit.isNotEmpty(annotations)) {

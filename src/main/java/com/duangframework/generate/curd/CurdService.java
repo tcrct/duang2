@@ -128,7 +128,7 @@ public abstract  class CurdService<T> implements IService<T> {
      */
     protected boolean deleteById(String id, MongoDao<T> mongoDao, ICacheService cacheService) {
         if(!ToolsKit.isValidDuangId(id)) {
-            throw new ServiceException("deleteById for User is fail: id is not DuangId");
+            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
         }
         try {
             Query<T> query = new Query<>();
@@ -137,6 +137,38 @@ public abstract  class CurdService<T> implements IService<T> {
             update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
             mongoDao.update(query, update);
             cacheService.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 批量删除泛型对象记录
+     * @param ids
+     * * @param id    泛型对象id字段值
+     *      *@param  mongoDao Dao对象
+     *      *@param  cacheService Cache对象
+     * @return
+     */
+    protected boolean deleteByIds(String[] ids, MongoDao<T> mongoDao, ICacheService cacheService) {
+        if(ToolsKit.isEmpty(ids)) {
+            throw new ServiceException("deleteByIds for ${entityName} is fail: ids is null");
+        }
+        for(String id : ids) {
+            if (!ToolsKit.isValidDuangId(id)) {
+                throw new ServiceException("deleteByIds for ${entityName} is fail: id is not DuangId");
+            }
+        }
+        try {
+            Query<T> query = new Query<>();
+            query.in(IdEntity.ID_FIELD, ids);
+            Update update = new Update();
+            update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
+            mongoDao.update(query, update);
+            for(String id: ids) {
+                cacheService.deleteById(id);
+            }
             return true;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage(), e);

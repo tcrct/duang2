@@ -46,6 +46,7 @@ public class ClassLoaderHelper {
         List<Class<?>> classList = new ArrayList<>(classKeySet.size());
         try {
             for (String classKey : classKeySet) {
+                System.out.println("###########: " + classKey);
                 classList.add(duangClassLoader.loadClass(classKey));
             }
             ClassHelper.reSetAllBizClass(classList);

@@ -37,7 +37,14 @@ public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
                 }
                 //以数组方式提交
                 if(key.contains("[]")) {
-                    requestParamsMap.put(key, Collections.singletonList(value));
+                    Object valueTmp = requestParamsMap.get(key);
+                    if(ToolsKit.isEmpty(valueTmp)) {
+                        requestParamsMap.put(key, Collections.singletonList(value));
+                    } else {
+                        List<Object> objectList = (List)valueTmp;
+                        objectList.add(value);
+                        requestParamsMap.put(key, objectList);
+                    }
                 } else {
                     requestParamsMap.put(key, value);
                 }
