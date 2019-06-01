@@ -66,6 +66,7 @@ public class NettyServer extends AbstractNettyServer {
                         } else {
                             System.err.println("INFO: [" + bootStrap.getAppName() + "] " + sdf.format(new Date()) + " "+key+"[" + address.getSocketAddress().getHostString()+ "] startup failed");
                         }
+                        bootStrap.setStarted(true);
                     }
                 });
             }

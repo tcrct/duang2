@@ -510,9 +510,17 @@ public final class ToolsKit {
     /**
      * 将搜索对象转换为查询对象
      * @param searchListDto
+     * @param searchListDto
      * @return
      */
-    public static Query searchDto2Query(SearchListDto searchListDto) {
+    public static Query searchDto2Query(SearchListDto searchListDto, Class<?> tClass) throws Exception {
+        if(ToolsKit.isEmpty(searchListDto)) {
+            throw new ServiceException("searchListDto is null");
+        }
+        if(ToolsKit.isEmpty(tClass)) {
+            throw new ServiceException("tClass is null");
+        }
+        Map<String, Field> fieldMap = ObjectKit.getFieldMap(tClass, true);
         Query query = new Query();
         int pageNo = searchListDto.getPageNo();
         if(pageNo == 1) {pageNo = 0;}
@@ -520,31 +528,33 @@ public final class ToolsKit {
         List<SearchDto> searchDtoList = searchListDto.getSearchDtos();
         if(ToolsKit.isNotEmpty(searchDtoList)) {
             for(SearchDto searchDto : searchDtoList) {
-                String field = searchDto.getField();
+                String fieldName = searchDto.getField();
+                Field field = fieldMap.get(fieldName);
+                Class<?> typeClass = field.getType();
                 String operator = ToolsKit.isEmpty(searchDto.getOperator()) ? "==" : searchDto.getOperator();
-                Object value = searchDto.getValue();
-                if (ToolsKit.isNotEmpty(field) && ToolsKit.isNotEmpty(value)) {
+                Object value =  TypeConverter.convert(typeClass, searchDto.getValue());
+                if (ToolsKit.isNotEmpty(fieldName) && ToolsKit.isNotEmpty(value)) {
                     switch (operator) {
                         case "!=":
-                            query.ne(field, value);
+                            query.ne(fieldName, value);
                             break;
                         case ">":
-                            query.gt(field, value);
+                            query.gt(fieldName, value);
                             break;
                         case ">=":
-                            query.gte(field, value);
+                            query.gte(fieldName, value);
                             break;
                         case "<":
-                            query.lt(field, value);
+                            query.lt(fieldName, value);
                             break;
                         case "<=":
-                            query.lte(field, value);
+                            query.lte(fieldName, value);
                             break;
                         case "like":
-                            query.like(field, value);
+                            query.like(fieldName, value);
                             break;
                         default:
-                            query.eq(field, value);
+                            query.eq(fieldName, value);
                             break;
                     }
                 }

@@ -1,8 +1,12 @@
 package com.duangframework.mvc.core;
 
 import com.duangframework.exception.MvcException;
+import com.duangframework.hotswap.HotSwapWatcher;
 import com.duangframework.kit.ClassKit;
+import com.duangframework.kit.CompilerKit;
+import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.mvc.core.helper.*;
+import com.duangframework.server.common.BootStrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +61,7 @@ public class StartContextListener {
                 }
             }
             after();
+            hotSwapWatcher();
         } catch (Exception e) {
             throw new MvcException(e.getMessage(), e);
         }
@@ -68,6 +73,16 @@ public class StartContextListener {
      */
     private void after() throws Exception {
         CustomInitRun.getInstance().after();
+    }
+
+
+    /**
+     * 开发模式下开启热部署功能
+     */
+    private void hotSwapWatcher() {
+        if(BootStrap.getInstants().isDevModel() && BootStrap.getInstants().isHotSwap()) {
+            ThreadPoolKit.execute(new HotSwapWatcher(CompilerKit.duang().dir()));
+        }
     }
 
 }
