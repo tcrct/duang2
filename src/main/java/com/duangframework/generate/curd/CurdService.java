@@ -175,25 +175,27 @@ public abstract  class CurdService<T> implements IService<T> {
         }
     }
 
-
     /**
      * 根据搜索对象搜索符合条件的泛型对象记录
      * @param searchListDto     搜索对象
      *@param  mongoDao Dao对象
-     *@param  cacheService Cache对象
+     *@param  tClass 泛型对象类
      * @return
      */
-    public PageDto<T> search(SearchListDto searchListDto, MongoDao<T> mongoDao, ICacheService cacheService) {
+    public PageDto<T> search(SearchListDto searchListDto, MongoDao<T> mongoDao, Class<T> tClass) {
         if(ToolsKit.isEmpty(searchListDto)) {
             throw new ServiceException("searchListDto is null");
         }
+        if(ToolsKit.isEmpty(tClass)) {
+            throw new ServiceException("tClass is null");
+        }
         try {
-            return mongoDao.findPage(ToolsKit.searchDto2Query(searchListDto));
+            return mongoDao.findPage(ToolsKit.searchDto2Query(searchListDto, tClass));
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ServiceException(e.getMessage(), e);
         }
     }
+
 
     /**
      * 根据条件查找所有泛型对象记录

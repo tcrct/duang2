@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 import javax.tools.*;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 动态编译工具类
@@ -52,6 +54,21 @@ public class CompilerUtils {
         return javaCompiler;
     }
 
+
+    public Map<String, byte[]> compile(String javaName, String javaSrc)  {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager stdManager = compiler.getStandardFileManager(null, null, null);
+        try (MemoryJavaFileManager manager = new MemoryJavaFileManager(stdManager)) {
+            JavaFileObject javaFileObject = MemoryJavaFileManager.makeStringSource(javaName, javaSrc);
+            JavaCompiler.CompilationTask task = compiler.getTask(null, manager, null, null, null, Arrays.asList(javaFileObject));
+            if (task.call())
+                return manager.getClassBytes();
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+        }
+        return null;
+    }
+
     /**
      * 编译java文件
      *
@@ -70,7 +87,7 @@ public class CompilerUtils {
         // 获取编译器实例
         JavaCompiler compiler = getJavaCompiler();
         // 获取标准文件管理器实例
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+        StandardJavaFileManager sdtManager = compiler.getStandardFileManager(null, null, null);
         try {
             if (ToolsKit.isEmpty(filePath) && ToolsKit.isEmpty(sourceDir) && ToolsKit.isEmpty(targetDir)) {
                 return false;
@@ -85,14 +102,14 @@ public class CompilerUtils {
                 return false;
             }
             // 获取要编译的编译单元
-            Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(sourceFileList);
+            Iterable<? extends JavaFileObject> compilationUnits = sdtManager.getJavaFileObjectsFromFiles(sourceFileList);
             /**
              * 编译选项，在编译java文件时，编译程序会自动的去寻找java文件引用的其他的java源文件或者class。
              * -sourcepath选项就是定义java源文件的查找目录，
              * -classpath选项就是定义class文件的查找目录。
              */
             Iterable<String> options = Arrays.asList("-d", targetDir, "-sourcepath", sourceDir);
-            JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits);
+            JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, sdtManager, diagnostics, options, null, compilationUnits);
             // 运行编译任务
             boolean isCompiler =  compilationTask.call();
             if (!isCompiler) {
@@ -104,7 +121,7 @@ public class CompilerUtils {
             }
             return isCompiler;
         } finally {
-            fileManager.close();
+            sdtManager.close();
         }
     }
 

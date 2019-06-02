@@ -71,6 +71,10 @@ public class BootStrap implements Closeable {
     private boolean enableCors = true;
     /**是否开启html token验证，用于防止表单重复提交, 默认不开启*/
     private boolean isTokenHtml = false;
+    /** 是否在运行*/
+    private boolean isStarted = false;
+    /**是否热部署*/
+    private boolean isHotSwap = true;
 
     /**  MQTT */
     private MqttOptions mqttOptions;
@@ -320,4 +324,20 @@ public class BootStrap implements Closeable {
     public boolean isTokenHtml() {
         return isTokenHtml;
     }
+
+    public void setStarted(boolean isStarted) {
+        this.isStarted = isStarted;
+    }
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    public void hotswap(boolean isHotSwap) {
+        this.isHotSwap = isHotSwap;
+    }
+
+    public boolean isHotSwap() {
+        return isHotSwap;
+    }
+
 }

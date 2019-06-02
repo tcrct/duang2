@@ -1,5 +1,6 @@
 package com.duangframework.hotswap;
 
+import com.duangframework.kit.CompilerKit;
 import com.duangframework.kit.PathKit;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
@@ -47,8 +48,7 @@ public class DuangClassLoader extends ClassLoader {
 
 
     private static String getBasePackagePath(String packagePath){
-        return PathKit.getWebRootPath() + File.separator + "target" + File.separator + "classes" + File.separator + packagePath.replace(".", File.separator);
-//        return PathKit.getWebRootPath() + File.separator+ "bin"+ File.separator + packagePath.replace(".", File.separator);
+        return CompilerKit.duang().classDir()+ File.separator + packagePath.replace(".", File.separator);
     }
 
     private void init() {
@@ -102,9 +102,10 @@ public class DuangClassLoader extends ClassLoader {
     }
 
     private static String getClassAbsolutePath(File file) {
-        String classPath = file.getAbsolutePath().replaceAll("\\\\", "/");
-        classPath = classPath.substring(classPath.indexOf("/classes") + "/classes".length() + 1, classPath.length() - 6);
-        classPath = classPath.replaceAll("/", ".");
+        String classPath = file.getAbsolutePath();
+        String replaceStr = CompilerKit.duang().classDir();
+        classPath = classPath.substring(replaceStr.length()+1, classPath.length()-6);
+        classPath = classPath.replace(File.separator, ".");
         return classPath;
     }
 
@@ -123,11 +124,14 @@ public class DuangClassLoader extends ClassLoader {
             }
             byte[] classBytes = bos.toByteArray();
             String classKey = getClassAbsolutePath(classPathFile);
-            System.out.println(classKey);
-            if(!"com.signetz.openapi.dto.v2.python.BaseEntity".equalsIgnoreCase(classKey)) {
-                defineClass(classKey, classBytes, 0, classBytes.length);
+//            if(!"com.signetz.openapi.dto.v2.python.BaseEntity".equalsIgnoreCase(classKey)) {
+
+//            }
+            if(!getClassKeySet().contains(classKey)) {
+                getClassKeySet().add(classKey);
+                System.out.println(classKey);
+//                defineClass(classKey, classBytes, 0, classBytes.length);
             }
-            CLASSLOADER_SET.add(classKey);
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
         }
