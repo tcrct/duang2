@@ -113,8 +113,6 @@ public class DuangClassLoader extends ClassLoader {
      */
     private void getClassData(File classPathFile) {
         try {
-//            String classKey = getClassAbsolutePath(classPathFile);
-//            loadClass(classKey,true);
             InputStream fin = new FileInputStream(classPathFile);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int bufferSize = 4096;
