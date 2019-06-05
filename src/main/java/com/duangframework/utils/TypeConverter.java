@@ -70,10 +70,14 @@ public class TypeConverter {
             }catch(Exception e){
                 String stringDate = (String)objValue;
                 try{
-                    date = ToolsKit.parseDate(stringDate, "yyyy-MM-dd HH:mm:ss.SSS");
+                    date = ToolsKit.parseDate(stringDate, "yyyy-MM-dd HH:mm:ss");
                 } catch(Exception e1) {
-                    date = new Date();
-                    date.setTime(Long.parseLong(stringDate));
+                    try{
+                        date = ToolsKit.parseDate(stringDate, "yyyy-MM-dd HH:mm:ss.SSS");
+                    } catch(Exception e2) {
+                        date = new Date();
+                        date.setTime(Long.parseLong(stringDate));
+                    }
                 }
             }
             if(null != date){

@@ -18,7 +18,8 @@ import java.util.Map;
 
 /**
  * 请求访问处理器
- * Created by laotang on 2018/6/14.
+ * @author laotang
+ * @date  2018/6/14
  */
 final public class RequestAccessHandler{
 
@@ -58,7 +59,7 @@ final public class RequestAccessHandler{
         method.setAccessible(true);
         //将请求参数生成数组对象注入
         // 反射执行方法
-        Object resultObj = new ActionInvocation(route, controller, method, target).invoke();    // 反射执行该方法
+        Object resultObj = new ActionInvocation(route, controller, method, target).invoke();
         // 返回结果
         controller.getRender(resultObj).setContext(request, response).render();
     }
