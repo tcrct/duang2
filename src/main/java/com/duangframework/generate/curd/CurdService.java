@@ -13,6 +13,7 @@ import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -155,14 +156,17 @@ public abstract  class CurdService<T> implements IService<T> {
         if(ToolsKit.isEmpty(ids)) {
             throw new ServiceException("deleteByIds for ${entityName} is fail: ids is null");
         }
-        for(String id : ids) {
+        DuangId[] objectIds = new DuangId[ids.length];
+        for(int i=0; i<ids.length; i++) {
+            String id = ids[i];
             if (!ToolsKit.isValidDuangId(id)) {
                 throw new ServiceException("deleteByIds for ${entityName} is fail: id is not DuangId");
             }
+            objectIds[i] = new DuangId(id);
         }
         try {
             Query<T> query = new Query<>();
-            query.in(IdEntity.ID_FIELD, ids);
+            query.in(IdEntity.ID_FIELD, objectIds);
             Update update = new Update();
             update.set(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_DELETE);
             mongoDao.update(query, update);
