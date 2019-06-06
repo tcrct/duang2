@@ -645,7 +645,7 @@ public final class ToolsKit {
      * 取出请求里的userid及terminal
      * @return Map
      */
-    private static Map<String,String> getRequestUserIdTerminal() {
+    public static Map<String,String> getRequestUserIdTerminal() {
         String userId = "";
         String terminal = "";
         try {

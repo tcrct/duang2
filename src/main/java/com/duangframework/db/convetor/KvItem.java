@@ -15,9 +15,12 @@ import java.util.Map;
  */
 public class KvItem implements java.io.Serializable {
 
-    private String key;                         // 查询字段
-    private String operator;                // 操作符， =，like, >=,<=之类
-    private Object value;                    // 查询值
+    // 查询字段
+    private String key;
+    // 操作符， =，like, >=,<=之类
+    private String operator;
+    // 查询值
+    private Object value;
 
     public KvItem() {
     }

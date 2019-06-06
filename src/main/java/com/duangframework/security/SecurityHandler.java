@@ -10,6 +10,7 @@ import com.duangframework.mvc.http.handler.IHandler;
 import io.netty.handler.codec.http.HttpHeaderNames;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,22 +22,18 @@ import java.util.Set;
  */
 public class SecurityHandler implements IHandler {
 
-    // 需要进行权限验证的URI地址前缀集合
-    public static final HashSet<String> URI_PREFIX_LIST = new HashSet<>();
+    // 不需要验证权限的URI地址集合
+    public static final HashSet<String> URI_PREFIX_SET = new HashSet<>();
     private static String AUTHORIZATION_HEADER_PREFIX;
-
-    public SecurityHandler() {
-        getAuthorizAtion();
-    }
 
     /**
      * 构造方法
-     * @param uriPrefixList             URI地址前缀集合
+     * @param uriPrefixList             不需要验证权限的URI地址集合
      */
     public SecurityHandler(Set<String> uriPrefixList) {
         getAuthorizAtion();
-        URI_PREFIX_LIST.clear();
-        URI_PREFIX_LIST.addAll(uriPrefixList);
+        URI_PREFIX_SET.clear();
+        URI_PREFIX_SET.addAll(uriPrefixList);
     }
 
     @Override
@@ -45,22 +42,14 @@ public class SecurityHandler implements IHandler {
         if(!checkHeaderAuth(request)) {
             throw new MvcException("authorization validation not passed");
         }
-
-        String key = request.getHeader(""); //访问权限对应的用户标识
+        //访问权限对应的用户标识，一般是用户ID，作Map集合的key
+        String key = ToolsKit.getRequestUserIdTerminal().get(ConstEnums.REQUEST_ID_FIELD.getValue());
         DuangSecurity duangSecurity = DuangSecurity.getDuangSecurityMap().get(key);
         if (ToolsKit.isEmpty(duangSecurity)){
             throw new MvcException("请先登录！");
         }
-
-        boolean isNeedSecurityVerification = false;
-        for(String uriPrefix : URI_PREFIX_LIST) {
-            if(target.startsWith(uriPrefix)) {
-                isNeedSecurityVerification = true;
-                break;
-            }
-        }
-
-        if(isNeedSecurityVerification && duangSecurity.isNeedSecurityVerification()) {
+        // 不存在不需要验证的集合里则要判断是否有权限
+        if(!URI_PREFIX_SET.contains(target)) {
             Set<String> securitySet = duangSecurity.getSecuritySet();
             if (ToolsKit.isEmpty(securitySet) && !securitySet.contains(target)) {
                 throw new MvcException("该用户无权限访问[" + target + "]，请检查！");

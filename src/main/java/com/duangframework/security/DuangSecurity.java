@@ -14,8 +14,6 @@ import java.util.Set;
  */
 public class DuangSecurity  {
 
-    private String key;
-    private boolean isNeedSecurityVerification;
     private Set<String> securitySet;
 
     private static final Map<String, DuangSecurity> duangSecurityHashMap = new HashMap<>();
@@ -23,29 +21,13 @@ public class DuangSecurity  {
     /**
      *构造方法
      * @param key   关键字，一般是用户ID，作Map集合的key
-     * @param isNeedSecurityVerification    是否需要验证
      * @param securityUriSet    允许访问的URI集合
      */
-    public DuangSecurity(String key, boolean isNeedSecurityVerification, Set<String> securityUriSet) {
-        this.key = key;
-        this.isNeedSecurityVerification = getNeedSecurityVerification();
+    public DuangSecurity(String key, Set<String> securityUriSet) {
         this.securitySet = securityUriSet;
         duangSecurityHashMap.put(key, this);
     }
 
-    private boolean getNeedSecurityVerification() {
-        String envKey = ConstEnums.PROPERTIES.USE_ENV.getValue();
-        String env = System.getProperty(envKey);
-        if(ToolsKit.isEmpty(env)) {
-            env = PropKit.get(envKey);
-        }
-        isNeedSecurityVerification =  "dev".equalsIgnoreCase(env);
-        return isNeedSecurityVerification;
-    }
-
-    public boolean isNeedSecurityVerification() {
-        return isNeedSecurityVerification;
-    }
 
     public Set<String> getSecuritySet() {
         return securitySet;
