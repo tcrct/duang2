@@ -1,9 +1,12 @@
 package com.duangframework.security;
 
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.plugin.IPlugin;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,15 +17,16 @@ import java.util.Set;
  */
 public class SecurityPlugin implements IPlugin {
 
-    private Set<String> uriPrefixSet;
+    private Set<String> uriPrefixSet = new HashSet<>();
     private ISecurity authObj;
 
     public SecurityPlugin(){
-
+        List<String> filterUrl = PropKit.getList("security.filter.uri");
+        uriPrefixSet.addAll(filterUrl);
     }
 
     public SecurityPlugin(Set<String> uriPrefixSet){
-        this.uriPrefixSet = uriPrefixSet;
+        this.uriPrefixSet.addAll(uriPrefixSet);
     }
 
     @Override

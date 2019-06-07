@@ -9,8 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -198,6 +197,25 @@ public final class ClassKit {
             FIELD_MAPPING_MAP.put(key, field);
         }
         return (null == field) ? null : field;
+    }
+
+    /**
+     * 根据class对象反射出所有属性字段，静态字段除外
+     * @param cls
+     * @return  Map集合，key为field.getName()
+     */
+    public static Map<String, Field> getFieldMap(Class<?> cls) {
+        Field[] fileds = getFields(cls);
+        if(null == fileds) {
+            return null;
+        }
+        Map<String, Field> map = new HashMap<>(fileds.length);
+        for(Field field : fileds) {
+            if(null != field) {
+                map.put(field.getName(), field);
+            }
+        }
+        return map;
     }
 
     /**

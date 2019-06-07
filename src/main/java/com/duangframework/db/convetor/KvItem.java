@@ -15,15 +15,18 @@ import java.util.Map;
  */
 public class KvItem implements java.io.Serializable {
 
-    private String key;                         // 查询字段
-    private String operator;                // 操作符， =，like, >=,<=之类
-    private Object value;                    // 查询值
+    // 查询字段
+    private String key;
+    // 操作符， =，like, >=,<=之类
+    private String operator;
+    // 查询值
+    private Object value;
 
     public KvItem() {
     }
 
     public KvItem(String key, Object value) {
-        this(key, null, value);
+        this(key, com.duangframework.db.mysql.common.Operator.EQ, value);
     }
 
     public KvItem(String key, String operator, Object value) {
@@ -49,7 +52,6 @@ public class KvItem implements java.io.Serializable {
     }
 
     public String getOperator() {
-        operator = com.duangframework.db.mysql.common.Operator.EQ;
         if(value instanceof DBObject || value instanceof Document) {
             Map dboMap = ((DBObject)value).toMap();
             if(ToolsKit.isNotEmpty(dboMap)) {

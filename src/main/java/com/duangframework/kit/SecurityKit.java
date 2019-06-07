@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 安全工具类
@@ -28,6 +29,8 @@ public class SecurityKit {
     private static Map<Object,SecurityUser> SECURITY_USER_MAP = new HashMap<>();
     // tokenId与userId映射关系, key为tokenId
     private static Map<String,String> TOKENID_USERID_MAP = new HashMap<>();
+    // userId与权限集合映射关系, key为userId
+    private static final Map<String, Set<String>> authHashMap = new HashMap<>();
 
     private static class Holder {
         private static final SecurityKit INSTANCE = new SecurityKit();
@@ -162,5 +165,19 @@ public class SecurityKit {
             SECURITY_USER_MAP.put(userId, securityUser);
         }
         return securityUser;
+    }
+
+    public Set<String> getAuths() {
+        if(ToolsKit.isNotEmpty(key)) {
+            throw new SecurityException("请先设置Id值");
+        }
+        return authHashMap.get(key);
+    }
+
+    public void setAuths(Set<String> authSet) {
+        if(ToolsKit.isNotEmpty(key)) {
+            throw new SecurityException("请先设置Id值");
+        }
+        authHashMap.put(key.toString(), authSet);
     }
 }

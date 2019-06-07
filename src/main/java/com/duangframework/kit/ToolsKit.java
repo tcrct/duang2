@@ -520,17 +520,18 @@ public final class ToolsKit {
         if(ToolsKit.isEmpty(tClass)) {
             throw new ServiceException("tClass is null");
         }
-        Map<String, Field> fieldMap = ObjectKit.getFieldMap(tClass, true);
+        Map<String,Field> fieldMap = ClassKit.getFieldMap(tClass);
         Query query = new Query();
         int pageNo = searchListDto.getPageNo();
         if(pageNo == 1) {pageNo = 0;}
         query.page(new PageDto(pageNo, searchListDto.getPageSize()));
         List<SearchDto> searchDtoList = searchListDto.getSearchDtos();
+        Class<?> typeClass = null;
         if(ToolsKit.isNotEmpty(searchDtoList)) {
             for(SearchDto searchDto : searchDtoList) {
                 String fieldName = searchDto.getField();
                 Field field = fieldMap.get(fieldName);
-                Class<?> typeClass = field.getType();
+                typeClass = (null == field) ? String.class : field.getType();
                 String operator = ToolsKit.isEmpty(searchDto.getOperator()) ? "==" : searchDto.getOperator();
                 Object value =  TypeConverter.convert(typeClass, searchDto.getValue());
                 if (ToolsKit.isNotEmpty(fieldName) && ToolsKit.isNotEmpty(value)) {
@@ -644,7 +645,7 @@ public final class ToolsKit {
      * 取出请求里的userid及terminal
      * @return Map
      */
-    private static Map<String,String> getRequestUserIdTerminal() {
+    public static Map<String,String> getRequestUserIdTerminal() {
         String userId = "";
         String terminal = "";
         try {
