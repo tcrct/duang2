@@ -78,6 +78,7 @@ public class StartContextListener {
 
     /**
      * 开发模式下开启热部署功能
+     * 在IDEA下，需要按下ctrl+s组合键进行保存，以达到快速启动热部署功能
      */
     private void hotSwapWatcher() {
         if(BootStrap.getInstants().isDevModel() && BootStrap.getInstants().isHotSwap()) {

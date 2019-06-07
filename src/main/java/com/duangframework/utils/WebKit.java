@@ -1,6 +1,5 @@
 package com.duangframework.utils;
 
-import com.duangframework.exception.AbstractDuangException;
 import com.duangframework.exception.Exceptions;
 import com.duangframework.exception.IException;
 import com.duangframework.kit.PropKit;
@@ -189,7 +188,7 @@ public class WebKit {
         headDto.setMethod(request.getMethod());
         headDto.setRequestId(request.getRequestId());
         IException ie = Exceptions.getDuangException(e);
-        int code = 1;
+        int code = IException.FAIL_CODE;
         String message = e.getMessage();
         if(null != ie) {
             code = ie.getCode();
@@ -199,7 +198,7 @@ public class WebKit {
         headDto.setUri(request.getRequestURI());
         headDto.setTimestamp(ToolsKit.getCurrentDateString());
         headDto.setMsg(message);
-        returnDto.setData("error");
+        returnDto.setData(IException.FAIL_MESSAGE);
         returnDto.setParams(request.getParameterMap());
         returnDto.setHead(headDto);
         builderExceptionResponse(request, response, returnDto);

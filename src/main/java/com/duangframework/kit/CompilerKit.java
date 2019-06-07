@@ -57,18 +57,37 @@ public class CompilerKit {
         return this;
     }
 
+    /**
+     *  源代码目录
+     * @param javaDir
+     * @return
+     */
     public CompilerKit javaDir(String javaDir) {
         this.sourceDir = javaDir;
         return this;
     }
 
+    /**
+     *  指定class目录
+     * @param classDir  class目录
+     * @return
+     */
     public CompilerKit classDir(String classDir) {
         this.targetDir = classDir;
         return this;
     }
+
+    /**
+     * maven开发模式下的固定路径
+     * @return
+     */
     private String rootItemPath() {
         return File.separator + "src" +File.separator + "main" + File.separator + "java";
     }
+
+    /**
+     * 设置默认值
+     */
     private void setDefaultValue() {
         if(ToolsKit.isEmpty(dirPath)) {
             dirPath = rootPath + rootItemPath() + File.separator +
@@ -82,11 +101,19 @@ public class CompilerKit {
         }
     }
 
+    /**
+     *  源代码根路径位置
+     * @return 源代码根目录
+     */
     public String dir() {
         setDefaultValue();
         return dirPath;
     }
 
+    /**
+     *  指定编译后的class保存位置
+     * @return  dir目录路径
+     */
     public String classDir() {
         setDefaultValue();
         return targetDir;
