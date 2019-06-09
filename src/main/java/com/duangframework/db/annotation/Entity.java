@@ -14,5 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Entity {
     String name() default "";
+    String label() default "";
     String database() default "";
 }
