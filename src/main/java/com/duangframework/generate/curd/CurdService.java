@@ -156,13 +156,13 @@ public abstract  class CurdService<T> implements IService<T> {
         if(ToolsKit.isEmpty(ids)) {
             throw new ServiceException("deleteByIds for ${entityName} is fail: ids is null");
         }
-        DuangId[] objectIds = new DuangId[ids.length];
+        ObjectId[] objectIds = new ObjectId[ids.length];
         for(int i=0; i<ids.length; i++) {
             String id = ids[i];
             if (!ToolsKit.isValidDuangId(id)) {
-                throw new ServiceException("deleteByIds for ${entityName} is fail: id is not DuangId");
+                throw new ServiceException("deleteByIds for ${entityName} is fail: id is not ObjectId");
             }
-            objectIds[i] = new DuangId(id);
+            objectIds[i] = new ObjectId(id);
         }
         try {
             Query<T> query = new Query<>();
