@@ -9,6 +9,7 @@ import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Import;
 import com.duangframework.mvc.core.helper.BeanHelper;
 import com.duangframework.mvc.plugin.IPlugin;
+import com.duangframework.mvc.proxy.IProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ public class MongodbPlugin implements IPlugin {
     public MongodbPlugin(MongoClientAdapter clientAdapter) throws Exception {
         DbClientFactory.setMongoClient(clientAdapter);
         DbClientFactory.setMongoDefaultClientId(clientAdapter.getId());
+        DbClientFactory.setProxyList(clientAdapter.getProxyList());
     }
 
 
@@ -85,6 +87,7 @@ public class MongodbPlugin implements IPlugin {
     if(ToolsKit.isEmpty(iocBeanMap)) {
         return;
     }
+    List<IProxy> proxyList = DbClientFactory.getProxyList();
     for(Iterator<Map.Entry<String, Object>> it = iocBeanMap.entrySet().iterator(); it.hasNext();) {
         Map.Entry<String, Object> entry = it.next();
         Object beanObj = entry.getValue();
@@ -99,7 +102,7 @@ public class MongodbPlugin implements IPlugin {
                         // <>里的泛型类
                         Class<?> paramTypeClass = ClassKit.loadClass(types[0].getTypeName());
                         String key = ToolsKit.isEmpty(importAnnot.client()) ? DbClientFactory.getMongoDefaultClientId() : importAnnot.client();
-                        Object daoObj = MongoUtils.getMongoDao(key, paramTypeClass);
+                        Object daoObj = MongoUtils.getMongoDao(key, paramTypeClass, proxyList);
                         if(null != daoObj) {
                             field.setAccessible(true);
                             field.set(beanObj, daoObj);

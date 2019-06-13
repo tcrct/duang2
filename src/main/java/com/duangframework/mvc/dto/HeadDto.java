@@ -2,6 +2,7 @@ package com.duangframework.mvc.dto;
 
 import com.duangframework.kit.ToolsKit;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public class HeadDto implements java.io.Serializable {
 	private String tokenId;
 	private String timestamp = ToolsKit.getCurrentDateString();
 	private String requestId;
-    private Map<String, String> headerMap ;
+    private Map<String, String> headerMap = new HashMap<>();
 
 	public HeadDto(){
 
@@ -52,7 +53,7 @@ public class HeadDto implements java.io.Serializable {
         this.tokenId = tokenId;
         this.timestamp = timestamp;
         this.requestId = requestId;
-        this.headerMap = headerMap;
+        this.headerMap.putAll(headerMap);
     }
 
     public int getRet() {
@@ -96,7 +97,7 @@ public class HeadDto implements java.io.Serializable {
     }
 
     public void setHeaderMap(Map<String, String> headerMap) {
-        this.headerMap = headerMap;
+        this.headerMap.putAll(headerMap);
     }
     public String getUri() {
         return uri;

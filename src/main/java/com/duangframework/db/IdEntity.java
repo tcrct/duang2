@@ -3,9 +3,13 @@ package com.duangframework.db;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.duangframework.db.annotation.Id;
-
 import java.util.Date;
 
+/**
+ * 所有实体类的基类，子类必须继续该类
+ * @author laotang
+ * @date 2019-6-13
+ */
 public class IdEntity implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -18,27 +22,49 @@ public class IdEntity implements java.io.Serializable {
 	public static final String UPDATEUSERID_FIELD = "updateuserid";
 	public static final String STATUS_FIELD = "status";
 	public static final String SOURCE_FIELD = "source";
+	public static final String PROJECTID_FIELD = "projectId";
+	public static final String COMPANYID_FIELD = "companyId";
 	public static final String STATUS_FIELD_SUCCESS = "审核通过";
 	public static final String STATUS_FIELD_DELETE = "已删除";
 
 	@Id
 	@JSONField(name=ID_FIELD)
 	private String id;
-
-	private Date createtime;			//创建时间
-
-	private String createuserid;		//创建人ID
-
-	private Date updatetime;			//更新时间
-
-	private String updateuserid;		//更新人ID
-
-	private String status;			//数据状态(查数据字典)
-
-	private String source;			//数据来源
+	/**
+	 * 创建时间
+	 */
+	private Date createtime;
+	/**
+	 * 创建人ID
+	 */
+	private String createuserid;
+	/**
+	 * 更新时间
+	 */
+	private Date updatetime;
+	/**
+	 * 更新人ID
+	 */
+	private String updateuserid;
+	/**
+	 * 数据状态(查数据字典)
+	 */
+	private String status;
+	/**
+	 * 数据来源
+	 */
+	private String source;
+	/**
+	 * 公司id标识
+	 */
+	private String companyId;
+	/**
+	 * 项目id标识
+	 */
+	private String projectId;
 
 	public IdEntity(String id, Date createtime, String createuserid,
-                    Date updatetime, String updateuserid, String status, String source) {
+					 Date updatetime, String updateuserid, String status, String source, String projectId, String companyId) {
 		super();
 		this.id = id;
 		this.createtime = createtime;
@@ -47,6 +73,8 @@ public class IdEntity implements java.io.Serializable {
 		this.updateuserid = updateuserid;
 		this.status = status;
 		this.source = source;
+		this.projectId = projectId;
+		this.companyId = companyId;
 	}
 
 	public IdEntity() {
@@ -113,6 +141,22 @@ public class IdEntity implements java.io.Serializable {
 		this.source = source;
 	}
 
+	public String getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(String companyId) {
+		this.companyId = companyId;
+	}
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
 	@Override
 	public String toString() {
 		return "IdEntity{" +
@@ -123,6 +167,8 @@ public class IdEntity implements java.io.Serializable {
 				", updateuserid='" + updateuserid + '\'' +
 				", status='" + status + '\'' +
 				", source='" + source + '\'' +
+				", projectId='" + projectId + '\'' +
+				", companyId='" + companyId + '\'' +
 				'}';
 	}
 }

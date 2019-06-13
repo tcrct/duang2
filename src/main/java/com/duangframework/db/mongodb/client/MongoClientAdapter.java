@@ -3,6 +3,7 @@ package com.duangframework.db.mongodb.client;
 import com.duangframework.db.IClient;
 import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.proxy.IProxy;
 import com.duangframework.utils.MD5;
 import com.mongodb.*;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
     private MongoConnect mongoConnect;
     private MongoClient mongoClient;
     private boolean isDefaultClient;
+    private List<IProxy> proxyList = new ArrayList<>();
     /**
      *链接客户端ID, 如多实例里，用于区分
      * 生成规则， MD5(this.toString())
@@ -43,6 +45,13 @@ public class MongoClientAdapter implements IClient<MongoClient> {
         this.isDefaultClient = isDefaultClient;
     }
 
+    public List<IProxy> getProxyList() {
+        return proxyList;
+    }
+
+    public void setProxyList(List<IProxy> proxyList) {
+        this.proxyList = proxyList;
+    }
 
     @Override
     public String getId() {
@@ -150,6 +159,8 @@ public class MongoClientAdapter implements IClient<MongoClient> {
         private String password;
         private String url;
         private boolean isDefault;
+        private List<IProxy> proxyList = new ArrayList<>();
+
 
         public Builder host(String host) {
             this.host = host;
@@ -181,9 +192,15 @@ public class MongoClientAdapter implements IClient<MongoClient> {
             return this;
         }
 
+        public Builder proxy(IProxy proxy){
+            this.proxyList.add(proxy);
+            return this;
+        }
+
         public MongoClientAdapter build() {
             MongoClientAdapter adapter =  ToolsKit.isEmpty(url) ? new MongoClientAdapter(new MongoConnect(host, port, database, username, password)) : new MongoClientAdapter(new MongoConnect(url));
             adapter.setDefaultClient(isDefault);
+            adapter.setProxyList(proxyList);
             return adapter;
         }
     }

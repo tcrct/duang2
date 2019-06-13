@@ -37,13 +37,16 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
 
     private final static Logger logger = LoggerFactory.getLogger(MongoBaseDao.class);
 
-    protected Class<T> cls;
+    protected Class<?> cls;
     protected DB mongoDB;
     protected DBCollection coll;
     protected MongoDatabase mongoDatabase;
     protected MongoCollection<Document> collection;
     protected DBObject keys;
 
+    public MongoBaseDao() {
+
+    }
 
     public MongoBaseDao(Class<T> cls){
 //        add(MongoClientKit.duangframework().getDefaultDB(),
@@ -60,7 +63,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
      * @param database  数据库名称
      * @param cls             集合类对象
      */
-    private void init(DB db, MongoDatabase database, Class<T> cls){
+    public void init(DB db, MongoDatabase database, Class<?> cls){
         boolean isExtends = ClassKit.isExtends(cls, IdEntity.class.getCanonicalName());
         if(!isExtends){
             throw new RuntimeException("the "+cls.getCanonicalName()+" is not extends "+ IdEntity.class.getCanonicalName() +", exit...");

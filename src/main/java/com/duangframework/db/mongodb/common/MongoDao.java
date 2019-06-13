@@ -9,6 +9,9 @@ import com.mongodb.client.MongoDatabase;
  */
 public class MongoDao<T> extends MongoBaseDao<T> {
 
+    public MongoDao(){
+    }
+
     public MongoDao(Class<T> clazz) {
         super(clazz);
     }

@@ -10,6 +10,8 @@ import com.duangframework.db.mongodb.convert.decode.MongodbDecodeValueFilter;
 import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.proxy.IProxy;
+import com.duangframework.mvc.proxy.ProxyManager;
 import com.duangframework.utils.DataType;
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
@@ -158,31 +160,44 @@ public class MongoUtils {
         return document;
     }
 
+
+    public static <T> MongoDao<T> getMongoDao(String dbClientId, Class<T> cls){
+        return getMongoDao(dbClientId, cls, DbClientFactory.getProxyList());
+    }
     /**
      * 根据Entity类取出MongoDao
      *@param dbClientId           多数据源时，指定的数据源客户端代号标识字符串
-     * @param cls           继承了IdEntity的类
+     * @param cls                       继承了IdEntity的类
+     * @param proxyList             代理类集合
      * @param <T>
      * @return
      */
-    public static <T> MongoDao<T> getMongoDao(String dbClientId, Class<T> cls){
+    public static <T> MongoDao<T> getMongoDao(String dbClientId, Class<T> cls, List<IProxy> proxyList){
         String key = ClassKit.getEntityName(cls);
         key = ToolsKit.isNotEmpty(dbClientId) ? dbClientId+"_" + key : key;
-        MongoDao<?> dao = MONGODAO_MAP.get(key);
-        if(null == dao){
+        MongoDao<?> mongoDao = MONGODAO_MAP.get(key);
+        if(null == mongoDao){
             try {
                 MongoClientAdapter clientAdapter = DbClientFactory.getMongoDbClient(dbClientId);
                 MongoClient mongoClient = clientAdapter.getClient();
                 String dbName = clientAdapter.getDbConnect().getDatabase();
                 DB db = mongoClient.getDB(dbName);
                 MongoDatabase database = mongoClient.getDatabase(dbName);
-                dao = new MongoDao<T>(db, database, cls);
-                MONGODAO_MAP.put(key, dao);
+                if(proxyList.isEmpty()) {
+                    mongoDao = new MongoDao<T>(db, database, cls);
+                }else {
+                    mongoDao = ProxyManager.createProxy(MongoDao.class, proxyList);
+                    if (null != mongoDao) {
+                        mongoDao.init(db,database, cls);
+                        logger.info("Create MongoDao Proxy: " + cls.getName() + " is Success!");
+                    }
+                }
+                MONGODAO_MAP.put(key, mongoDao);
             } catch (Exception e) {
                 logger.warn("getMongoDao is fail: " + e.getMessage(), e);
             }
         }
-        return (MongoDao<T>)dao;
+        return (MongoDao<T>)mongoDao;
     }
 
     /**

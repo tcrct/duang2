@@ -104,10 +104,12 @@ public final class ToolsKit {
 
     @SuppressWarnings("rawtypes")
     private static boolean checkObjectIsEmpty(Object obj, boolean bool) {
-        if (null == obj)
+        if (null == obj) {
             return bool;
-        else if (obj == "" || "".equals(obj))
+        }
+        else if (obj == "" || "".equals(obj)) {
             return bool;
+        }
         else if (obj instanceof Integer || obj instanceof Long || obj instanceof Double) {
             try {
                 Double.parseDouble(obj + "");
@@ -115,19 +117,24 @@ public final class ToolsKit {
                 return bool;
             }
         } else if (obj instanceof String) {
-            if (((String) obj).length() <= 0)
+            if (((String) obj).length() <= 0) {
                 return bool;
-            if ("null".equalsIgnoreCase(obj+""))
+            }
+            if ("null".equalsIgnoreCase(obj+"")) {
                 return bool;
+            }
         } else if (obj instanceof Map) {
-            if (((Map) obj).size() == 0)
+            if (((Map) obj).size() == 0) {
                 return bool;
+            }
         } else if (obj instanceof Collection) {
-            if (((Collection) obj).size() == 0)
+            if (((Collection) obj).size() == 0) {
                 return bool;
+            }
         } else if (obj instanceof Object[]) {
-            if (((Object[]) obj).length == 0)
+            if (((Object[]) obj).length == 0) {
                 return bool;
+            }
         }
         return !bool;
     }
@@ -308,6 +315,7 @@ public final class ToolsKit {
 
     public static FileFilter fileFilter(final File dir, final String extName){
         return new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 if(".class".equalsIgnoreCase(extName)) {
                     return ( file.isFile() && file.getName().endsWith(extName) ) || file.isDirectory();
@@ -343,7 +351,9 @@ public final class ToolsKit {
     }
 
     public static final String htmlChar2String(String htmlChar) {
-        if (isEmpty(htmlChar)) return "";
+        if (isEmpty(htmlChar)) {
+            return "";
+        }
         for (Iterator<Map.Entry<String, String>> it = HTML_CHAR.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, String> entry = it.next();
             htmlChar = htmlChar.replace(entry.getValue(), entry.getKey());
@@ -574,7 +584,9 @@ public final class ToolsKit {
         Map<String,String> map = getRequestUserIdTerminal();
         addIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
-                map.get(ConstEnums.TERMINAL_FIELD.getValue()));
+                map.get(ConstEnums.TERMINAL_FIELD.getValue()),
+                map.get(IdEntity.PROJECTID_FIELD),
+                map.get(IdEntity.COMPANYID_FIELD));
     }
 
     /***
@@ -584,7 +596,7 @@ public final class ToolsKit {
      * @param userId 创建人ID
      * @param source 数据来源
      */
-    private static void addIdEntityData(Object obj, String userId, String source) throws Exception {
+    private static void addIdEntityData(Object obj, String userId, String source, String projectId, String companyId) throws Exception {
         if (isEmpty(obj) || isEmpty(userId)) {
             throw new ServiceException("自动填充IdEntity数据时出错,需要填充对象为空或创建/更新用户ID为空");
         }
@@ -595,6 +607,8 @@ public final class ToolsKit {
         Field createUserIdField = IdEntity.class.getDeclaredField(IdEntity.CREATEUSERID_FIELD);
         Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
         Field sourceField = IdEntity.class.getDeclaredField(IdEntity.SOURCE_FIELD);
+        Field projectIdField = IdEntity.class.getDeclaredField(IdEntity.PROJECTID_FIELD);
+        Field companyIdField = IdEntity.class.getDeclaredField(IdEntity.COMPANYID_FIELD);
         Object value;
         value = ObjectKit.getFieldValue(obj, createTimeField);
         if (isEmpty(value)) {
@@ -614,6 +628,14 @@ public final class ToolsKit {
         if (isEmpty(value)) {
             ObjectKit.setField(obj, sourceField, source);
         }
+        value = ObjectKit.getFieldValue(obj, projectIdField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, projectIdField, projectId);
+        }
+        value = ObjectKit.getFieldValue(obj, companyIdField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, companyIdField, companyId);
+        }
     }
 
     /**
@@ -624,7 +646,9 @@ public final class ToolsKit {
         Map<String,String> map = getRequestUserIdTerminal();
         updateIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
-                map.get(ConstEnums.TERMINAL_FIELD.getValue()));
+                map.get(ConstEnums.TERMINAL_FIELD.getValue()),
+                map.get(IdEntity.PROJECTID_FIELD),
+                map.get(IdEntity.COMPANYID_FIELD));
     }
 
     /**
@@ -632,13 +656,17 @@ public final class ToolsKit {
      *
      * @param obj 要修改的对象
      */
-    private static void updateIdEntityData(Object obj, String userId, String source) throws Exception {
+    private static void updateIdEntityData(Object obj, String userId, String source, String projectId, String companyId) throws Exception {
         Field updateTimeField = IdEntity.class.getDeclaredField(IdEntity.UPDATETIME_FIELD);
         Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
         Field sourceField = IdEntity.class.getDeclaredField(IdEntity.SOURCE_FIELD);
+        Field projectIdField = IdEntity.class.getDeclaredField(IdEntity.PROJECTID_FIELD);
+        Field companyIdField = IdEntity.class.getDeclaredField(IdEntity.COMPANYID_FIELD);
         ObjectKit.setField(obj, updateTimeField, new Date());
         ObjectKit.setField(obj, updateUserIdField, userId);
         ObjectKit.setField(obj, sourceField, source);
+        ObjectKit.setField(obj, projectIdField, projectId);
+        ObjectKit.setField(obj, companyIdField, companyId);
     }
 
     /**
@@ -646,8 +674,7 @@ public final class ToolsKit {
      * @return Map
      */
     public static Map<String,String> getRequestUserIdTerminal() {
-        String userId = "";
-        String terminal = "";
+        String userId = "", projectId = "", companyId="", terminal = "";
         try {
             HeadDto headDto = ToolsKit.getThreadLocalDto();
             if(ToolsKit.isNotEmpty(headDto)) {
@@ -655,6 +682,8 @@ public final class ToolsKit {
                 String tokenId = headDto.getTokenId();
                 if(ToolsKit.isNotEmpty(tokenId)) {
                     userId = getSecurityUser(tokenId).getUserId();
+                    projectId = getSecurityUser(tokenId).getProjectId();
+                    companyId = getSecurityUser(tokenId).getCompanyId();
                 }
             }
         } catch (Exception e) {
@@ -662,9 +691,13 @@ public final class ToolsKit {
         }
         userId = ToolsKit.isEmpty(userId) ? "admin" : userId;
         terminal = ToolsKit.isEmpty(terminal) ? "console" : terminal;
+        projectId = ToolsKit.isEmpty(projectId) ? PropKit.get(ConstEnums.PROPERTIES.PRODUCT_APPID.getValue()) : projectId;
+        companyId = ToolsKit.isEmpty(companyId) ? "0" : companyId;
         Map<String, String> map =  new HashMap<>();
         map.put(ConstEnums.REQUEST_ID_FIELD.getValue(), userId);
         map.put(ConstEnums.TERMINAL_FIELD.getValue(), terminal);
+        map.put(IdEntity.PROJECTID_FIELD, projectId);
+        map.put(IdEntity.COMPANYID_FIELD, companyId);
         return map;
     }
 

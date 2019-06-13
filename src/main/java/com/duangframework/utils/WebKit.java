@@ -237,7 +237,7 @@ public class WebKit {
         if(ToolsKit.isEmpty(tokenId)) {
             tokenId = request.getParameter(TOKENID_FIELD_NAME);
             if(ToolsKit.isEmpty(tokenId)) {
-                tokenId = request.getParameter(ConstEnums.TOKENID_FIELD.getValue());
+                tokenId = request.getParameter(TOKENID_FIELD_NAME.toLowerCase());
             }
         }
 

@@ -1,6 +1,9 @@
 package com.duangframework.security.dto;
 
+import com.duangframework.kit.PropKit;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.vtor.annotation.Empty;
 import com.duangframework.vtor.annotation.NotEmpty;
 import com.duangframework.vtor.annotation.Pattern;
@@ -32,9 +35,9 @@ public class LoginDto  {
     @Phone
     private String phone;
 
-    @NotEmpty(message = "项目标识不能为空")
     private String projectId;
 
+    @NotEmpty(message = "公司标识ID不能为空")
     private String companyId;
 
     //第三方权限服务地址
@@ -107,6 +110,9 @@ public class LoginDto  {
     }
 
     public String getProjectId() {
+        if(ToolsKit.isEmpty(projectId)) {
+            projectId = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_APPID.getValue());
+        }
         return projectId;
     }
 

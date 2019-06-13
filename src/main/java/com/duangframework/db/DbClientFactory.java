@@ -3,7 +3,10 @@ package com.duangframework.db;
 import com.duangframework.db.mongodb.client.MongoClientAdapter;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.proxy.IProxy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -14,6 +17,16 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class DbClientFactory {
 
+
+    private static List<IProxy> proxyList = new ArrayList<>();
+
+    public static List<IProxy> getProxyList() {
+        return proxyList;
+    }
+
+    public static void setProxyList(List<IProxy> proxyList) {
+        DbClientFactory.proxyList = proxyList;
+    }
     /************************************************************************/
     /************************  MONGODB *********************************/
     /***********************************************************************/
