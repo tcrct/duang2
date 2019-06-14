@@ -4,13 +4,12 @@ import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import com.duangframework.vtor.annotation.Empty;
-import com.duangframework.vtor.annotation.NotEmpty;
-import com.duangframework.vtor.annotation.Pattern;
-import com.duangframework.vtor.annotation.Phone;
+import com.duangframework.vtor.annotation.*;
 
 /**
- * Created by laotang on 2018/11/25.
+ * 登录Dto
+ * @author laotang
+ * @date  2018/11/25.
  */
 @Bean
 public class LoginDto  {
@@ -22,17 +21,17 @@ public class LoginDto  {
     public static final String PROJECT_ID_FIELD = "projectId";
     public static final String SECURITY_SERVICE_URL_FIELD = "securityServiceUrl";
 
-    @NotEmpty(message = "帐号不能为空")
+    @Length(value = 20, message = "帐号不能为空")
     private String account;
 
-    @NotEmpty(message = "密码不能为空")
+    @Length(value = 20, message = "密码不能为空")
     @Pattern(regexp = "^[a-zA-Z0-9]{6,24}$", message = "密码格式错误")
     private String password;
 
     @Pattern(regexp = "^[a-zA-Z0-9]{4,10}$", message = "验证码格式错误")
     private String captcha;
 
-    @Phone
+    @Phone()
     private String phone;
 
     private String projectId;
@@ -43,23 +42,27 @@ public class LoginDto  {
     //第三方权限服务地址
     private String securityServiceUrl;
 
+    /**分account,phone等**/
+    @NotEmpty(message = "登录方式不能为空")
+    private String loginType;
+
     public LoginDto() {
     }
 
 
     public LoginDto(String account, String password, String companyId) {
-        this(account,password,companyId, null);
+        this(account,password,companyId, null, "account");
     }
 
-    public LoginDto(String account, String password, String companyId, String projectId) {
-        this(account,password,null, null, companyId, projectId);
+    public LoginDto(String account, String password, String companyId, String projectId, String loginType) {
+        this(account,password,null, null, companyId, projectId,loginType);
     }
 
-    public LoginDto(String account, String password, String captcha, String phone, String companyId, String projectId) {
-        this(account,password,captcha, phone, companyId, projectId, null);
+    public LoginDto(String account, String password, String captcha, String phone, String companyId, String projectId, String loginType) {
+        this(account,password,captcha, phone, companyId, projectId, null, loginType);
     }
 
-    public LoginDto(String account, String password, String captcha, String companyId, String projectId, String phone, String securityServiceUrl) {
+    public LoginDto(String account, String password, String captcha, String companyId, String projectId, String phone, String securityServiceUrl, String loginType) {
         this.account = account;
         this.password = password;
         this.captcha = captcha;
@@ -67,6 +70,7 @@ public class LoginDto  {
         this.projectId = projectId;
         this.securityServiceUrl = securityServiceUrl;
         this.phone = phone;
+        this.loginType = loginType;
     }
 
     public String getAccount() {
@@ -128,6 +132,14 @@ public class LoginDto  {
         this.phone = phone;
     }
 
+    public String getLoginType() {
+        return loginType;
+    }
+
+    public void setLoginType(String loginType) {
+        this.loginType = loginType;
+    }
+
     @Override
     public String toString() {
         return "LoginDto{" +
@@ -138,6 +150,7 @@ public class LoginDto  {
                 ", companyId='" + companyId + '\'' +
                 ", projectId='" + projectId + '\'' +
                 ", securityServiceUrl='" + securityServiceUrl + '\'' +
+                ", loginType='" + loginType + '\'' +
                 '}';
     }
 }

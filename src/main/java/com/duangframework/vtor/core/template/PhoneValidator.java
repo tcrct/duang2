@@ -28,15 +28,17 @@ public class PhoneValidator extends AbstractValidatorTemplate<Phone> {
             throw new ValidatorException(paramName + "不能为空");
         }
 
-        boolean isPhone =  false;
-        if(!".*".equals(annonation.regexp())) {
-            isPhone = PatternKit.isMatch(annonation.regexp(), paramValue.toString());
-        } else {
-            isPhone = PatternKit.isMobile(paramValue.toString());
-        }
+        if(ToolsKit.isNotEmpty(paramValue)) {
+            boolean isPhone =  false;
+            if (!".*".equals(annonation.regexp())) {
+                isPhone = PatternKit.isMatch(annonation.regexp(), paramValue.toString());
+            } else {
+                isPhone = PatternKit.isMobile(paramValue.toString());
+            }
 
-        if(!isPhone) {
-            throw new ValidatorException(paramName +"["+paramValue+"]"+ annonation.message());
+            if (!isPhone) {
+                throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message());
+            }
         }
     }
 }

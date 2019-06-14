@@ -27,15 +27,17 @@ public class PatternValidator extends AbstractValidatorTemplate<Pattern> {
             throw new ValidatorException(paramName + "不能为空");
         }
 
-        boolean isPattern = false;
-        if(!".*".equals(annonation.regexp())) {
-            isPattern = PatternKit.isMatch(annonation.regexp(), paramValue.toString());
-        } else {
-            isPattern = true;
-        }
+        if(ToolsKit.isNotEmpty(paramValue)) {
+            boolean isPattern = false;
+            if (!".*".equals(annonation.regexp())) {
+                isPattern = PatternKit.isMatch(annonation.regexp(), paramValue.toString());
+            } else {
+                isPattern = true;
+            }
 
-        if(!isPattern) {
-            throw new ValidatorException(paramName +"["+paramValue+"]"+ annonation.message());
+            if (!isPattern) {
+                throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message());
+            }
         }
     }
 }

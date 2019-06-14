@@ -26,14 +26,16 @@ public class UrlValidator extends AbstractValidatorTemplate<URL> {
             throw new ValidatorException(paramName + "不能为空");
         }
 
-        boolean isUrl = false;
-        if("*".equals(annonation.regexp())) {
-            isUrl = PatternKit.isURL(paramValue+"");
-        } else {
-            isUrl = PatternKit.isMatch(annonation.regexp(), paramValue+"");
-        }
-        if(!isUrl) {
-            throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message());
+        if(ToolsKit.isNotEmpty(paramValue)) {
+            boolean isUrl = false;
+            if ("*".equals(annonation.regexp())) {
+                isUrl = PatternKit.isURL(paramValue + "");
+            } else {
+                isUrl = PatternKit.isMatch(annonation.regexp(), paramValue + "");
+            }
+            if (!isUrl) {
+                throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message());
+            }
         }
     }
 }

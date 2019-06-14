@@ -23,12 +23,14 @@ public class MinValidator extends AbstractValidatorTemplate<Min> {
         if(!annonation.isEmpty() &&  ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
-        try {
-          if(Double.parseDouble(paramValue+"") < annonation.value()){
-              throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message().replace("${value}", annonation.value()+""));
-          }
-        } catch (Exception e) {
-            throw new ValidatorException(e.getMessage());
+        if(ToolsKit.isNotEmpty(paramValue)) {
+            try {
+                if (Double.parseDouble(paramValue + "") < annonation.value()) {
+                    throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message().replace("${value}", annonation.value() + ""));
+                }
+            } catch (Exception e) {
+                throw new ValidatorException(e.getMessage());
+            }
         }
     }
 }

@@ -27,18 +27,19 @@ public class YmdValidator extends AbstractValidatorTemplate<Ymd> {
             throw new ValidatorException(paramName + "不能为空");
         }
 
-        try {
-            boolean isJdkDate = DataType.isDate(paramValue.getClass()) || DataType.isTimestamp(paramValue.getClass());
-            if(!isJdkDate) {
-                ToolsKit.parseDate(paramValue.toString(), annonation.format());
-            }
-        } catch (Exception e) {
+        if(ToolsKit.isNotEmpty(paramValue)) {
             try {
-                ToolsKit.parseDate(paramValue.toString(), ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-            } catch (Exception e1) {
-                throw new ValidatorException(paramName +"["+paramValue+"]"+ annonation.message());
+                boolean isJdkDate = DataType.isDate(paramValue.getClass()) || DataType.isTimestamp(paramValue.getClass());
+                if (!isJdkDate) {
+                    ToolsKit.parseDate(paramValue.toString(), annonation.format());
+                }
+            } catch (Exception e) {
+                try {
+                    ToolsKit.parseDate(paramValue.toString(), ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+                } catch (Exception e1) {
+                    throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message());
+                }
             }
         }
-
     }
 }

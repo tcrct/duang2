@@ -17,4 +17,6 @@ public @interface Length {
     String message() default "超出指定的长度[${value}]限制！";
 
     String defaultValue() default "";
+
+    boolean isEmpty() default true;
 }

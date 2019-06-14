@@ -26,14 +26,16 @@ public class EmailValidator extends AbstractValidatorTemplate<Email> {
             throw new ValidatorException(paramName + "不能为空");
         }
 
-        boolean isEmail = false;
-        if(!".*".equals(annonation.regexp())) {
-            isEmail = PatternKit.isMatch(annonation.regexp(), paramValue.toString());
-        } else {
-            isEmail = PatternKit.isEmail(paramValue.toString());
-        }
-        if(!isEmail) {
-            throw new ValidatorException(paramName +"["+paramValue+"]"+ annonation.message());
+        if(ToolsKit.isNotEmpty(paramValue)) {
+            boolean isEmail = false;
+            if (!".*".equals(annonation.regexp())) {
+                isEmail = PatternKit.isMatch(annonation.regexp(), paramValue.toString());
+            } else {
+                isEmail = PatternKit.isEmail(paramValue.toString());
+            }
+            if (!isEmail) {
+                throw new ValidatorException(paramName + "[" + paramValue + "]" + annonation.message());
+            }
         }
     }
 }
