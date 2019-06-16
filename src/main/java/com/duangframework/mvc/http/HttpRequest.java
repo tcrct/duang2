@@ -1,6 +1,7 @@
 package com.duangframework.mvc.http;
 
 import com.duangframework.exception.HttpDecoderException;
+import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.ServerConfig;
@@ -17,6 +18,7 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
 import io.netty.handler.codec.http.multipart.DiskFileUpload;
+import io.netty.util.concurrent.FastThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -35,7 +42,7 @@ import java.util.function.Consumer;
 public class HttpRequest implements IRequest{
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
-
+//    public static final FastThreadLocal<Map<String,Object>> PARAMS_THREAD_LOCAL = new FastThreadLocal<>();
     static {
         DiskFileUpload.deleteOnExitTemporaryFile = true;
         DiskFileUpload.baseDirectory = null;
@@ -83,7 +90,7 @@ public class HttpRequest implements IRequest{
     private void init() {
         try {
             // request header
-            headers = new HashMap<>(request.headers().size());
+            headers  = new ConcurrentHashMap<>();
             request.headers().iteratorAsString().forEachRemaining(new Consumer<Map.Entry<String, String>>() {
                 @Override
                 public void accept(Map.Entry<String, String> stringStringEntry) {
@@ -91,14 +98,20 @@ public class HttpRequest implements IRequest{
                 }
             });
             // reqeust body 根据请求方式，解码请求参数
-            AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
-            params = decoder.decoder();
+            FutureTask<Map<String, Object>> decoderFutureTask = ThreadPoolKit.execute(new Callable<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> call() throws Exception {
+                    AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
+                    return decoder.decoder();
+                }
+            });
+            params = decoderFutureTask.get();
             if(ToolsKit.isNotEmpty(request.content())) {
                 content = Unpooled.copiedBuffer(request.content()).array();
             }
 
             // cookies
-            cookies = new HashMap<>();
+            cookies = new ConcurrentHashMap<>();
             String cookie = getHeader(Cookie.COOKIE_FIELD);
             cookie = ToolsKit.isNotEmpty(cookie) ? cookie : getHeader(Cookie.COOKIE_FIELD.toLowerCase());
             if (ToolsKit.isNotEmpty(cookie)) {

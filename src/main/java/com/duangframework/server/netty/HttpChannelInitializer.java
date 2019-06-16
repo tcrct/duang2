@@ -3,6 +3,7 @@ package com.duangframework.server.netty;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.server.netty.handler.ChannelBaseHandler;
 import com.duangframework.server.netty.handler.CorsHandler;
+import com.duangframework.server.netty.handler.HttpBaseHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -76,7 +77,8 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             channelPipeline.addLast("ssl", new SslHandler(sslEngine));
         }
         // 真正处理业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
-        channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
+//        channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
+        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
     }
 
     @Override

@@ -59,7 +59,8 @@ final public class RequestAccessHandler{
         method.setAccessible(true);
         //将请求参数生成数组对象注入
         // 反射执行方法
-        Object resultObj = new ActionInvocation(route, controller, method, target).invoke();
+        ActionInvocation invocation = new ActionInvocation(route, controller, method, target);
+        Object resultObj = invocation.invoke();
         // 返回结果
         controller.getRender(resultObj).setContext(request, response).render();
     }

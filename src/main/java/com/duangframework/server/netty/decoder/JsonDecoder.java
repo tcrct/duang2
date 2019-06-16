@@ -8,7 +8,9 @@ import com.duangframework.encrypt.core.EncryptUtils;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Mapping;
 import com.duangframework.mvc.dto.ReturnDto;
+import com.duangframework.mvc.http.HttpRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +64,7 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
             Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
             GetDecoder getDecoder = new GetDecoder(request);
             paramsMap.putAll(getDecoder.decoder());
-            return paramsMap;
+            requestParamsMap = paramsMap;
         }
         return requestParamsMap;
     }

@@ -15,6 +15,7 @@ import com.duangframework.server.common.BootStrap;
 import com.duangframework.utils.IpUtils;
 import com.duangframework.utils.WebKit;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.util.ReferenceCountUtil;
@@ -30,7 +31,8 @@ import java.util.concurrent.TimeoutException;
  * @author laotang
  * @date 2017/10/30
  */
-public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequest> {
+//public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static Logger logger = LoggerFactory.getLogger(HttpBaseHandler.class);
     private static BootStrap bootStrap;
@@ -38,24 +40,23 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
     public HttpBaseHandler(BootStrap bs) {
         bootStrap = bs;
     }
-
-    public static void channelRead(BootStrap bs, final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        if(ToolsKit.isEmpty(bootStrap)) bootStrap = bs;
+//    public void channelRead(BootStrap bs, final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+    @Override
+    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+//        if(ToolsKit.isEmpty(bootStrap)) bootStrap = bs;
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;
 
         try {
-            FullHttpRequest httpRequest = request.copy();
-            verificationRequest(httpRequest);
-            requestTask = new RequestTask(ctx, httpRequest);
+            requestTask = new RequestTask(ctx, request);
             futureTask = ThreadPoolKit.execute(requestTask);
             // 是否开发模式，如果是则不指定超时
             if(bootStrap.isDevModel()) {
                 response = futureTask.get();
             } else {
                 // 等待结果返回，如果超出指定时间，则抛出TimeoutException, 默认时间为3秒
-                response = futureTask.get(getTimeout(httpRequest.uri()), TimeUnit.MILLISECONDS);
+                response = futureTask.get(getTimeout(request.uri()), TimeUnit.MILLISECONDS);
             }
         } catch (TimeoutException e) {
             // 超时时，会执行该异常
@@ -79,41 +80,7 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
         }
     }
 
-    /**
-     * 验证请求是否正确
-     * @return
-     */
-    private static void verificationRequest(FullHttpRequest request) {
-
-        // 保证解析结果正确,否则直接退出
-        if (!request.decoderResult().isSuccess()) {
-            throw new ValidatorException("request decoderParams is not success, so exit...");
-        }
-
-        // 支持的的请求方式
-        String method = request.method().toString();
-        HttpMethod httpMethod = HttpMethod.valueOf(method);
-        if(ToolsKit.isEmpty(httpMethod)) {
-            throw new ValidatorException("request method["+ httpMethod.toString() +"] is not support, so exit...");
-        }
-
-        // uri是有长度的
-        String uri = request.uri();
-        if (uri == null || uri.trim().length() == 0) {
-            throw new ValidatorException("request uri length is 0 , so exit...");
-        } else {
-            // 判断是否有参数，有参数则先截掉参数
-            if(uri.contains("?")) {
-                uri = uri.substring(0, uri.indexOf("?"));
-            }
-            // 如果包含有.则视为静态文件访问
-            if(uri.contains(".")) {
-                throw new ValidatorException("not support static file access, so exit...");
-            }
-        }
-    }
-
-    private static long getTimeout(String target) {
+    private long getTimeout(String target) {
         Route route = RouteHelper.getRouteMap().get(target);
         if(ToolsKit.isEmpty(route)) {
             // TODO... restful风格的URI确定不了，暂不能支持timeout设置，按默认值3秒
@@ -123,7 +90,7 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
 
-    private static IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
+    private IResponse buildExceptionResponse(RequestTask requestTask, AbstractDuangException duangException) {
         IResponse httpResponse = ToolsKit.isEmpty(requestTask) ? HttpResponse.build() : requestTask.getResponse();
         int code = duangException.getCode();
         String message = duangException.getMessage();
@@ -140,4 +107,5 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
         httpResponse.setHeader("status", "200");
         return httpResponse;
     }
+
 }

@@ -1,11 +1,14 @@
 package com.duangframework.kit;
 
-import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.net.http.HttpRequest;
 import com.duangframework.net.http.HttpResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 /**
  * 静态内部类方式实现单例模式
@@ -15,24 +18,25 @@ import java.util.Map;
  */
 public class HttpKit {
 
-    private static class HttpKitHolder {
-        private static final HttpKit INSTANCE = new HttpKit();
-    }
-    private HttpKit() {}
+    private static final Logger logger = LoggerFactory.getLogger(HttpKit.class);
+
+//    private static class HttpKitHolder {
+//        private static final HttpKit INSTANCE = new HttpKit();
+//    }
+//    private HttpKit() {}
     public static final HttpKit duang() {
-        clear();
-        return HttpKitHolder.INSTANCE;
+        return new HttpKit();
     }
     /*****************************************************************************/
 
-    private static Map<String, String> _headerMap = new HashMap<>();
-    private static Map<String, Object> _paramMap = new HashMap<>();
-    private static String _url;
-    private static boolean _encode;
-    private static boolean _isAppend;
-    private static String _body;
+    private Map<String, String> _headerMap = new HashMap<>();
+    private Map<String, Object> _paramMap = new HashMap<>();
+    private String _url;
+    private boolean _encode;
+    private boolean _isAppend;
+    private String _body;
 
-    private static void clear() {
+    private void clear() {
         _headerMap.clear();
         _paramMap.clear();
         _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, HttpRequest.CONTENT_TYPE_JSON);
@@ -143,8 +147,19 @@ public class HttpKit {
      * @return
      */
     public HttpResult get() {
-        HttpRequest httpRequest = HttpRequest.get(_url, _paramMap, _encode).headers(_headerMap);
-        return new HttpResult(httpRequest);
+        try {
+            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
+                @Override
+                public HttpResult call() throws Exception {
+                    HttpRequest httpRequest = HttpRequest.get(_url, _paramMap, _encode).headers(_headerMap);
+                    return new HttpResult(httpRequest);
+                }
+            });
+            return futureTask.get();
+        } catch (Exception e) {
+            logger.warn("发送get请求时出错: " + e.getMessage(), e);
+            return null;
+        }
     }
 
     /**
@@ -152,16 +167,28 @@ public class HttpKit {
      * @return
      */
     public HttpResult post() {
-        HttpRequest httpRequest = null;
-        if (_isAppend) {
-            httpRequest = HttpRequest.post(_url, _paramMap, _encode);
-        } else {
-            httpRequest = HttpRequest.post(_url, _encode);
+
+        try {
+            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
+                @Override
+                public HttpResult call() throws Exception {
+                    HttpRequest httpRequest = null;
+                    if (_isAppend) {
+                        httpRequest = HttpRequest.post(_url, _paramMap, _encode);
+                    } else {
+                        httpRequest = HttpRequest.post(_url, _encode);
+                    }
+                    httpRequest = _body.isEmpty() ? httpRequest.headers(_headerMap).form(_paramMap)
+                            : httpRequest.headers(_headerMap).send(_body.getBytes());
+                    return new HttpResult(httpRequest);
+                }
+            });
+            return futureTask.get();
+        } catch (Exception e) {
+            logger.warn("发送post请求时出错: " + e.getMessage(), e);
+            return null;
         }
 
-        httpRequest = _body.isEmpty() ? httpRequest.headers(_headerMap).form(_paramMap)
-                : httpRequest.headers(_headerMap).send(_body.getBytes());
-        return new HttpResult(httpRequest);
     }
 
     /**
@@ -169,8 +196,20 @@ public class HttpKit {
      * @return
      */
     public HttpResult options() {
-        HttpRequest httpRequest = HttpRequest.options(_url);
-        return new HttpResult(httpRequest);
+        try {
+            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
+                @Override
+                public HttpResult call() throws Exception {
+                    HttpRequest httpRequest = HttpRequest.options(_url);
+                    return new HttpResult(httpRequest);
+                }
+            });
+            return futureTask.get();
+        } catch (Exception e) {
+            logger.warn("发送post请求时出错: " + e.getMessage(), e);
+            return null;
+        }
+
     }
 
 }

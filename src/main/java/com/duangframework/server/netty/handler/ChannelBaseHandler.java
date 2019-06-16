@@ -41,7 +41,9 @@ public class ChannelBaseHandler extends SimpleChannelInboundHandler<Object> {
             if(HttpHeaderValues.WEBSOCKET.toString().equalsIgnoreCase(upgrade) &&  bootStrap.isEnableWebSocket()) {
                 WebSocketBaseHandler.conversion2WebSocketProtocol(bootStrap, ctx, request);
             } else {
-                HttpBaseHandler.channelRead(bootStrap, ctx, request);
+//                HttpBaseHandler httpBaseHandler = new HttpBaseHandler(bootStrap);
+//                httpBaseHandler.channelRead(bootStrap, ctx, request);
+
             }
         } else if (object instanceof WebSocketFrame) { //如果是Websocket请求，则进行websocket操作
             WebSocketBaseHandler.channelRead(bootStrap, ctx, (WebSocketFrame) object);

@@ -26,7 +26,7 @@ public abstract class AbstractDecoder<T> {
     protected static String[] EMPTY_ARRAYS = {};
 
     protected FullHttpRequest request;
-    protected  Map<String,Object> requestParamsMap;
+    protected Map<String,Object> requestParamsMap;
     protected boolean isEncryptParam;
     protected String json;
     protected static final String MIDDLE_BRACKETS= "[]";

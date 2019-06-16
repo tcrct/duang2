@@ -5,11 +5,15 @@ import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.http.*;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * 解码工厂类
  * Created by laotang on 2017/10/31.
  */
 public class DecoderFactory {
+
     /**
      *  提交参数解码
      * @param method             请求方式
