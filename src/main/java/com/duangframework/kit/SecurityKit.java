@@ -3,15 +3,13 @@ package com.duangframework.kit;
 import com.duangframework.mvc.core.helper.ClassHelper;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.AbstractSecurity;
+import com.duangframework.security.DuangSecurity;
 import com.duangframework.security.dto.LoginDto;
 import com.duangframework.security.SecurityUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 安全工具类
@@ -108,6 +106,7 @@ public class SecurityKit {
             // 添加到缓存，以userId为key
             SECURITY_USER_MAP.put(securityUser.getUserId(), securityUser);
             TOKENID_USERID_MAP.put(securityUser.getTokenId(), securityUser.getUserId());
+            setAuths(securityUser.getUserId(), securityUser.getRelationDto().getAuthorityMap().values());
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
             throw new SecurityException(e.getMessage());
@@ -174,10 +173,10 @@ public class SecurityKit {
         return authHashMap.get(key);
     }
 
-    public void setAuths(Set<String> authSet) {
-        if(ToolsKit.isNotEmpty(key)) {
-            throw new SecurityException("请先设置Id值");
+    private void setAuths(String key , Collection<String> authList) {
+        if(ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
+            throw new SecurityException("设置权限值时,参数不能为空");
         }
-        authHashMap.put(key.toString(), authSet);
+        authHashMap.put(key.toString(), new HashSet<>(authList));
     }
 }
