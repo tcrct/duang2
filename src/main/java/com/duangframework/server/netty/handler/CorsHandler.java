@@ -11,9 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Created by laotang
@@ -24,12 +22,13 @@ public class CorsHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CorsHandler.class);
     private FullHttpRequest request;
+    private static boolean IS_ADD_ALLOW = false;
     private static Set<String> ORIGIN_SET = new HashSet<String>(){{
         this.add("127.0.0");
         this.add("192.168");
         this.add("localhost");
     }};
-    private static String ALLOW_STRING = "Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id";
+    private static String ALLOW_STRING = "Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId";
 
     public CorsHandler() {
         List<String> list = PropKit.getList(ConstEnums.PROPERTIES.CORS_ORIGINS.getValue());
@@ -48,10 +47,10 @@ public class CorsHandler extends ChannelDuplexHandler {
                 origin = origin.substring(0, endIndex > -1 ? endIndex : origin.length());
                 ORIGIN_SET.add(origin.toLowerCase().trim());
             }
-            String corsAllowHeaders = PropKit.get(ConstEnums.PROPERTIES.CORS_ALLOW_HEADERS.getValue());
-            if(ToolsKit.isNotEmpty(corsAllowHeaders)) {
-                ALLOW_STRING += "," + corsAllowHeaders;
-            }
+        }
+        String corsAllowHeaders = PropKit.get(ConstEnums.PROPERTIES.CORS_ALLOW_HEADERS.getValue());
+        if(ToolsKit.isNotEmpty(corsAllowHeaders)) {
+            ALLOW_STRING += "," + corsAllowHeaders;
         }
     }
 
@@ -104,9 +103,34 @@ public class CorsHandler extends ChannelDuplexHandler {
         HttpHeaders headers = request.headers();
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
     }
 
+    /*
+    private String createAllowString(HttpHeaders headers) {
+        if(IS_ADD_ALLOW) {
+            return ALLOW_STRING;
+        }
+        String str = headers.get(HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS);
+        String itemArray[]  = null;
+        if(ToolsKit.isNotEmpty(str)) {
+            itemArray = str.trim().split(",");
+        }
+        String[] allowArray = ALLOW_STRING.split(",");
+        Set<String> allowSet = new HashSet<String>();
+        allowSet.addAll(Arrays.asList(allowArray));
+        if(ToolsKit.isNotEmpty(itemArray)) {
+            allowSet.addAll(Arrays.asList(itemArray));
+        }
+        ALLOW_STRING = "";
+        for(String allow : allowSet) {
+            ALLOW_STRING +=","+allow;
+        }
+        IS_ADD_ALLOW = true;
+        return ALLOW_STRING;
+    }
+*/
     private String getAllowOrigin(ChannelHandlerContext ctx, FullHttpRequest request) {
         HttpHeaders headers = request.headers();
         String origin = headers.get(HttpHeaderNames.ORIGIN);

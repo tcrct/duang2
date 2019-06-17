@@ -702,6 +702,18 @@ public final class ToolsKit {
     }
 
     /**
+     * 取已经当前登录的SecurityUser对象
+     * @return      SecurityUser对象
+     * @Exception SecurityUser对象不存在，则抛出空指针异常
+     */
+    public static SecurityUser getSecurityUser() {
+        try {
+            return getSecurityUser(ToolsKit.getThreadLocalDto().getTokenId());
+        } catch (Exception e) {
+            throw new MvcException(e.getMessage(), e);
+        }
+    }
+    /**
      * 根据key参数，取已经登录的SecurityUser对象
      * @param key   参数值为userId或tokenId
      * @return      SecurityUser对象

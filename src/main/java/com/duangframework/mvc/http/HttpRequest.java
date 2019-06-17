@@ -42,6 +42,7 @@ import java.util.function.Consumer;
 public class HttpRequest implements IRequest{
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+    private static final Lock LOCK = new ReentrantLock();
 //    public static final FastThreadLocal<Map<String,Object>> PARAMS_THREAD_LOCAL = new FastThreadLocal<>();
     static {
         DiskFileUpload.deleteOnExitTemporaryFile = true;
@@ -80,7 +81,13 @@ public class HttpRequest implements IRequest{
     private HttpRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         ctx = channelHandlerContext;
         request = fullHttpRequest;
-        init();
+        try {
+            LOCK.lock();
+            init();
+        } finally {
+            LOCK.unlock();
+        }
+
     }
 
     public static HttpRequest build(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
@@ -98,14 +105,16 @@ public class HttpRequest implements IRequest{
                 }
             });
             // reqeust body 根据请求方式，解码请求参数
-            FutureTask<Map<String, Object>> decoderFutureTask = ThreadPoolKit.execute(new Callable<Map<String, Object>>() {
-                @Override
-                public Map<String, Object> call() throws Exception {
-                    AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
-                    return decoder.decoder();
-                }
-            });
-            params = decoderFutureTask.get();
+//            FutureTask<Map<String, Object>> decoderFutureTask = ThreadPoolKit.execute(new Callable<Map<String, Object>>() {
+//                @Override
+//                public Map<String, Object> call() throws Exception {
+//                    AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
+//                    return decoder.decoder();
+//                }
+//            });
+//            params = decoderFutureTask.get();
+            AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
+            params = decoder.decoder();
             if(ToolsKit.isNotEmpty(request.content())) {
                 content = Unpooled.copiedBuffer(request.content()).array();
             }

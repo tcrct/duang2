@@ -4,6 +4,7 @@ import com.duangframework.db.IDao;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.common.Query;
 import com.duangframework.db.common.Update;
+import com.duangframework.db.mongodb.common.Operator;
 import com.duangframework.db.mongodb.enums.MongodbDataTypeEnum;
 import com.duangframework.db.mongodb.utils.MongoIndexUtils;
 import com.duangframework.db.mongodb.utils.MongoUtils;
@@ -479,13 +480,14 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
      * 去重查询
      * @param key		去重关键字
      * @param query		查询条件
+     * @param clazz		去重关键字的类型
      * @return			去重关键字的集合
      */
-    public List<String> distinct(String key, Query query) {
-        final List<String> distinctList = new ArrayList<>();
-        collection.distinct(key, new BasicDBObject(query.getQuery()), String.class).forEach(new Block<String>() {
+    public <T> List<T> distinct(String key, Query query, Class<T> clazz) {
+        final List<T> distinctList = new ArrayList<>();
+        collection.distinct(key, new BasicDBObject(query.getQuery()), clazz).forEach(new Block<T>() {
             @Override
-            public void apply(String s) {
+            public void apply(T s) {
                 distinctList.add(s);
             }
         });

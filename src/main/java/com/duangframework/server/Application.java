@@ -50,6 +50,9 @@ public class Application {
     // -----tokenHtml
     private boolean isTokenHtml;
 
+    // -----cors
+    private boolean enableCors;
+
     public static Application duang() {
         if(application == null) {
             application = new Application();
@@ -121,6 +124,11 @@ public class Application {
         return application;
     }
 
+    public Application cors(boolean isCors) {
+        enableCors = isCors;
+        return application;
+    }
+
     /**
      * host，port 以启动脚本 -D 方式注入的优先级最高(注意变量命名)，配置文件次之，代码里指定的优先级最低
      */
@@ -155,6 +163,7 @@ public class Application {
             bootStrap = new BootStrap(host, port);
             bootStrap.setEnvModel(EnvEnum.valueOf(serverEnv.toUpperCase()));
             bootStrap.setTokenHtml(isTokenHtml);
+            bootStrap.setEnableCors(enableCors);
 
             // mqtt
             if(null != mqttOptions) {
