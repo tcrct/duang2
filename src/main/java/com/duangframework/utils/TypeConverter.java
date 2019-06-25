@@ -1,5 +1,6 @@
 package com.duangframework.utils;
 
+import com.alibaba.fastjson.JSONArray;
 import com.duangframework.kit.ToolsKit;
 
 import java.sql.Timestamp;
@@ -52,7 +53,13 @@ public class TypeConverter {
         } else if (DataType.isArray(type)) {
             result =  objValue;
         } else if (DataType.isListType(type)) {
-            List list = (ArrayList) objValue;
+            List list = null;
+            if(objValue instanceof JSONArray) {
+                String jsonString = ((JSONArray)objValue).toJSONString();
+                list = ToolsKit.jsonParseArray(jsonString, List.class);
+            } else {
+                list = (ArrayList) objValue;
+            }
             result =  list;
         } else if (DataType.isSetType(type)) {
             List list = (ArrayList) objValue;

@@ -411,7 +411,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
      * @return
      */
     public List<Map>  group(String key, Query query){
-        return group(key, query, "message");
+        return group(key, query, "desc");
     }
     /**
      * 分组查询
@@ -458,7 +458,7 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
             public int compare(Object dbo1, Object dbo2) {
                 double count1 = (Double)((Map)dbo1).get("count");
                 double count2 = (Double)((Map)dbo2).get("count");
-                if("message".equals(sort)) {
+                if("desc".equals(sort)) {
                     return (count1 > count2) ? 0 : 1;
                 } else {
                     return (count1 > count2) ? 1 : 0;

@@ -1,6 +1,7 @@
 package com.duangframework.server.common;
 
 import com.duangframework.exception.NettyStartUpException;
+import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mqtt.core.MqttOptions;
@@ -293,11 +294,24 @@ public class BootStrap implements Closeable {
     }
 
     public String getAppName() {
-        return null == appName ? "duangframework" : appName;
+        setAppName(PropKit.get(ConstEnums.PROPERTIES.PRODUCT_CODE.getValue(), "duangframework"));
+        return appName;
+    }
+
+    public String getAppId() {
+        return PropKit.get(ConstEnums.PROPERTIES.PRODUCT_APPID.getValue(), "duangframework");
     }
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+    public String getSeanPackage() {
+        return  PropKit.get(ConstEnums.PROPERTIES.BASE_PACKAGE_PATH.getValue(), "all");
+    }
+
+    public String getScanJar() {
+        return  PropKit.get(ConstEnums.PROPERTIES.JAR_PREFIX.getValue(), "all");
     }
 
 

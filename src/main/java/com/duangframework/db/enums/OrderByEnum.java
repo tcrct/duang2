@@ -7,7 +7,7 @@ package com.duangframework.db.enums;
  */
 public enum OrderByEnum {
 	ASC(1,"asc"),
-	DESC(-1, "message");
+	DESC(-1, "desc");
 
 	private final int value;
 	private final String key;

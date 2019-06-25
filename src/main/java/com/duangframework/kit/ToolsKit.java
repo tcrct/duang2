@@ -8,7 +8,9 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.annotation.ConvertField;
+import com.duangframework.db.common.Order;
 import com.duangframework.db.common.Query;
+import com.duangframework.db.enums.OrderByEnum;
 import com.duangframework.encrypt.core.HttpHeaderNames;
 import com.duangframework.exception.IException;
 import com.duangframework.exception.MvcException;
@@ -535,6 +537,7 @@ public final class ToolsKit {
         int pageNo = searchListDto.getPageNo();
         if(pageNo == 1) {pageNo = 0;}
         query.page(new PageDto(pageNo, searchListDto.getPageSize()));
+        query.order(new Order(IdEntity.ID_FIELD, OrderByEnum.DESC));
         List<SearchDto> searchDtoList = searchListDto.getSearchDtos();
         Class<?> typeClass = null;
         if(ToolsKit.isNotEmpty(searchDtoList)) {

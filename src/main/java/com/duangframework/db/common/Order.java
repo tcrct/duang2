@@ -13,12 +13,14 @@ import java.util.Map;
 public class Order {
 
 	private LinkedHashMap<String, String> orderLinkedMap = null;
-	public final static String ASC = "asc";
-	public final static String DESC = "message";
-	
-	
+
 	public Order() {
 		orderLinkedMap = new LinkedHashMap<String,String>();
+	}
+
+	public Order(String key, OrderByEnum orderByEnum) {
+		orderLinkedMap = new LinkedHashMap<String,String>();
+		orderLinkedMap.put(key, orderByEnum.getKey());
 	}
 	
 	/**

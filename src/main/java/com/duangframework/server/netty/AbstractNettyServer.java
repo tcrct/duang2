@@ -148,7 +148,7 @@ public abstract class AbstractNettyServer implements IServer {
         return pidFile;
     }
 
-    public void writePidFile() {
+    public String writePidFile() {
         String pidFile = pidFile();
         OS os = OS.get();
         String pid= "";
@@ -190,11 +190,10 @@ public abstract class AbstractNettyServer implements IServer {
                     pid = name.substring(0, pos);
                 } else {
                     logger.warn("Write pid file not supported on non-linux system");
-                    return;
                 }
             } catch (Exception e) {
                 logger.warn("Write pid file not supported on non-linux system");
-                return;
+                return "";
             }
         }
         try {
@@ -209,6 +208,7 @@ public abstract class AbstractNettyServer implements IServer {
         } catch (Exception e) {
             logger.warn("Error writing pid file: %s", e.getMessage(), e);
         }
+        return pid;
     }
 
     public void clearPidFile() {

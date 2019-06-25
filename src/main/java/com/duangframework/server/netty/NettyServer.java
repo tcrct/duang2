@@ -11,8 +11,8 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.GenericFutureListener;
 
-import java.net.SocketAddress;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by laotang on 2018/6/7.
@@ -58,11 +58,27 @@ public class NettyServer extends AbstractNettyServer {
                     @Override
                     public void operationComplete(Future<Void> future) throws Exception {
                         if (future.isSuccess()) {
+                            // 写PID到文件
+                            String pid  = writePidFile();
                             // 启动HTTP上下文监听器
                             if(BootStrap.HTTP_SERVER_NAME.equalsIgnoreCase(key)) {
                                 StartContextListener.getInstance().start();
+                                StringBuilder infoString = new StringBuilder();
+                                infoString.append("########  duangframework ########\n");
+                                infoString.append("    http server : ").append(endpoint).append("\n");
+                                infoString.append("               date : ").append(sdf.format(new Date())).append("\n");
+                                infoString.append("       project id : ").append(bootStrap.getAppId()).append("\n");
+                                infoString.append(" project name : ").append(bootStrap.getAppName()).append("\n");
+                                infoString.append("         scan pkg : ").append(bootStrap.getSeanPackage()).append("\n");
+                                infoString.append("           scan jar : ").append(bootStrap.getScanJar()).append("\n");
+                                infoString.append("                   pid : ").append(pid).append("\n");
+                                infoString.append("                  env : ").append(bootStrap.getEnvModel().name().toLowerCase()).append("\n");
+                                infoString.append("            startup : ").append(bootStrap.getStartTimeMillis()+" ms").append("\n");
+                                infoString.append("########  God bless no bugs! ########");
+                                System.err.println(infoString);
+                            } else {
+                                System.err.println("INFO: [" + bootStrap.getAppName() + "] " + sdf.format(new Date()) + " " + key + "[" + endpoint + "] startup in " + bootStrap.getStartTimeMillis() + " ms, God bless no bugs!");
                             }
-                            System.err.println("INFO: [" + bootStrap.getAppName() + "] " + sdf.format(new Date()) +" "+key+"[" + endpoint + "] startup in " + bootStrap.getStartTimeMillis() + " ms, God bless no bugs!");
                         } else {
                             System.err.println("INFO: [" + bootStrap.getAppName() + "] " + sdf.format(new Date()) + " "+key+"[" + address.getSocketAddress().getHostString()+ "] startup failed");
                         }
@@ -70,7 +86,6 @@ public class NettyServer extends AbstractNettyServer {
                     }
                 });
             }
-            writePidFile(); // 写PID到文件
             shutdownHook();//添加关闭hook
             // 等待或监听数据全部完成，阻塞线程
 //            future.channel().closeFuture().awaitUninterruptibly();

@@ -1,9 +1,7 @@
 package com.duangframework.kit;
 
-import com.duangframework.mvc.core.helper.ClassHelper;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.AbstractSecurity;
-import com.duangframework.security.DuangSecurity;
 import com.duangframework.security.dto.LoginDto;
 import com.duangframework.security.SecurityUser;
 import org.slf4j.Logger;

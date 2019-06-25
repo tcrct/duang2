@@ -213,7 +213,7 @@ public class MongoUtils {
         if(ToolsKit.isEmpty(orderBy)){
             return BasicDBObjectBuilder.start(IdEntity.ID_FIELD, -1).get();		//默认用OID时间倒序
         }else{
-            return BasicDBObjectBuilder.start(fieldName, "message".equalsIgnoreCase(orderBy) ? -1 : 1).get();
+            return BasicDBObjectBuilder.start(fieldName, "desc".equalsIgnoreCase(orderBy) ? -1 : 1).get();
         }
     }
 
