@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * 动态编译工具类
@@ -25,6 +27,9 @@ public class CompilerKit {
     private CompilerKit() {
 //        fileListener();
         rootPath = PathKit.getWebRootPath();
+        if(rootPath.endsWith("-web") || rootPath.endsWith("-WEB")) {
+            rootPath = rootPath.substring(0, rootPath.lastIndexOf(File.separator));
+        }
     }
     public static final CompilerKit duang() {
         clear();
@@ -90,11 +95,10 @@ public class CompilerKit {
      */
     private void setDefaultValue() {
         if(ToolsKit.isEmpty(dirPath)) {
-            dirPath = rootPath + rootItemPath() + File.separator +
-                    PropKit.get(ConstEnums.PROPERTIES.BASE_PACKAGE_PATH.getValue()).replace(".", File.separator);
+            dirPath = rootPath;// + rootItemPath();
         }
         if(ToolsKit.isEmpty(sourceDir)) {
-            sourceDir = rootPath + rootItemPath();
+            sourceDir = rootPath;// + rootItemPath();
         }
         if(ToolsKit.isEmpty(targetDir)) {
             targetDir = rootPath + File.separator + "target" + File.separator + "classes";
@@ -107,6 +111,7 @@ public class CompilerKit {
      */
     public String dir() {
         setDefaultValue();
+        logger.warn("hotswap dir path : " + dirPath);
         return dirPath;
     }
 
@@ -115,14 +120,18 @@ public class CompilerKit {
      * @return  dir目录路径
      */
     public String classDir() {
-        setDefaultValue();
+//        setDefaultValue();
+//        logger.warn("hotswap class path : " + targetDir);
+        if(ToolsKit.isEmpty(targetDir)) {
+            targetDir = rootPath + File.separator + "target" + File.separator + "classes";
+        }
         return targetDir;
     }
 
     /**
      * 编译
      */
-    public void compiler() {
+    public void compiler(List<File> watchingDirs) {
         boolean isSuccess = false;
         setDefaultValue();
         try {

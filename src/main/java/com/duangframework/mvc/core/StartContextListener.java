@@ -61,7 +61,8 @@ public class StartContextListener {
                 }
             }
             after();
-            hotSwapWatcher();
+            //TODO 启动热部署监听...
+//             hotSwapWatcher();
         } catch (Exception e) {
             throw new MvcException(e.getMessage(), e);
         }

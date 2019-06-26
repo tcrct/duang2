@@ -29,6 +29,7 @@ public class DuangClassLoader extends ClassLoader {
     private boolean isFindDuangClassLoaderClass = false;
     private String BASE_PACKAGE_PATH;
     private static final String CLASS_EXTNAME = ".class";
+    private static long lastModified = 0L;
 
     /**
      * 所有业务类的名称
@@ -94,11 +95,16 @@ public class DuangClassLoader extends ClassLoader {
             } else if (file.isFile()) {
 //                String classPath = getClassAbsolutePath(file);
 //                String classKey = classPath + ".class";
-//                if (classPath.startsWith(BASE_PACKAGE_PATH)) {
+                if (isClassModified(file)) {
                     getClassData(file.getAbsoluteFile());
-//                }
+                }
             }
         }
+    }
+
+    /**判断是否被修改过**/
+    private static boolean isClassModified(File file) {
+        return file.lastModified() > lastModified;
     }
 
     private static String getClassAbsolutePath(File file) {
@@ -114,6 +120,7 @@ public class DuangClassLoader extends ClassLoader {
      */
     private void getClassData(File classPathFile) {
         try {
+            lastModified = classPathFile.lastModified();
             InputStream fin = new FileInputStream(classPathFile);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int bufferSize = 4096;
@@ -129,8 +136,8 @@ public class DuangClassLoader extends ClassLoader {
 //            }
             if(!getClassKeySet().contains(classKey)) {
                 getClassKeySet().add(classKey);
-                System.out.println(classKey);
-//                defineClass(classKey, classBytes, 0, classBytes.length);
+//                System.out.println(classKey);
+                defineClass(classKey, classBytes, 0, classBytes.length);
             }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);

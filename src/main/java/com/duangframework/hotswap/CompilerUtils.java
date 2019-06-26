@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import javax.tools.*;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,8 +60,9 @@ public class CompilerUtils {
         try (MemoryJavaFileManager manager = new MemoryJavaFileManager(stdManager)) {
             JavaFileObject javaFileObject = MemoryJavaFileManager.makeStringSource(javaName, javaSrc);
             JavaCompiler.CompilationTask task = compiler.getTask(null, manager, null, null, null, Arrays.asList(javaFileObject));
-            if (task.call())
+            if (task.call()) {
                 return manager.getClassBytes();
+            }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
         }
@@ -78,10 +78,11 @@ public class CompilerUtils {
      *            java源文件存放目录
      * @param targetDir
      *            编译后class类文件存放目录
-     * @return
+     * @return boolean
      * @throws Exception
      */
     public boolean compiler(String filePath, String sourceDir, String targetDir) throws Exception {
+//    public boolean compiler(List<File> sourceDirList, String sourceDir, String targetDir) throws Exception {
         // 错误信息
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         // 获取编译器实例
@@ -96,9 +97,10 @@ public class CompilerUtils {
             File sourceFile = new File(filePath);
             List<File> sourceFileList = new ArrayList<>();
             getSourceFiles(sourceFile, sourceFileList);
+//            List<File> sourceFileList = getSourceFiles(sourceDirList);
             // 没有java文件，直接返回
             if (ToolsKit.isEmpty(sourceFileList)) {
-                logger.warn(filePath + "目录下查找不到任何java文件");
+                logger.warn("查找不到任何java文件");
                 return false;
             }
             // 获取要编译的编译单元
@@ -123,6 +125,32 @@ public class CompilerUtils {
         } finally {
             sdtManager.close();
         }
+    }
+
+    private List<File> getSourceFiles(List<File> sourceDirList) throws Exception {
+        List<File> sourceFileList = new ArrayList<>();
+        for(File sourceFile : sourceDirList) {
+            if (sourceFile.isDirectory()) {
+                // 得到该目录下以.java结尾的文件或者目录
+                File[] childrenFiles = sourceFile.listFiles(new FileFilter() {
+                    @Override
+                    public boolean accept(File pathname) {
+                        if (pathname.isDirectory()) {
+                            return true;
+                        } else {
+                            String name = pathname.getName();
+                            return name.endsWith(".java") ? true : false;
+                        }
+                    }
+                });
+                for (File childFile : childrenFiles) {
+                    if(childFile.isFile()) {
+                        sourceFileList.add(childFile);
+                    }
+                }
+            }
+        }
+        return sourceFileList;
     }
 
     /**
@@ -155,7 +183,9 @@ public class CompilerUtils {
                 }
             } else {
                 // 若file对象为文件
-                sourceFileList.add(sourceFile);
+                if(!sourceFile.getAbsolutePath().contains("src"+File.separator+"test") && !sourceFile.getName().endsWith("Test")) {
+                    sourceFileList.add(sourceFile);
+                }
             }
         }
     }

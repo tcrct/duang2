@@ -13,11 +13,11 @@ public class FileItem {
     private String contentTransferEncoding;
     private String fileName;
     private String contentType;
-    private long   length;
+    private Long   length;
     @JSONField(serialize = false, deserialize = false)
     private byte[] data;
 
-    public FileItem(String name, String contentTransferEncoding, String fileName, String contentType, long length, byte[] data) {
+    public FileItem(String name, String contentTransferEncoding, String fileName, String contentType, Long length, byte[] data) {
         this.name = name;
         this.contentTransferEncoding = contentTransferEncoding;
         this.fileName = fileName;
@@ -42,12 +42,16 @@ public class FileItem {
         return contentType;
     }
 
-    public long getLength() {
+    public Long getLength() {
         return length;
     }
 
     public byte[] getData() {
         return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     @Override

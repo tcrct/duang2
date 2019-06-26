@@ -56,7 +56,7 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
                             throw new MvcException("MultiPartPostDecoder Is Fail :  bytes is null... " );
                         }
 //                        Arrays.copyOfRange(bytes, 0, bytes.length);
-                        fileItem = new FileItem(fileUpload.getName(), fileUpload.getContentTransferEncoding(), fileUpload.getFilename(), fileUpload.getContentType(), bytes.length, bytes);
+                        fileItem = new FileItem(fileUpload.getName(), fileUpload.getContentTransferEncoding(), fileUpload.getFilename(), fileUpload.getContentType(), Long.parseLong(bytes.length+""), bytes);
                         requestParamsMap.put(fileItem.getName(), fileItem);
                     }
                 }

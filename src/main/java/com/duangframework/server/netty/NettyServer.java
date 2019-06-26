@@ -64,17 +64,17 @@ public class NettyServer extends AbstractNettyServer {
                             if(BootStrap.HTTP_SERVER_NAME.equalsIgnoreCase(key)) {
                                 StartContextListener.getInstance().start();
                                 StringBuilder infoString = new StringBuilder();
-                                infoString.append("########  duangframework ########\n");
-                                infoString.append("    http server : ").append(endpoint).append("\n");
-                                infoString.append("               date : ").append(sdf.format(new Date())).append("\n");
-                                infoString.append("       project id : ").append(bootStrap.getAppId()).append("\n");
-                                infoString.append(" project name : ").append(bootStrap.getAppName()).append("\n");
-                                infoString.append("         scan pkg : ").append(bootStrap.getSeanPackage()).append("\n");
-                                infoString.append("           scan jar : ").append(bootStrap.getScanJar()).append("\n");
-                                infoString.append("                   pid : ").append(pid).append("\n");
-                                infoString.append("                  env : ").append(bootStrap.getEnvModel().name().toLowerCase()).append("\n");
-                                infoString.append("            startup : ").append(bootStrap.getStartTimeMillis()+" ms").append("\n");
-                                infoString.append("########  God bless no bugs! ########");
+                                infoString.append("########## duangframework ##########\n");
+                                infoString.append("     http server : ").append(endpoint).append("\n");
+                                infoString.append("                date : ").append(sdf.format(new Date())).append("\n");
+                                infoString.append("        project id : ").append(bootStrap.getAppId()).append("\n");
+                                infoString.append("  project name : ").append(bootStrap.getAppName()).append("\n");
+                                infoString.append("          scan pkg : ").append(bootStrap.getSeanPackage()).append("\n");
+                                infoString.append("            scan jar : ").append(bootStrap.getScanJar()).append("\n");
+                                infoString.append("                    pid : ").append(pid).append("\n");
+                                infoString.append("                   env : ").append(bootStrap.getEnvModel().name().toLowerCase()).append("\n");
+                                infoString.append("             startup : ").append(bootStrap.getStartTimeMillis()+" ms").append("\n");
+                                infoString.append("########## god bless no bugs ##########");
                                 System.err.println(infoString);
                             } else {
                                 System.err.println("INFO: [" + bootStrap.getAppName() + "] " + sdf.format(new Date()) + " " + key + "[" + endpoint + "] startup in " + bootStrap.getStartTimeMillis() + " ms, God bless no bugs!");

@@ -12,7 +12,7 @@ import java.nio.file.*;
 import java.util.*;
 
 /**
- * 监听 class path 下 .class 文件变动，触发 UndertowServer.restart()
+ * 监听 class path 下 .class 文件变动，触发 duang.restart()
  */
 public class HotSwapWatcher extends Thread {
 
@@ -48,7 +48,10 @@ public class HotSwapWatcher extends Thread {
 
 	private void buildDirs(File file, Set<String> watchingDirSet) {
 		if (file.isDirectory()) {
-			watchingDirSet.add(file.getPath());
+			String filePath = file.getPath();
+			if(!filePath.contains(".") && !filePath.contains("target") && !filePath.contains("test")) {
+				watchingDirSet.add(filePath);
+			}
 
 			File[] fileList = file.listFiles();
 			for (File f : fileList) {
@@ -60,8 +63,8 @@ public class HotSwapWatcher extends Thread {
 	@Override
 	public void run() {
 		try {
-			logger.warn("hotswap is run");
 			doRun();
+			logger.warn("hotswap is run");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -70,7 +73,7 @@ public class HotSwapWatcher extends Thread {
 	protected void doRun() throws IOException {
 		WatchService watcher = FileSystems.getDefault().newWatchService();
 		addShutdownHook(watcher);
-
+		List<File> watchingFiles = new ArrayList<>(watchingPaths.size());
 		for (Path path : watchingPaths) {
 			path.register(
 					watcher,
@@ -78,14 +81,13 @@ public class HotSwapWatcher extends Thread {
 					StandardWatchEventKinds.ENTRY_MODIFY,
 					StandardWatchEventKinds.ENTRY_CREATE
 			);
+			watchingFiles.add(path.toFile());
 		}
-
 		while (running) {
 			try {
 				// watchKey = watcher.poll(watchingInterval, TimeUnit.MILLISECONDS);	// watcher.take(); 阻塞等待
 				// 比较两种方式的灵敏性，或许 take() 方法更好，起码资源占用少，测试 windows 机器上的响应
 				watchKey = watcher.take();
-
 				if (watchKey == null) {
 					// System.out.println(System.currentTimeMillis() / 1000);
 					continue ;
@@ -99,15 +101,15 @@ public class HotSwapWatcher extends Thread {
 				}
 				break ;
 			}
-
 			List<WatchEvent<?>> watchEvents = watchKey.pollEvents();
+//			String dirPath = watchKey.watchable()+"";
  			for(WatchEvent<?> event : watchEvents) {
 				String fileName = event.context().toString();
 				if (fileName.endsWith(".java")) {
 					if (BootStrap.getInstants().isStarted()) {
 						resetWatchKey();
                         // hotswap compiler
-                        CompilerKit.duang().compiler();
+                        CompilerKit.duang().compiler(watchingFiles);
 						while((watchKey = watcher.poll()) != null) {
 							// System.out.println("---> poll() ");
 							watchKey.pollEvents();
@@ -118,7 +120,6 @@ public class HotSwapWatcher extends Thread {
 					}
 				}
 			}
-
 			resetWatchKey();
 		}
 	}
