@@ -588,6 +588,7 @@ public final class ToolsKit {
         addIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
                 map.get(ConstEnums.TERMINAL_FIELD.getValue()),
+                map.get(IdEntity.DEPARTIMENTID_FIELD),
                 map.get(IdEntity.PROJECTID_FIELD),
                 map.get(IdEntity.COMPANYID_FIELD));
     }
@@ -598,20 +599,24 @@ public final class ToolsKit {
      * @param obj 需要反射的对象
      * @param userId 创建人ID
      * @param source 数据来源
+     * @param departmentId 部门ID
+     *@param projectId 项目ID
+     * @param companyId 公司ID
      */
-    private static void addIdEntityData(Object obj, String userId, String source, String projectId, String companyId) throws Exception {
+    private static void addIdEntityData(Object obj, String userId, String source, String departmentId, String projectId, String companyId) throws Exception {
         if (isEmpty(obj) || isEmpty(userId)) {
             throw new ServiceException("自动填充IdEntity数据时出错,需要填充对象为空或创建/更新用户ID为空");
         }
         Date currentDate = new Date();
-        Field createTimeField = IdEntity.class.getDeclaredField(IdEntity.CREATETIME_FIELD);
-        Field updateTimeField = IdEntity.class.getDeclaredField(IdEntity.UPDATETIME_FIELD);
-        Field statusField = IdEntity.class.getDeclaredField(IdEntity.STATUS_FIELD);
-        Field createUserIdField = IdEntity.class.getDeclaredField(IdEntity.CREATEUSERID_FIELD);
-        Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
-        Field sourceField = IdEntity.class.getDeclaredField(IdEntity.SOURCE_FIELD);
-        Field projectIdField = IdEntity.class.getDeclaredField(IdEntity.PROJECTID_FIELD);
-        Field companyIdField = IdEntity.class.getDeclaredField(IdEntity.COMPANYID_FIELD);
+        Field createTimeField = getIdEntityField(IdEntity.CREATETIME_FIELD);
+        Field updateTimeField = getIdEntityField(IdEntity.UPDATETIME_FIELD);
+        Field statusField = getIdEntityField(IdEntity.STATUS_FIELD);
+        Field createUserIdField = getIdEntityField(IdEntity.CREATEUSERID_FIELD);
+        Field updateUserIdField = getIdEntityField(IdEntity.UPDATEUSERID_FIELD);
+        Field sourceField = getIdEntityField(IdEntity.SOURCE_FIELD);
+        Field deptField = getIdEntityField(IdEntity.DEPARTIMENTID_FIELD);
+        Field projectIdField = getIdEntityField(IdEntity.PROJECTID_FIELD);
+        Field companyIdField = getIdEntityField(IdEntity.COMPANYID_FIELD);
         Object value;
         value = ObjectKit.getFieldValue(obj, createTimeField);
         if (isEmpty(value)) {
@@ -630,6 +635,10 @@ public final class ToolsKit {
         value = ObjectKit.getFieldValue(obj, sourceField);
         if (isEmpty(value)) {
             ObjectKit.setField(obj, sourceField, source);
+        }
+        value = ObjectKit.getFieldValue(obj, deptField);
+        if (isEmpty(value)) {
+            ObjectKit.setField(obj, deptField, departmentId);
         }
         value = ObjectKit.getFieldValue(obj, projectIdField);
         if (isEmpty(value)) {
@@ -650,6 +659,7 @@ public final class ToolsKit {
         updateIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
                 map.get(ConstEnums.TERMINAL_FIELD.getValue()),
+                map.get(IdEntity.DEPARTIMENTID_FIELD),
                 map.get(IdEntity.PROJECTID_FIELD),
                 map.get(IdEntity.COMPANYID_FIELD));
     }
@@ -659,17 +669,17 @@ public final class ToolsKit {
      *
      * @param obj 要修改的对象
      */
-    private static void updateIdEntityData(Object obj, String userId, String source, String projectId, String companyId) throws Exception {
-        Field updateTimeField = IdEntity.class.getDeclaredField(IdEntity.UPDATETIME_FIELD);
-        Field updateUserIdField = IdEntity.class.getDeclaredField(IdEntity.UPDATEUSERID_FIELD);
-        Field sourceField = IdEntity.class.getDeclaredField(IdEntity.SOURCE_FIELD);
-        Field projectIdField = IdEntity.class.getDeclaredField(IdEntity.PROJECTID_FIELD);
-        Field companyIdField = IdEntity.class.getDeclaredField(IdEntity.COMPANYID_FIELD);
-        ObjectKit.setField(obj, updateTimeField, new Date());
-        ObjectKit.setField(obj, updateUserIdField, userId);
-        ObjectKit.setField(obj, sourceField, source);
-        ObjectKit.setField(obj, projectIdField, projectId);
-        ObjectKit.setField(obj, companyIdField, companyId);
+    private static void updateIdEntityData(Object obj, String userId, String source, String departimentId, String projectId, String companyId) throws Exception {
+        ObjectKit.setField(obj, getIdEntityField(IdEntity.UPDATETIME_FIELD), new Date());
+        ObjectKit.setField(obj, getIdEntityField(IdEntity.UPDATEUSERID_FIELD), userId);
+        ObjectKit.setField(obj, getIdEntityField(IdEntity.SOURCE_FIELD), source);
+        ObjectKit.setField(obj, getIdEntityField(IdEntity.DEPARTIMENTID_FIELD), departimentId);
+        ObjectKit.setField(obj, getIdEntityField(IdEntity.PROJECTID_FIELD), projectId);
+        ObjectKit.setField(obj, getIdEntityField(IdEntity.COMPANYID_FIELD), companyId);
+    }
+
+    private static Field getIdEntityField(String key) throws Exception{
+        return IdEntity.class.getDeclaredField(key);
     }
 
     /**
@@ -677,16 +687,18 @@ public final class ToolsKit {
      * @return Map
      */
     public static Map<String,String> getRequestUserIdTerminal() {
-        String userId = "", projectId = "", companyId="", terminal = "";
+        String userId = "", projectId = "", companyId="", terminal = "", departmentId="";
         try {
             HeadDto headDto = ToolsKit.getThreadLocalDto();
             if(ToolsKit.isNotEmpty(headDto)) {
                 terminal = headDto.getHeaderMap().get(ConstEnums.TERMINAL_FIELD);
                 String tokenId = headDto.getTokenId();
                 if(ToolsKit.isNotEmpty(tokenId)) {
-                    userId = getSecurityUser(tokenId).getUserId();
-                    projectId = getSecurityUser(tokenId).getProjectId();
-                    companyId = getSecurityUser(tokenId).getCompanyId();
+                    SecurityUser securityUser = getSecurityUser(tokenId);
+                    userId = securityUser.getUserId();
+                    departmentId = securityUser.getDepartmentId();
+                    projectId = securityUser.getProjectId();
+                    companyId = securityUser.getCompanyId();
                 }
             }
         } catch (Exception e) {
@@ -699,6 +711,7 @@ public final class ToolsKit {
         Map<String, String> map =  new HashMap<>();
         map.put(ConstEnums.REQUEST_ID_FIELD.getValue(), userId);
         map.put(ConstEnums.TERMINAL_FIELD.getValue(), terminal);
+        map.put(IdEntity.DEPARTIMENTID_FIELD, departmentId);
         map.put(IdEntity.PROJECTID_FIELD, projectId);
         map.put(IdEntity.COMPANYID_FIELD, companyId);
         return map;

@@ -12,6 +12,7 @@ import com.duangframework.mvc.annotation.Mock;
 import com.duangframework.mvc.route.RequestMapping;
 import com.duangframework.utils.DataType;
 import com.duangframework.utils.GenericsUtils;
+import com.duangframework.vtor.annotation.FieldName;
 import com.duangframework.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
 
@@ -20,6 +21,7 @@ import java.io.FileFilter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +49,7 @@ public class ApiDocument {
     }
 
 
-    public List<ClassDocModle> document() {
+    public List<ClassDocModle> document() throws Exception {
         classDocModleList.clear();
         scanSourceFile(sourceDir);
         return classDocModleList;
@@ -173,11 +175,15 @@ public class ApiDocument {
                                     } else {
                                         parameterType = ClassKit.loadClass(type.toString());
                                     }
-                                    if(ToolsKit.isDuangBean(parameterType)) {
+                                    if(!DataType.isListType(parameterType) &&
+                                            !DataType.isMapType(parameterType) &&
+                                            !DataType.isSetType(parameterType) && ToolsKit.isDuangBean(parameterType)) {
                                         Field[] fields = parameterType.getDeclaredFields();
                                         for(Field field : fields) {
                                             parameterModle = builderParameterModle(field);
-                                            parameterModleList.add(parameterModle);
+                                            if(ToolsKit.isNotEmpty(parameterModle)) {
+                                                parameterModleList.add(parameterModle);
+                                            }
                                         }
                                     } else {
                                         parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"", "");
@@ -313,6 +319,10 @@ public class ApiDocument {
     }
 
     private ParameterModle builderParameterModle(Field field) {
+        //静态字段不取
+        if(Modifier.isStatic(field.getModifiers())) {
+            return null;
+        }
         ParameterModle parameterModle = new ParameterModle();
         parameterModle.setName(field.getName());
         parameterModle.setType(field.getType().getSimpleName());
@@ -323,6 +333,11 @@ public class ApiDocument {
 //                System.out.println(field.getName() + "##########: " + annotationClass.getName() );
                 if(NotEmpty.class.equals(annotationClass)) {
                     parameterModle.setEmpty(false);  // no empty
+                }
+                if(FieldName.class.equals(annotationClass)) {
+                    FieldName fieldName = field.getAnnotation(FieldName.class);
+                    String label = fieldName.label();
+                    parameterModle.setDesc(ToolsKit.isEmpty(label) ? parameterModle.getName() : label);
                 }
                 if(Mock.class.equals(annotationClass)) {
                     Mock mock = field.getAnnotation(Mock.class);

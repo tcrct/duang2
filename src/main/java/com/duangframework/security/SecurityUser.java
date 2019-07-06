@@ -25,11 +25,13 @@ public class SecurityUser implements java.io.Serializable {
     private RelationDto relationDto;       //关联关系Dto对象
     private String companyId;   // 公司ID
     private String projectId;      // 项目ID
+    private String departmentId; //部门ID
 
     public SecurityUser() {
     }
 
-    public SecurityUser(String userId, String codeId, String account, String username, String tokenId, String terminal, RelationDto relationDto,String companyId, String projectId) {
+    public SecurityUser(String userId, String codeId, String account, String username, String tokenId, String terminal,
+                        RelationDto relationDto,String companyId, String projectId, String departmentId) {
         this.userId = userId;
         this.codeId = codeId;
         this.account = account;
@@ -39,6 +41,7 @@ public class SecurityUser implements java.io.Serializable {
         this.relationDto = relationDto;
         this.companyId = companyId;
         this.projectId = projectId;
+        this.departmentId = departmentId;
     }
 
     public String getUserId() {
@@ -113,6 +116,14 @@ public class SecurityUser implements java.io.Serializable {
         this.projectId = projectId;
     }
 
+    public String getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
+    }
+
     @Override
     public String toString() {
         return "SecurityUser{" +
@@ -125,6 +136,7 @@ public class SecurityUser implements java.io.Serializable {
                 ", relationDto=" + ToolsKit.toJsonString(relationDto) +
                 ", companyId='" + companyId + '\'' +
                 ", projectId='" + projectId + '\'' +
+                ", departmentId='" + departmentId + '\'' +
                 '}';
     }
 }

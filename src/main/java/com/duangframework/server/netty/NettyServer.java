@@ -4,15 +4,18 @@ import com.duangframework.exception.MvcException;
 import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.mqtt.core.MqttOptions;
 import com.duangframework.mvc.core.StartContextListener;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.server.common.DuangSocketAddress;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.GenericFutureListener;
+import org.apache.commons.lang3.StringUtils;
 
+import java.nio.charset.Charset;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.List;
 
 /**
  * Created by laotang on 2018/6/7.
@@ -75,7 +78,7 @@ public class NettyServer extends AbstractNettyServer {
                                 infoString.append("                   env : ").append(bootStrap.getEnvModel().name().toLowerCase()).append("\n");
                                 infoString.append("             startup : ").append(bootStrap.getStartTimeMillis()+" ms").append("\n");
                                 infoString.append("########## god bless no bugs ##########");
-                                System.err.println(infoString);
+                                System.err.println(StringUtils.toEncodedString(infoString.toString().getBytes(), Charset.forName(ConstEnums.PROPERTIES.DEFAULT_ENCODING.getValue())));
                             } else {
                                 System.err.println("INFO: [" + bootStrap.getAppName() + "] " + sdf.format(new Date()) + " " + key + "[" + endpoint + "] startup in " + bootStrap.getStartTimeMillis() + " ms, God bless no bugs!");
                             }

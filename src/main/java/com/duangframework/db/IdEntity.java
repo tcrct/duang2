@@ -22,6 +22,7 @@ public class IdEntity implements java.io.Serializable {
 	public static final String UPDATEUSERID_FIELD = "updateuserid";
 	public static final String STATUS_FIELD = "status";
 	public static final String SOURCE_FIELD = "source";
+	public static final String DEPARTIMENTID_FIELD = "departmentId";
 	public static final String PROJECTID_FIELD = "projectId";
 	public static final String COMPANYID_FIELD = "companyId";
 	public static final String STATUS_FIELD_SUCCESS = "审核通过";
@@ -62,9 +63,13 @@ public class IdEntity implements java.io.Serializable {
 	 * 项目id标识
 	 */
 	private String projectId;
+	/**
+	 * 部门id标识
+	 */
+	private String departmentId;
 
 	public IdEntity(String id, Date createtime, String createuserid,
-					 Date updatetime, String updateuserid, String status, String source, String projectId, String companyId) {
+					 Date updatetime, String updateuserid, String status, String source, String departmentId, String projectId, String companyId) {
 		super();
 		this.id = id;
 		this.createtime = createtime;
@@ -73,6 +78,7 @@ public class IdEntity implements java.io.Serializable {
 		this.updateuserid = updateuserid;
 		this.status = status;
 		this.source = source;
+		this.departmentId = departmentId;
 		this.projectId = projectId;
 		this.companyId = companyId;
 	}
@@ -157,6 +163,14 @@ public class IdEntity implements java.io.Serializable {
 		this.projectId = projectId;
 	}
 
+	public String getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(String departmentId) {
+		this.departmentId = departmentId;
+	}
+
 	@Override
 	public String toString() {
 		return "IdEntity{" +
@@ -167,6 +181,7 @@ public class IdEntity implements java.io.Serializable {
 				", updateuserid='" + updateuserid + '\'' +
 				", status='" + status + '\'' +
 				", source='" + source + '\'' +
+				", departmentId='" + departmentId + '\'' +
 				", projectId='" + projectId + '\'' +
 				", companyId='" + companyId + '\'' +
 				'}';

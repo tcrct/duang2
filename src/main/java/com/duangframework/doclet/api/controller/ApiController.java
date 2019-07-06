@@ -1,6 +1,7 @@
 package com.duangframework.doclet.api.controller;
 
 import com.duangframework.doclet.api.service.ApiService;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Before;
 import com.duangframework.mvc.annotation.Controller;
 import com.duangframework.mvc.annotation.Import;
@@ -29,7 +30,8 @@ public class ApiController extends BaseController {
     @Mapping(value = "/list", desc = "controller列表")
     public void list() {
         try {
-            returnSuccessJson(apiService.list());
+            String controllerDirPath = getValue("path");
+            returnSuccessJson(apiService.list(controllerDirPath));
         } catch (Exception e) {
             returnFailJson(e, e.getMessage());
         }
@@ -37,7 +39,7 @@ public class ApiController extends BaseController {
 
     /**
      * 取单个Controller下的所有Method
-     * @param key
+     * @param key key为Controller name
      */
     @Mapping(value = "/methods", method = HttpMethod.GET)
     public void methods(@NotEmpty String key) {
@@ -50,7 +52,7 @@ public class ApiController extends BaseController {
 
     /**
      * 单个Method方法的详细资料
-     * @param key
+     * @param key   key为Controller name+"."+Method name
      */
     @Mapping(value = "/detail", method = HttpMethod.GET)
     public void detail(@NotEmpty String key) {

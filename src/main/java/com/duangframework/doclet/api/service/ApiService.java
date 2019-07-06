@@ -7,12 +7,15 @@ import com.duangframework.doclet.modle.ClassDocModle;
 import com.duangframework.doclet.modle.MethodDocModle;
 import com.duangframework.exception.MvcException;
 import com.duangframework.kit.ClassKit;
+import com.duangframework.kit.PathKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Mock;
 import com.duangframework.mvc.annotation.Service;
 import com.duangframework.mvc.route.RequestMapping;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -28,14 +31,31 @@ public class ApiService {
     private static final Map<String, MethodListDto> methodListMap = new TreeMap<>();
     // Method 详细 key为Controller name+"."+Method name
     private static final Map<String, MethodDocModle> methodDetailMap = new TreeMap<>();
+    private static boolean isBuildDoc = false;
 
-    public Map<String, String> list() {
+    private void buildDocument(String controllerDirPath) {
+        if(!isBuildDoc) {
+            ApiDocument apiDocument = new ApiDocument(controllerDirPath);
+            try {
+                apiDocument.document();
+                isBuildDoc = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Map<String, String> list(String controllerDirPath) {
         if(ToolsKit.isNotEmpty(controllerListMap)) {
             return controllerListMap;
         }
+        if(ToolsKit.isEmpty(controllerDirPath)) {
+            throw new MvcException("请先指定path参数值，path为Controller层的全路径");
+        }
+        buildDocument(controllerDirPath);
         List<ClassDocModle> classDocModleList = ApiDocument.getClassDocModleList();
         if(ToolsKit.isEmpty(classDocModleList)) {
-            throw new MvcException("请先生成api文档");
+            throw new MvcException("请创建成api文档");
         }
 
         for(Iterator<ClassDocModle> it = classDocModleList.iterator(); it.hasNext();) {

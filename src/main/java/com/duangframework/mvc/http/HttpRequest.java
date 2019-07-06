@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -82,8 +83,10 @@ public class HttpRequest implements IRequest{
         ctx = channelHandlerContext;
         request = fullHttpRequest;
         try {
-            LOCK.lock();
+            LOCK.tryLock(500, TimeUnit.MILLISECONDS);
             init();
+        }catch (Exception e) {
+            logger.warn("LOCK.tryLock: " + e.getMessage(), e);
         } finally {
             LOCK.unlock();
         }

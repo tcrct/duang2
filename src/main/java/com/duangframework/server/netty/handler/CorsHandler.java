@@ -3,6 +3,7 @@ package com.duangframework.server.netty.handler;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.utils.WebKit;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.util.AttributeKey;
@@ -29,14 +30,19 @@ public class CorsHandler extends ChannelDuplexHandler {
         this.add("localhost");
     }};
     private static String ALLOW_STRING = "Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId";
+//    private static final String HTTP_METHOD_STRING = HttpMethod.GET+","+HttpMethod.POST+","+HttpMethod.OPTIONS;
 
     public CorsHandler() {
         List<String> list = PropKit.getList(ConstEnums.PROPERTIES.CORS_ORIGINS.getValue());
-        init(new HashSet<>(list));
+        if(!IS_ADD_ALLOW) {
+            init(new HashSet<>(list));
+        }
     }
 
     public CorsHandler(Set<String> originSet) {
-        init(originSet);
+        if(!IS_ADD_ALLOW) {
+            init(originSet);
+        }
     }
 
     private void init(Set<String> originSet) {
@@ -52,6 +58,7 @@ public class CorsHandler extends ChannelDuplexHandler {
         if(ToolsKit.isNotEmpty(corsAllowHeaders)) {
             ALLOW_STRING += "," + corsAllowHeaders;
         }
+        IS_ADD_ALLOW = true;
     }
 
     @Override
@@ -90,6 +97,8 @@ public class CorsHandler extends ChannelDuplexHandler {
         responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
         responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
+        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
+        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
 
         if(!responseHeaders.contains(HttpHeaderNames.CONTENT_LENGTH)) {
             responseHeaders.set(HttpHeaderNames.CONTENT_LENGTH, HttpHeaderValues.ZERO);
@@ -103,8 +112,9 @@ public class CorsHandler extends ChannelDuplexHandler {
         HttpHeaders headers = request.headers();
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
+        headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
+        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
     }
 
     /*
@@ -146,13 +156,14 @@ public class CorsHandler extends ChannelDuplexHandler {
 //        origin = origin.toLowerCase().replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace("*", "");
 //        String protocol = request.protocolVersion().protocolName().toLowerCase();
 //        System.out.println("protocol: " + protocol);
+
         origin = origin.toLowerCase().trim();
-        for (String originItem : ORIGIN_SET) {
-            if(origin.contains(originItem)){
-                return origin;
-            }
-        }
-        return "";
+//        for (String originItem : ORIGIN_SET) {
+//            if(origin.contains(originItem)){
+//                return origin;
+//            }
+//        }
+        return origin;
     }
 
 
