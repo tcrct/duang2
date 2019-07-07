@@ -12,8 +12,8 @@ public class ThreadPoolKit {
 	private final static Logger logger = LoggerFactory.getLogger(ThreadPoolKit.class);
 
 	private static long KEEP_ALIVE_TIME = 30L;			// KeepAlive时间,默认30分钟
-	private static int MIN_POOL_NUMBER = 10;			// 最小线程数
-	private static int MAX_POOL_NUMBER = 100;		// 最大线程数
+	private static int MIN_POOL_NUMBER = 20;			// 最小线程数
+	private static int MAX_POOL_NUMBER = 200;		// 最大线程数
 	/**
 	 * 　corePoolSize - 池中所保存的线程数，包括空闲线程。
 
