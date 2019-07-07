@@ -6,6 +6,7 @@ import com.duangframework.doclet.modle.MethodDocModle;
 import com.duangframework.doclet.modle.ParameterModle;
 import com.duangframework.doclet.modle.TagModle;
 import com.duangframework.kit.ClassKit;
+import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Mapping;
 import com.duangframework.mvc.annotation.Mock;
@@ -37,6 +38,7 @@ public class ApiDocument {
     private static List<ClassDocModle> classDocModleList = new ArrayList<>();
     // 源文件所有的第一级目录路径
     private String sourceDir;
+    private List<File> javaFileList = new ArrayList<>();
 
 
     public ApiDocument(String sourceDir) {
@@ -52,168 +54,181 @@ public class ApiDocument {
     public List<ClassDocModle> document() throws Exception {
         classDocModleList.clear();
         scanSourceFile(sourceDir);
+        if(ToolsKit.isNotEmpty(javaFileList)) {
+            for(File file : javaFileList) {
+                ThreadPoolKit.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        JavaDocReader(file);
+                    }
+                });
+            }
+        }
         return classDocModleList;
     }
-
     private void scanSourceFile(String folderPath) {
         File dir = new File(folderPath);
-        if (!dir.exists() || !dir.isDirectory()) {	//不存在或不是目录
+        if (!dir.exists() || !dir.isDirectory()) {    //不存在或不是目录
             throw new IllegalArgumentException(dir.getAbsolutePath() + " is not exists or not is Directory!");
         }
         //遍历目录下的所有文件
-        File[] files = dir.listFiles(classFileFilter(dir,".java"));
-        for(int i=0; i<files.length; i++) {
+        File[] files = dir.listFiles(classFileFilter(dir, ".java"));
+        for (int i = 0; i < files.length; i++) {
             File file = files[i];
-            if(file.isDirectory()){
+            if (file.isDirectory()) {
                 scanSourceFile(file.getAbsolutePath());
-            }else{
-                if(file.isFile()) {
-                    if(!file.getName().toLowerCase().endsWith(".java")) {
+            } else {
+                if (file.isFile()) {
+                    if (!file.getName().toLowerCase().endsWith(".java")) {
                         continue;
                     }
-                    //调用解析方法
-                    ClassDoc[] data = JavaDocReader.show(file.getPath());
-                    ClassDoc classDoc = data[0];
-                    // 如果抽象，静态， 接口，设置了Ignore注解则退出本次循环
-                    if(ToolsKit.isEmpty(classDoc) || isIgnoreAnnotation(classDoc.annotations())
-                            || classDoc.isStatic() || classDoc.isAbstract() || classDoc.isInterface()) {
-                        continue;
-                    }
-
-                    List<TagModle> tagModleList = null;
-                    List<MethodDocModle> methodDocModleList = null;
-                    Tag[] tagsArray = classDoc.tags();
-                    if(ToolsKit.isNotEmpty(tagsArray)) {
-                        tagModleList = new ArrayList<>(tagsArray.length);
-                        for (Tag tag : tagsArray) {
-                            if(ToolsKit.isNotEmpty(tag)) {
-                                String tagName = tag.name();
-                                tagModleList.add(new TagModle(tagName.substring(1, tagName.length()), tag.text()));
-                            }
-                        }
-                    }
-                    Method[] jdkMethod = null;
-                    try {
-                        Class<?> controllerClass = Class.forName(classDoc.toString());
-                        jdkMethod = controllerClass.getDeclaredMethods();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    // Controller Mapping注解部份
-                    RequestMapping mappingModle = buildRequestMapping(classDoc.annotations());
-
-                    MethodDoc[]  methodDocs =  classDoc.methods();
-                    if(ToolsKit.isNotEmpty(methodDocs)) {
-                        methodDocModleList = new ArrayList<>(methodDocs.length);
-                        for(MethodDoc methodDoc : methodDocs) {
-                            // 是抽象方法,静态方法, 接口则退出
-                            if(ToolsKit.isEmpty(methodDoc) || isIgnoreAnnotation(methodDoc.annotations())
-                                    || methodDoc.isAbstract() || methodDoc.isStatic() || methodDoc.isInterface()){
-                                continue;
-                            }
-                            MethodDocModle methodDocModle = new MethodDocModle();
-                            // 方法名
-                            methodDocModle.setName(methodDoc.name());
-                            // 注释说明
-                            methodDocModle.setCommentText(methodDoc.commentText().trim());
-                            // 返回值
-                            String returnTypeString = methodDoc.returnType().toString();
-                            if(List.class.getName().equalsIgnoreCase(returnTypeString) ||
-                                    Set.class.getName().equalsIgnoreCase(returnTypeString)  ) {
-                                for(Method method : jdkMethod) {
-                                    if(method.getName().equalsIgnoreCase(methodDoc.name())) {
-                                        Class<?> typeClass = GenericsUtils.getGenericReturnType(method);
-                                        returnTypeString = methodDoc.returnType().simpleTypeName()+"<"+typeClass.getTypeName()+">";
-                                        System.out.println(returnTypeString);
-                                    }
-                                }
-                            }
-                            methodDocModle.setReturnType(returnTypeString);
-                            // 异常部份
-                            Type[] exceptionTypeArray = methodDoc.thrownExceptionTypes();
-                            if(ToolsKit.isNotEmpty(exceptionTypeArray)) {
-                                List<String> exceptionList = new ArrayList<>(exceptionTypeArray.length);
-                                for(Type type : exceptionTypeArray) {
-                                    exceptionList.add(type.typeName());
-                                }
-                                methodDocModle.setException(exceptionList);
-                            }
-                            //参数部份
-                            Parameter[] parameters = methodDoc.parameters();
-                            List<ParameterModle> parameterModleList = new ArrayList<>();
-                            if(ToolsKit.isNotEmpty(parameters)) {
-                                for(Parameter parameter : parameters) {
-                                    /* 参数注解部份
-                                    for(AnnotationDesc annotationDesc : parameter.annotations()) {
-                                        AnnotationTypeDoc typeDoc = annotationDesc.annotationType();
-                                        if(ToolsKit.isEmpty(typeDoc)) {
-                                            continue;
-                                        }
-                                        System.out.println("################################: " + typeDoc.toString());
-
-                                        for(AnnotationTypeElementDoc elementDocs : typeDoc.elements()){
-                                            System.out.println("parameterName:  " +parameter.name());
-                                            System.out.println("parameterType: " + parameter.type());
-                                            System.out.println("elementName: " + elementDocs.name());
-
-                                            annotationDesc..elementValues();
-                                            try {
-                                            // 要将Unicode转为中文
-                                                System.out.println(URLDecoder.decode(elementDocs.defaultValue().toString(), "UTF-8"));
-//                                            System.out.println("defaultValue:  " +new String(elementDocs.defaultValue().toString().getBytes(), "gb2312"));
-                                            } catch (Exception e) {}
-                                        }
-                                    }
-                                    */
-
-                                    ParameterModle parameterModle = null;
-                                    Type type = parameter.type();
-                                    String typeString = type.toString();
-                                    Class<?> parameterType = null;
-                                    if(typeString.indexOf(".") == -1) {
-                                        parameterType = ClassKit.loadClass(DataType.conversionBaseType(typeString));
-                                    } else {
-                                        parameterType = ClassKit.loadClass(type.toString());
-                                    }
-                                    if(!DataType.isListType(parameterType) &&
-                                            !DataType.isMapType(parameterType) &&
-                                            !DataType.isSetType(parameterType) && ToolsKit.isDuangBean(parameterType)) {
-                                        Field[] fields = parameterType.getDeclaredFields();
-                                        for(Field field : fields) {
-                                            parameterModle = builderParameterModle(field);
-                                            if(ToolsKit.isNotEmpty(parameterModle)) {
-                                                parameterModleList.add(parameterModle);
-                                            }
-                                        }
-                                    } else {
-                                        parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"", "");
-                                        builderParameterModle( parameterModle, parameter.annotations());
-                                        parameterModleList.add(parameterModle);
-                                    }
-                                }
-                                methodDocModle.setParamModles(parameterModleList);
-                            }
-                            // 注释部份
-                            Tag[] tags = methodDoc.tags();
-                            if(ToolsKit.isNotEmpty(tags)) {
-                                List<TagModle> modlesTagList = new ArrayList<>();
-                                for (Tag tag : tags) {
-                                    String tagName = tag.name();
-                                    modlesTagList.add(new TagModle(tagName.substring(1, tagName.length()), tag.text()));
-                                }
-                                methodDocModle.setTagModles(modlesTagList);
-                            }
-                            // 注解部份
-                            RequestMapping methodMapping = buildRequestMapping(methodDoc.annotations());
-                            methodDocModle.setMappingModle(methodMapping);
-
-                            methodDocModleList.add(methodDocModle);
-                        }
-                    }
-                    classDocModleList.add(new ClassDocModle(classDoc.toString(), mappingModle, classDoc.commentText().trim(), tagModleList, methodDocModleList));
+                    javaFileList.add(file);
                 }
             }
         }
+    }
+
+    private void JavaDocReader(File file) {
+        //调用解析方法
+        ClassDoc[] data = JavaDocReader.show(file.getPath());
+        ClassDoc classDoc = data[0];
+        // 如果抽象，静态， 接口，设置了Ignore注解则退出本次循环
+        if(ToolsKit.isEmpty(classDoc) || isIgnoreAnnotation(classDoc.annotations())
+                || classDoc.isStatic() || classDoc.isAbstract() || classDoc.isInterface()) {
+            return;
+        }
+
+        List<TagModle> tagModleList = null;
+        List<MethodDocModle> methodDocModleList = null;
+        Tag[] tagsArray = classDoc.tags();
+        if(ToolsKit.isNotEmpty(tagsArray)) {
+            tagModleList = new ArrayList<>(tagsArray.length);
+            for (Tag tag : tagsArray) {
+                if(ToolsKit.isNotEmpty(tag)) {
+                    String tagName = tag.name();
+                    tagModleList.add(new TagModle(tagName.substring(1, tagName.length()), tag.text()));
+                }
+            }
+        }
+        Method[] jdkMethod = null;
+        try {
+            Class<?> controllerClass = Class.forName(classDoc.toString());
+            jdkMethod = controllerClass.getDeclaredMethods();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Controller Mapping注解部份
+        RequestMapping mappingModle = buildRequestMapping(classDoc.annotations());
+
+        MethodDoc[]  methodDocs =  classDoc.methods();
+        if(ToolsKit.isNotEmpty(methodDocs)) {
+            methodDocModleList = new ArrayList<>(methodDocs.length);
+            for(MethodDoc methodDoc : methodDocs) {
+                // 是抽象方法,静态方法, 接口则退出
+                if(ToolsKit.isEmpty(methodDoc) || isIgnoreAnnotation(methodDoc.annotations())
+                        || methodDoc.isAbstract() || methodDoc.isStatic() || methodDoc.isInterface()){
+                    continue;
+                }
+                MethodDocModle methodDocModle = new MethodDocModle();
+                // 方法名
+                methodDocModle.setName(methodDoc.name());
+                // 注释说明
+                methodDocModle.setCommentText(methodDoc.commentText().trim());
+                // 返回值
+                String returnTypeString = methodDoc.returnType().toString();
+                if(List.class.getName().equalsIgnoreCase(returnTypeString) ||
+                        Set.class.getName().equalsIgnoreCase(returnTypeString)  ) {
+                    for(Method method : jdkMethod) {
+                        if(method.getName().equalsIgnoreCase(methodDoc.name())) {
+                            Class<?> typeClass = GenericsUtils.getGenericReturnType(method);
+                            returnTypeString = methodDoc.returnType().simpleTypeName()+"<"+typeClass.getTypeName()+">";
+                            System.out.println(returnTypeString);
+                        }
+                    }
+                }
+                methodDocModle.setReturnType(returnTypeString);
+                // 异常部份
+                Type[] exceptionTypeArray = methodDoc.thrownExceptionTypes();
+                if(ToolsKit.isNotEmpty(exceptionTypeArray)) {
+                    List<String> exceptionList = new ArrayList<>(exceptionTypeArray.length);
+                    for(Type type : exceptionTypeArray) {
+                        exceptionList.add(type.typeName());
+                    }
+                    methodDocModle.setException(exceptionList);
+                }
+                //参数部份
+                Parameter[] parameters = methodDoc.parameters();
+                List<ParameterModle> parameterModleList = new ArrayList<>();
+                if(ToolsKit.isNotEmpty(parameters)) {
+                    for(Parameter parameter : parameters) {
+                        /* 参数注解部份
+                        for(AnnotationDesc annotationDesc : parameter.annotations()) {
+                            AnnotationTypeDoc typeDoc = annotationDesc.annotationType();
+                            if(ToolsKit.isEmpty(typeDoc)) {
+                                continue;
+                            }
+                            System.out.println("################################: " + typeDoc.toString());
+
+                            for(AnnotationTypeElementDoc elementDocs : typeDoc.elements()){
+                                System.out.println("parameterName:  " +parameter.name());
+                                System.out.println("parameterType: " + parameter.type());
+                                System.out.println("elementName: " + elementDocs.name());
+
+                                annotationDesc..elementValues();
+                                try {
+                                // 要将Unicode转为中文
+                                    System.out.println(URLDecoder.decode(elementDocs.defaultValue().toString(), "UTF-8"));
+//                                            System.out.println("defaultValue:  " +new String(elementDocs.defaultValue().toString().getBytes(), "gb2312"));
+                                } catch (Exception e) {}
+                            }
+                        }
+                        */
+
+                        ParameterModle parameterModle = null;
+                        Type type = parameter.type();
+                        String typeString = type.toString();
+                        Class<?> parameterType = null;
+                        if(typeString.indexOf(".") == -1) {
+                            parameterType = ClassKit.loadClass(DataType.conversionBaseType(typeString));
+                        } else {
+                            parameterType = ClassKit.loadClass(type.toString());
+                        }
+                        if(!DataType.isListType(parameterType) &&
+                                !DataType.isMapType(parameterType) &&
+                                !DataType.isSetType(parameterType) && ToolsKit.isDuangBean(parameterType)) {
+                            Field[] fields = parameterType.getDeclaredFields();
+                            for(Field field : fields) {
+                                parameterModle = builderParameterModle(field);
+                                if(ToolsKit.isNotEmpty(parameterModle)) {
+                                    parameterModleList.add(parameterModle);
+                                }
+                            }
+                        } else {
+                            parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"", "");
+                            builderParameterModle( parameterModle, parameter.annotations());
+                            parameterModleList.add(parameterModle);
+                        }
+                    }
+                    methodDocModle.setParamModles(parameterModleList);
+                }
+                // 注释部份
+                Tag[] tags = methodDoc.tags();
+                if(ToolsKit.isNotEmpty(tags)) {
+                    List<TagModle> modlesTagList = new ArrayList<>();
+                    for (Tag tag : tags) {
+                        String tagName = tag.name();
+                        modlesTagList.add(new TagModle(tagName.substring(1, tagName.length()), tag.text()));
+                    }
+                    methodDocModle.setTagModles(modlesTagList);
+                }
+                // 注解部份
+                RequestMapping methodMapping = buildRequestMapping(methodDoc.annotations());
+                methodDocModle.setMappingModle(methodMapping);
+
+                methodDocModleList.add(methodDocModle);
+            }
+        }
+        classDocModleList.add(new ClassDocModle(classDoc.toString(), mappingModle, classDoc.commentText().trim(), tagModleList, methodDocModleList));
     }
 
     /**
