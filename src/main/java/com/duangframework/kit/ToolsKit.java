@@ -8,8 +8,10 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.duangframework.db.IdEntity;
 import com.duangframework.db.annotation.ConvertField;
+import com.duangframework.db.annotation.Entity;
 import com.duangframework.db.common.Order;
 import com.duangframework.db.common.Query;
+import com.duangframework.db.convetor.KvItem;
 import com.duangframework.db.enums.OrderByEnum;
 import com.duangframework.encrypt.core.HttpHeaderNames;
 import com.duangframework.exception.IException;
@@ -392,6 +394,7 @@ public final class ToolsKit {
             return false;
         }
         return parameterType.isAnnotationPresent(Bean.class)
+                || parameterType.isAnnotationPresent(Entity.class)
                 || DataType.isIdEntityType(parameterType)
                 || ObjectKit.newInstance(parameterType) instanceof Serializable;
     }
@@ -826,6 +829,30 @@ public final class ToolsKit {
         }
 
         return false;
+    }
+
+    /**
+     * 设置方法参数的泛型
+     * @param key       请求的URI地址
+     * @param kvItem    key为参数变量名，value为泛型Type
+     */
+    public static final Map<String,KvItem> mehtodParamsGenericTypeMap = new HashMap<>();
+    public static void setMehtodParamsGenericType(String key, KvItem kvItem) {
+        mehtodParamsGenericTypeMap.put(key, kvItem);
+    }
+
+    /**
+     * 根据请求地址URI，取出指定变量名称的泛型值
+     * @param uri   请求URI地址
+     * @param paramsName    变量名
+     * @return
+     */
+    public static Type getMehtodParamsGenericTypeMap(String uri, String paramsName) {
+        KvItem kvItem = mehtodParamsGenericTypeMap.get(uri);
+        if(ToolsKit.isEmpty(kvItem)) {
+            return null;
+        }
+        return kvItem.getKey().equals(paramsName) ? (Type)kvItem.getValue() : null;
     }
 
 }

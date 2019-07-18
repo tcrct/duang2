@@ -25,12 +25,14 @@ public class MethodDocModle implements java.io.Serializable {
     private List<ParameterModle> paramModles;
     // 注解
     private RequestMapping mappingModle;
-
+    //参数体
+    private List<ParameterModle> returnParamModles;
     public MethodDocModle() {
 
     }
 
-    public MethodDocModle(String name, RequestMapping mappingModle, String commentText, List<String> exception, String returnType, List<TagModle> tagModles, List<ParameterModle> paramModles) {
+    public MethodDocModle(String name, RequestMapping mappingModle, String commentText, List<String> exception, String returnType,
+                          List<TagModle> tagModles, List<ParameterModle> paramModles, List<ParameterModle> returnParamModles) {
         this.name = name;
         this.mappingModle = mappingModle;
         this.commentText = commentText;
@@ -38,6 +40,7 @@ public class MethodDocModle implements java.io.Serializable {
         this.returnType = returnType;
         this.tagModles = tagModles;
         this.paramModles = paramModles;
+        this.returnParamModles= returnParamModles;
     }
 
     public String getName() {
@@ -96,6 +99,14 @@ public class MethodDocModle implements java.io.Serializable {
         this.mappingModle = mappingModle;
     }
 
+    public List<ParameterModle> getReturnParamModles() {
+        return returnParamModles;
+    }
+
+    public void setReturnParamModles(List<ParameterModle> returnParamModles) {
+        this.returnParamModles = returnParamModles;
+    }
+
     @Override
     public String toString() {
         return "MethodDocModle{" +
@@ -105,6 +116,7 @@ public class MethodDocModle implements java.io.Serializable {
                 ", returnType='" + returnType + '\'' +
                 ", tagModles=" + tagModles +
                 ", paramModles=" + paramModles +
+                ", returnParamModles=" + returnParamModles +
                 '}';
     }
 }

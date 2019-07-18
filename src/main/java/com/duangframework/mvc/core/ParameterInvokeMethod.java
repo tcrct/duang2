@@ -2,6 +2,7 @@ package com.duangframework.mvc.core;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.duangframework.db.convetor.KvItem;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.kit.ObjectKit;
@@ -63,6 +64,7 @@ public class ParameterInvokeMethod {
                 Type[] typeParams = ((ParameterizedType) type).getActualTypeArguments();
                 if(typeParams.length > 0) {
                     genType = typeParams[0];
+//                    ToolsKit.setMehtodParamsGenericType(request.getRequestURI(), new KvItem(methodParams[i].getName(), genType));
                 }
             }
             Annotation[] annotations = methodParams[i].getAnnotations();
@@ -78,24 +80,6 @@ public class ParameterInvokeMethod {
             } else {
                 requestParamValueObj[i] = TypeConverter.convert(parameterType, paramValue);
             }
-//            } else if (DataType.isString(parameterType)) {
-//                requestParamValueObj[i] = paramValue;
-//            } else if (DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
-//                requestParamValueObj[i] = Integer.parseInt(paramValue);
-//            } else if (DataType.isLong(parameterType) || DataType.isLongObject(parameterType)) {
-//                requestParamValueObj[i] =Long.parseLong(paramValue);
-//            } else if (DataType.isDouble(parameterType) || DataType.isDoubleObject(parameterType)) {
-//                requestParamValueObj[i] = Double.parseDouble(paramValue);
-//            } else if (DataType.isDate(parameterType)) {
-//                requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-//            } else if (DataType.isTimestamp(parameterType)) {
-//                requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-//            } else if(DataType.isListType(parameterType) || DataType.isSetType(parameterType) || DataType.isQueueType(parameterType)) {
-//                requestParamValueObj[i] = invokeCollention(request, parameterType);
-//            } else if(DataType.isMapType(parameterType) ) {
-//                requestParamValueObj[i] = invokeMap(request);
-//            }
-
             //返回前，根据验证注解，进行参数数据验证
             if (ToolsKit.isNotEmpty(annotations)) {
                 try {

@@ -175,6 +175,6 @@ public class SecurityKit {
         if(ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
             throw new SecurityException("设置权限值时,参数不能为空");
         }
-        authHashMap.put(key.toString(), new HashSet<>(authList));
+        authHashMap.put(key, new HashSet<>(authList));
     }
 }

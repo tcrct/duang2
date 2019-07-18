@@ -1,19 +1,41 @@
 package com.duangframework.mvc.dto;
 
+import com.duangframework.db.annotation.VoColl;
 import com.duangframework.mvc.annotation.Bean;
+import com.duangframework.mvc.annotation.Param;
+//import com.duangframework.vtor.annotation.FieldName;
 
 import java.util.List;
 
+/**
+ * 搜索条件集合Dto
+ * @author laotang
+ */
 @Bean
 public class SearchListDto extends ApiDto {
 
-    private int pageNo = 0;		//页数,由0开始
-    private int pageSize = 10;		//页行数
-    // 搜索字段集合
+    /**
+     * 页数,由0开始
+     */
+    @Param(label = "页数", desc = "页数,由0开始", defaultValue = "0")
+    private int pageNo = 0;
+    /**
+     * 页行数，默认每页10行
+     */
+    @Param(label = "页行数", desc = "页行数，默认每页10行", defaultValue = "10")
+    private int pageSize = 10;
+    /**
+     * 搜索字段集合
+      */
+    @Param(label = "搜索对象集合", desc = "将搜索条件封装成SearchDto", defaultValue = "SearchDto")
     @Bean
+    @VoColl
     private List<SearchDto> searchDtos;
-    // 多条件查询时，and 或 or 连接查询VtorFactory
-    private String operator = "and";  // and 或 or 链接 SearchDto对象值, 如果值为空，默认为and查询
+    /**
+     * 多条件查询时，and 或 or 链接 SearchDto对象值, 如果值为空，默认为and查询
+      */
+    @Param(label = "查询模式", desc = "多条件查询时，and 或 or 链接 SearchDto对象值, 如果值为空，默认为and查询", defaultValue = "and")
+    private String operator = "and";
 
     public SearchListDto() {
     }

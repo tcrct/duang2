@@ -1,19 +1,27 @@
 package com.duangframework.mvc.dto;
 
 import com.duangframework.mvc.annotation.Bean;
+import com.duangframework.mvc.annotation.Param;
 import com.duangframework.vtor.annotation.NotEmpty;
 
 /**
  * 搜索Dto
+ *
+ * @author laotang
  */
 @Bean
 public class SearchDto implements java.io.Serializable {
 
     @NotEmpty
-    private String field;         // 搜索字段
-    private String operator;  // 表达式，==, >, >= , <, <=, !=, like, 默认为 ==
+    @Param(name="field", label = "搜索字段", desc = "需要参与搜索的字段名称")
+    private String field;
+
+    @Param(name="operator", label = "表达式", desc = "==, >, >= , <, <=, !=, like, 默认为 ==")
+    private String operator;
+
     @NotEmpty
-    private Object value;    // 搜索值
+    @Param(name="value", label = "搜索值", desc = "需要参与搜索的字段值")
+    private Object value;
 
 
     public SearchDto() {

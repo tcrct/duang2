@@ -3,6 +3,8 @@ package com.duangframework.db;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.duangframework.db.annotation.Id;
+import com.duangframework.mvc.annotation.Param;
+
 import java.util.Date;
 
 /**
@@ -30,42 +32,52 @@ public class IdEntity implements java.io.Serializable {
 
 	@Id
 	@JSONField(name=ID_FIELD)
+	@Param(label = "记录序列号", desc = "该记录的序列号标识,全局唯一")
 	private String id;
 	/**
 	 * 创建时间
 	 */
+	@Param(label = "创建时间", desc = "该记录的创建时间")
 	private Date createtime;
 	/**
 	 * 创建人ID
 	 */
+	@Param(label = "创建人ID", desc = "该记录的创建人ID")
 	private String createuserid;
 	/**
 	 * 更新时间
 	 */
+	@Param(label = "更新时间", desc = "该记录的更新时间")
 	private Date updatetime;
 	/**
 	 * 更新人ID
 	 */
+	@Param(label = "更新人ID", desc = "该记录的更新人ID")
 	private String updateuserid;
 	/**
 	 * 数据状态(查数据字典)
 	 */
+	@Param(label = "数据状态", desc = "该记录的数据状态")
 	private String status;
 	/**
 	 * 数据来源
 	 */
+	@Param(label = "数据来源", desc = "该记录的数据来源")
 	private String source;
 	/**
 	 * 公司id标识
 	 */
+	@Param(label = "公司id标识", desc = "该记录的公司id标识")
 	private String companyId;
 	/**
 	 * 项目id标识
 	 */
+	@Param(label = "项目id标识", desc = "该记录的项目id标识")
 	private String projectId;
 	/**
 	 * 部门id标识
 	 */
+	@Param(label = "部门id标识", desc = "该记录的部门id标识")
 	private String departmentId;
 
 	public IdEntity(String id, Date createtime, String createuserid,

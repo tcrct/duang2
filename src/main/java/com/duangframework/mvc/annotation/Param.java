@@ -28,8 +28,18 @@ public @interface Param {
     String desc() default "";
 
     // 参数类型
-    Class<?> type() default String.class;
+    Class<?> type() default Object.class;
 
     // 对自定义的javabean进行参数说明与验证，该class对象要存在@Vtor注解
     Class<?> bean() default Object.class;
+
+    // 表单id值，例如：<input id="user_name" />
+    String id() default "";
+
+    // 表单显示字段值，例如: <input  label="姓名" />
+    String label() default "";
+
+    // 是否隐藏，默认为否 例如: <input  hidden="none" />
+    boolean isHidden() default false;
+
 }

@@ -1,24 +1,40 @@
 package com.duangframework.mvc.dto;
 
+import com.duangframework.db.annotation.VoColl;
+import com.duangframework.mvc.annotation.Bean;
+import com.duangframework.mvc.annotation.Param;
+import com.duangframework.utils.GenericsUtils;
+
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author laotang
  */
+@Bean
 public class PageDto<T> implements java.io.Serializable {
+
+	public static final String RESULT_FIELD = "result";
 	
-	//-- 分页参数 --//
-	protected int pageNo = 1;		//页数
-	protected int pageSize = 1;		//页行数
+	@Param(label = "页数", defaultValue = "1", desc = "当前页数")
+	protected int pageNo = 1;
+	@Param(label = "页行数", defaultValue = "1", desc = "当前页行数")
+	protected int pageSize = 1;
+	@Param(label = "统计总行数", defaultValue = "true", desc = "否是开启自动统计总行数,true为开启")
 	protected boolean autoCount = true;
-	//-- 返回结果 --//
+	@Param(label = "分页结果集", desc = "查询后返回的分页结果集")
 	protected List<T> result = Collections.emptyList();
+	@Param(label = "总行数", desc = "查询后返回结果集的总行数")
 	protected long totalCount = -1;
+
+//	private Class<T> genricTypeClass;
 	
 	public PageDto() {
-		
+//		genricTypeClass = GenericsUtils.getSuperClassGenricType(getClass());
 	}
+
+
+
 	
 	public PageDto(int pageNo, int pageSize) {
 		setPageNo(pageNo);

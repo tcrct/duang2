@@ -1,6 +1,7 @@
 package com.duangframework.doclet;
 
 import com.duangframework.db.annotation.Ignore;
+import com.duangframework.db.annotation.VoColl;
 import com.duangframework.doclet.modle.ClassDocModle;
 import com.duangframework.doclet.modle.MethodDocModle;
 import com.duangframework.doclet.modle.ParameterModle;
@@ -10,12 +11,16 @@ import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Mapping;
 import com.duangframework.mvc.annotation.Mock;
+import com.duangframework.mvc.annotation.Param;
+import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.mvc.route.RequestMapping;
 import com.duangframework.utils.DataType;
 import com.duangframework.utils.GenericsUtils;
-import com.duangframework.vtor.annotation.FieldName;
+//import com.duangframework.vtor.annotation.FieldName;
+import com.duangframework.vtor.annotation.DuangId;
 import com.duangframework.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
+import org.terracotta.offheapstore.paging.Page;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -26,6 +31,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -55,14 +62,22 @@ public class ApiDocument {
         classDocModleList.clear();
         scanSourceFile(sourceDir);
         if(ToolsKit.isNotEmpty(javaFileList)) {
+//            CountDownLatch latch = new CountDownLatch(javaFileList.size());
             for(File file : javaFileList) {
-                ThreadPoolKit.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        JavaDocReader(file);
-                    }
-                });
+                javaDocReader(file, null);
+//                ThreadPoolKit.execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        javaDocReader(file, latch);
+//                    }
+//                });
             }
+//            try {
+//                // 等待所有线程完成,如果10秒没有完成，则超时退出等待
+//                latch.await(10, TimeUnit.SECONDS);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
         return classDocModleList;
     }
@@ -88,7 +103,7 @@ public class ApiDocument {
         }
     }
 
-    private void JavaDocReader(File file) {
+    private void javaDocReader(File file, CountDownLatch latch) {
         //调用解析方法
         ClassDoc[] data = JavaDocReader.show(file.getPath());
         ClassDoc classDoc = data[0];
@@ -129,23 +144,84 @@ public class ApiDocument {
                         || methodDoc.isAbstract() || methodDoc.isStatic() || methodDoc.isInterface()){
                     continue;
                 }
+
                 MethodDocModle methodDocModle = new MethodDocModle();
                 // 方法名
                 methodDocModle.setName(methodDoc.name());
                 // 注释说明
                 methodDocModle.setCommentText(methodDoc.commentText().trim());
                 // 返回值
-                String returnTypeString = methodDoc.returnType().toString();
+                Type returnType = methodDoc.returnType();
+                String returnTypeString = returnType.qualifiedTypeName();
                 if(List.class.getName().equalsIgnoreCase(returnTypeString) ||
-                        Set.class.getName().equalsIgnoreCase(returnTypeString)  ) {
+                        Set.class.getName().equalsIgnoreCase(returnTypeString) ||
+                        PageDto.class.getName().equalsIgnoreCase(returnTypeString)) {
                     for(Method method : jdkMethod) {
                         if(method.getName().equalsIgnoreCase(methodDoc.name())) {
                             Class<?> typeClass = GenericsUtils.getGenericReturnType(method);
-                            returnTypeString = methodDoc.returnType().simpleTypeName()+"<"+typeClass.getTypeName()+">";
-                            System.out.println(returnTypeString);
+                            returnTypeString = returnTypeString+"<"+typeClass.getTypeName()+">";
+                            System.out.println("##############: " + returnTypeString);
                         }
                     }
                 }
+                // 如果返回值是属于DuangBean规则的
+                /*
+                if(!"void".equalsIgnoreCase(returnTypeString)) {
+                    List<ParameterModle> returnParamModleList = new ArrayList<>();
+                    boolean isPageDtoClass = false;
+                    if(returnTypeString.contains("<") && returnTypeString.contains(">")) {
+                        Field[] fields = null,  fields2 = null;
+                        String genericTypeString = returnTypeString.substring(returnTypeString.indexOf("<")+1, returnTypeString.indexOf(">"));
+                        if(PageDto.class.getSimpleName().startsWith(returnTypeString)) {
+                            fields = ClassKit.getFields(PageDto.class);
+                            isPageDtoClass = true;
+                            fields2 = ClassKit.getFields(ClassKit.loadClass(genericTypeString));
+                        } else {
+                            fields = ClassKit.getFields(ClassKit.loadClass(genericTypeString));
+                        }
+                        for (Field field : fields) {
+                            ParameterModle parameterModle = builderParameterModle(field);
+                            if(isPageDtoClass && ToolsKit.isNotEmpty(fields2) && PageDto.RESULT_FIELD.equalsIgnoreCase(parameterModle.getName())) {
+                                List<ParameterModle> p = new ArrayList<>(fields2.length);
+                                if(ToolsKit.isNotEmpty(fields2)) {
+                                    for (Field f : fields2) {
+                                        ParameterModle parameterModle2 = builderParameterModle(f);
+                                        p.add(parameterModle2);
+                                    }
+                                    parameterModle.setSubModles(p);
+                                }
+                            }
+                            if(ToolsKit.isNotEmpty(parameterModle)) {
+                                returnParamModleList.add(parameterModle);
+                            }
+                        }
+                    } else {
+                        Class<?> returnParamClass = DataType.conversionBaseType(returnTypeString);
+                        if (null == returnParamClass) {
+                            returnParamClass = ClassKit.loadClass(returnTypeString);
+                        }
+                        if (ToolsKit.isDuangBean(returnParamClass)) {
+                            Field[] fields = ClassKit.getFields(returnParamClass);
+                            for (Field field : fields) {
+                                ParameterModle parameterModle = builderParameterModle(field);
+                                if (ToolsKit.isNotEmpty(parameterModle)) {
+                                    returnParamModleList.add(parameterModle);
+                                }
+                            }
+                        } else {
+                            ParameterModle parameterModle = new ParameterModle();
+                            parameterModle.setType(returnParamClass.getSimpleName());
+                            parameterModle.setDesc("");
+                            parameterModle.setDefaultValue("");
+                            parameterModle.setRules("");
+                            parameterModle.setEmpty(false);
+                            parameterModle.setName("data");
+                            returnParamModleList.add(parameterModle);
+                        }
+                    }
+                    methodDocModle.setReturnParamModles(returnParamModleList);
+                }
+                */
                 methodDocModle.setReturnType(returnTypeString);
                 // 异常部份
                 Type[] exceptionTypeArray = methodDoc.thrownExceptionTypes();
@@ -174,7 +250,7 @@ public class ApiDocument {
                                 System.out.println("parameterType: " + parameter.type());
                                 System.out.println("elementName: " + elementDocs.name());
 
-                                annotationDesc..elementValues();
+                                annotationDesc.elementValues();
                                 try {
                                 // 要将Unicode转为中文
                                     System.out.println(URLDecoder.decode(elementDocs.defaultValue().toString(), "UTF-8"));
@@ -193,6 +269,7 @@ public class ApiDocument {
                         } else {
                             parameterType = ClassKit.loadClass(type.toString());
                         }
+                        // 如果是DuangBean的参数
                         if(!DataType.isListType(parameterType) &&
                                 !DataType.isMapType(parameterType) &&
                                 !DataType.isSetType(parameterType) && ToolsKit.isDuangBean(parameterType)) {
@@ -203,6 +280,7 @@ public class ApiDocument {
                                     parameterModleList.add(parameterModle);
                                 }
                             }
+                            // 基本类型的参数
                         } else {
                             parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"", "");
                             builderParameterModle( parameterModle, parameter.annotations());
@@ -229,6 +307,7 @@ public class ApiDocument {
             }
         }
         classDocModleList.add(new ClassDocModle(classDoc.toString(), mappingModle, classDoc.commentText().trim(), tagModleList, methodDocModleList));
+//        latch.countDown();
     }
 
     /**
@@ -333,6 +412,7 @@ public class ApiDocument {
         return requestMapping;
     }
 
+
     private ParameterModle builderParameterModle(Field field) {
         //静态字段不取
         if(Modifier.isStatic(field.getModifiers())) {
@@ -346,19 +426,43 @@ public class ApiDocument {
             for(Annotation annotation : annotations) {
                 Class<?> annotationClass = annotation.annotationType();
 //                System.out.println(field.getName() + "##########: " + annotationClass.getName() );
-                if(NotEmpty.class.equals(annotationClass)) {
-                    parameterModle.setEmpty(false);  // no empty
+                if(VoColl.class.equals(annotationClass)) {
+                    java.lang.reflect.Type genericType = field.getGenericType();
+                    if(ToolsKit.isNotEmpty(genericType)) {
+                        java.lang.reflect.ParameterizedType parameterizedType = (java.lang.reflect.ParameterizedType)genericType;
+                        java.lang.reflect.Type[] actualTypes = parameterizedType.getActualTypeArguments();
+                        if(ToolsKit.isNotEmpty(actualTypes)) {
+                            Class<?> accountPrincipalApproveClazz = (Class<?>) actualTypes[0];
+                            Field[] fields = ClassKit.getFields(accountPrincipalApproveClazz);
+                            List<ParameterModle> subParameterModle = new ArrayList<>(fields.length);
+                            for (Field f : fields) {
+                                ParameterModle parameterModle2 = builderParameterModle(f);
+                                subParameterModle.add(parameterModle2);
+                            }
+                            parameterModle.setSubModles(subParameterModle);
+                        }
+                    }
                 }
-                if(FieldName.class.equals(annotationClass)) {
-                    FieldName fieldName = field.getAnnotation(FieldName.class);
-                    String label = fieldName.label();
-                    parameterModle.setDesc(ToolsKit.isEmpty(label) ? parameterModle.getName() : label);
+
+                if(NotEmpty.class.equals(annotationClass)) {
+                    parameterModle.setEmpty(false);
+                }
+                if(Param.class.equals(annotationClass)) {
+                    Param param = field.getAnnotation(Param.class);
+                    String desc = param.desc();
+                    parameterModle.setDesc(ToolsKit.isEmpty(desc) ? (ToolsKit.isEmpty(param.label()) ? field.getName() : param.label()) : desc);
+                    parameterModle.setDefaultValue(param.defaultValue());
+                    Class<?> paramType = param.type();
+                    if(ToolsKit.isNotEmpty(paramType) && !Object.class.equals(paramType)) {
+                        parameterModle.setType(paramType.getSimpleName());
+                    }
                 }
                 if(Mock.class.equals(annotationClass)) {
                     Mock mock = field.getAnnotation(Mock.class);
                     parameterModle.setDefaultValue(mock.value());
                     parameterModle.setDesc(mock.desc());
                 }
+                parameterModle.setRules(annotationClass.getName());
 //                builderParameterModleItem(parameterModle, annotationClass);
             }
         }
@@ -375,6 +479,10 @@ public class ApiDocument {
                     for(AnnotationDesc.ElementValuePair pair : pairs) {
                         if(NotEmpty.class.getName().equalsIgnoreCase(typeString)) {
                             parameterModle.setEmpty(false);
+                        }
+                        if(DuangId.class.getName().equalsIgnoreCase(typeString)) {
+                            parameterModle.setDesc("符合DuangId规则的字符串");
+                            parameterModle.setDefaultValue(new com.duangframework.utils.DuangId().toString());
                         }
                         if("defaultValue".equalsIgnoreCase(pair.element().name())) {
                             parameterModle.setDefaultValue(pair.value().value().toString());
@@ -394,4 +502,5 @@ public class ApiDocument {
 //            parameterModle.setDefaultValue(mock.value());
 //        }
 //    }
+
 }
