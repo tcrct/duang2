@@ -28,25 +28,26 @@ public class ${entityName}Controller extends BaseController {
      * @since 1.0
      */
     @Mapping(value = "/save", desc = "保存")
-    public void save(${entityName} ${entityVarName}) {
+    public ${entityName} save(${entityName} ${entityVarName}) {
         try {
-            returnSuccessJson(${entityVarName}Service.save(${entityVarName}));
+            return ${entityVarName}Service.save(${entityVarName});
         } catch (Exception e) {
-            returnFailJson(e);
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
     /**
      *  根据ID删除一条记录
      * @param id    符合DuangId规则的字符串
+     * @resparam [{"name":"data","type":"Boolean","desc":"是否删除成功,true为成功"}]
      * @since 1.0
      */
     @Mapping(value = "/deletebyid", desc = "删除")
-    public void deleteById(@DuangId String id) {
+    public Boolean deleteById(@DuangId String id) {
         try {
-            returnSuccessJson(${entityVarName}Service.deleteById(id));
+            return ${entityVarName}Service.deleteById(id);
         } catch (Exception e) {
-            returnFailJson(e);
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
@@ -56,24 +57,25 @@ public class ${entityName}Controller extends BaseController {
      * @since 1.0
      */
     @Mapping(value = "/findbyid", desc = "查找")
-    public void findById(@DuangId String id) {
+    public ${entityName} findById(@DuangId String id) {
         try {
             returnSuccessJson(${entityVarName}Service.findById(id));
         } catch (Exception e) {
-            returnFailJson(e);
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
   /**
      *  根据搜索对象查询记录集合
      * @param searchListDto    搜索对象
+     * @since 1.0
      */
     @Mapping(value = "/search", desc = "搜索")
-    public void search(SearchListDto searchListDto) {
+    public PageDto<${entityName}> search(SearchListDto searchListDto) {
         try {
-            returnSuccessJson(${entityVarName}Service.search(searchListDto));
+            return ${entityVarName}Service.search(searchListDto);
         } catch (Exception e) {
-            returnFailJson(e);
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 }

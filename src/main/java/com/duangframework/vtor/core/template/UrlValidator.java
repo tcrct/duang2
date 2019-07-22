@@ -22,7 +22,11 @@ public class UrlValidator extends AbstractValidatorTemplate<URL> {
     @Override
     public void handle(URL annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
-        if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
+        boolean isEmapy = annonation.isEmpty();
+        if(isEmapy) {
+            return;
+        }
+        if(ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
 

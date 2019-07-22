@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface NotEmpty {
 
-    String message() default "不能为空！";
+    String message() default "不能为空";
 
     String defaultValue() default "";
 

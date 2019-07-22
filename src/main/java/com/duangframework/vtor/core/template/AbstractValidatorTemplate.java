@@ -27,4 +27,5 @@ public abstract class AbstractValidatorTemplate<T> {
     public void vaildator(T annotation, Class<?> parameterType, String paramName, Object paramValue) throws Exception {
         handle(annotation, parameterType, paramName, paramValue);
     }
+
 }

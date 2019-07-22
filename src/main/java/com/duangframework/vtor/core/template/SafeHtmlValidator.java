@@ -21,6 +21,7 @@ public class SafeHtmlValidator extends AbstractValidatorTemplate<SafeHtml> {
     @Override
     public void handle(SafeHtml annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
+
         if(ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }

@@ -131,12 +131,8 @@ public class DuangClassLoader extends ClassLoader {
             }
             byte[] classBytes = bos.toByteArray();
             String classKey = getClassAbsolutePath(classPathFile);
-//            if(!"com.signetz.openapi.dto.v2.python.BaseEntity".equalsIgnoreCase(classKey)) {
-
-//            }
             if(!getClassKeySet().contains(classKey)) {
                 getClassKeySet().add(classKey);
-//                System.out.println(classKey);
                 defineClass(classKey, classBytes, 0, classBytes.length);
             }
         } catch (Exception e) {

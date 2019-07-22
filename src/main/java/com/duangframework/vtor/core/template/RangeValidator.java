@@ -22,10 +22,13 @@ public class RangeValidator extends AbstractValidatorTemplate<Range> {
     @Override
     public void handle(Range annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
-        if(!annonation.isEmpty() && ToolsKit.isEmpty(paramValue)) {
+        boolean isEmapy = annonation.isEmpty();
+        if(isEmapy) {
+            return;
+        }
+        if(ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
-
         if(ToolsKit.isNotEmpty(parameterType)) {
             Double value =Double.parseDouble(paramValue.toString());
             double max = annonation.max();

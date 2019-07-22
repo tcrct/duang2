@@ -6,8 +6,8 @@ import com.duangframework.doclet.modle.ClassDocModle;
 import com.duangframework.doclet.modle.MethodDocModle;
 import com.duangframework.doclet.modle.ParameterModle;
 import com.duangframework.doclet.modle.TagModle;
+import com.duangframework.doclet.param.ParameterAnnotationsFactory;
 import com.duangframework.kit.ClassKit;
-import com.duangframework.kit.ThreadPoolKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Mapping;
 import com.duangframework.mvc.annotation.Mock;
@@ -20,7 +20,6 @@ import com.duangframework.utils.GenericsUtils;
 import com.duangframework.vtor.annotation.DuangId;
 import com.duangframework.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
-import org.terracotta.offheapstore.paging.Page;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -106,6 +104,9 @@ public class ApiDocument {
     private void javaDocReader(File file, CountDownLatch latch) {
         //调用解析方法
         ClassDoc[] data = JavaDocReader.show(file.getPath());
+        if(ToolsKit.isEmpty(data)) {
+            return;
+        }
         ClassDoc classDoc = data[0];
         // 如果抽象，静态， 接口，设置了Ignore注解则退出本次循环
         if(ToolsKit.isEmpty(classDoc) || isIgnoreAnnotation(classDoc.annotations())
@@ -160,68 +161,10 @@ public class ApiDocument {
                         if(method.getName().equalsIgnoreCase(methodDoc.name())) {
                             Class<?> typeClass = GenericsUtils.getGenericReturnType(method);
                             returnTypeString = returnTypeString+"<"+typeClass.getTypeName()+">";
-                            System.out.println("##############: " + returnTypeString);
+//                            System.out.println("##############: " + returnTypeString);
                         }
                     }
                 }
-                // 如果返回值是属于DuangBean规则的
-                /*
-                if(!"void".equalsIgnoreCase(returnTypeString)) {
-                    List<ParameterModle> returnParamModleList = new ArrayList<>();
-                    boolean isPageDtoClass = false;
-                    if(returnTypeString.contains("<") && returnTypeString.contains(">")) {
-                        Field[] fields = null,  fields2 = null;
-                        String genericTypeString = returnTypeString.substring(returnTypeString.indexOf("<")+1, returnTypeString.indexOf(">"));
-                        if(PageDto.class.getSimpleName().startsWith(returnTypeString)) {
-                            fields = ClassKit.getFields(PageDto.class);
-                            isPageDtoClass = true;
-                            fields2 = ClassKit.getFields(ClassKit.loadClass(genericTypeString));
-                        } else {
-                            fields = ClassKit.getFields(ClassKit.loadClass(genericTypeString));
-                        }
-                        for (Field field : fields) {
-                            ParameterModle parameterModle = builderParameterModle(field);
-                            if(isPageDtoClass && ToolsKit.isNotEmpty(fields2) && PageDto.RESULT_FIELD.equalsIgnoreCase(parameterModle.getName())) {
-                                List<ParameterModle> p = new ArrayList<>(fields2.length);
-                                if(ToolsKit.isNotEmpty(fields2)) {
-                                    for (Field f : fields2) {
-                                        ParameterModle parameterModle2 = builderParameterModle(f);
-                                        p.add(parameterModle2);
-                                    }
-                                    parameterModle.setSubModles(p);
-                                }
-                            }
-                            if(ToolsKit.isNotEmpty(parameterModle)) {
-                                returnParamModleList.add(parameterModle);
-                            }
-                        }
-                    } else {
-                        Class<?> returnParamClass = DataType.conversionBaseType(returnTypeString);
-                        if (null == returnParamClass) {
-                            returnParamClass = ClassKit.loadClass(returnTypeString);
-                        }
-                        if (ToolsKit.isDuangBean(returnParamClass)) {
-                            Field[] fields = ClassKit.getFields(returnParamClass);
-                            for (Field field : fields) {
-                                ParameterModle parameterModle = builderParameterModle(field);
-                                if (ToolsKit.isNotEmpty(parameterModle)) {
-                                    returnParamModleList.add(parameterModle);
-                                }
-                            }
-                        } else {
-                            ParameterModle parameterModle = new ParameterModle();
-                            parameterModle.setType(returnParamClass.getSimpleName());
-                            parameterModle.setDesc("");
-                            parameterModle.setDefaultValue("");
-                            parameterModle.setRules("");
-                            parameterModle.setEmpty(false);
-                            parameterModle.setName("data");
-                            returnParamModleList.add(parameterModle);
-                        }
-                    }
-                    methodDocModle.setReturnParamModles(returnParamModleList);
-                }
-                */
                 methodDocModle.setReturnType(returnTypeString);
                 // 异常部份
                 Type[] exceptionTypeArray = methodDoc.thrownExceptionTypes();
@@ -250,11 +193,11 @@ public class ApiDocument {
                                 System.out.println("parameterType: " + parameter.type());
                                 System.out.println("elementName: " + elementDocs.name());
 
-                                annotationDesc.elementValues();
+                                System.out.println(annotationDesc.elementValues());
                                 try {
                                 // 要将Unicode转为中文
                                     System.out.println(URLDecoder.decode(elementDocs.defaultValue().toString(), "UTF-8"));
-//                                            System.out.println("defaultValue:  " +new String(elementDocs.defaultValue().toString().getBytes(), "gb2312"));
+                                            System.out.println("defaultValue:  " +new String(elementDocs.defaultValue().toString().getBytes(), "gb2312"));
                                 } catch (Exception e) {}
                             }
                         }
@@ -282,7 +225,7 @@ public class ApiDocument {
                             }
                             // 基本类型的参数
                         } else {
-                            parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"", "");
+                            parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true, new ArrayList<>(), "");
                             builderParameterModle( parameterModle, parameter.annotations());
                             parameterModleList.add(parameterModle);
                         }
@@ -299,7 +242,7 @@ public class ApiDocument {
                     }
                     methodDocModle.setTagModles(modlesTagList);
                 }
-                // 注解部份
+                // 注解部份,只取Mapping注解
                 RequestMapping methodMapping = buildRequestMapping(methodDoc.annotations());
                 methodDocModle.setMappingModle(methodMapping);
 
@@ -420,14 +363,28 @@ public class ApiDocument {
         }
         ParameterModle parameterModle = new ParameterModle();
         parameterModle.setName(field.getName());
-        parameterModle.setType(field.getType().getSimpleName());
+        java.lang.reflect.Type fieldType = field.getType();
+        java.lang.reflect.Type genericType = field.getGenericType();
+        if((DataType.isListType(fieldType.getClass()) || DataType.isSetType(fieldType.getClass()))
+                &&ToolsKit.isNotEmpty(genericType)) {
+            java.lang.reflect.ParameterizedType parameterizedType = (java.lang.reflect.ParameterizedType) genericType;
+            java.lang.reflect.Type[] actualTypes = parameterizedType.getActualTypeArguments();
+            if(ToolsKit.isNotEmpty(actualTypes)) {
+                Class<?> accountPrincipalApproveClazz = (Class<?>) actualTypes[0];
+                parameterModle.setType(field.getType().getSimpleName()+"<"+accountPrincipalApproveClazz.getName()+">");
+            }
+        } else {
+            parameterModle.setType(field.getType().getSimpleName());
+        }
         Annotation[] annotations = field.getAnnotations();
         if(ToolsKit.isNotEmpty(annotations)) {
+            List<String> ruleList = new ArrayList<>();
             for(Annotation annotation : annotations) {
+                StringBuilder annotAtionString = new StringBuilder();
                 Class<?> annotationClass = annotation.annotationType();
 //                System.out.println(field.getName() + "##########: " + annotationClass.getName() );
                 if(VoColl.class.equals(annotationClass)) {
-                    java.lang.reflect.Type genericType = field.getGenericType();
+                    genericType = field.getGenericType();
                     if(ToolsKit.isNotEmpty(genericType)) {
                         java.lang.reflect.ParameterizedType parameterizedType = (java.lang.reflect.ParameterizedType)genericType;
                         java.lang.reflect.Type[] actualTypes = parameterizedType.getActualTypeArguments();
@@ -443,11 +400,19 @@ public class ApiDocument {
                         }
                     }
                 }
-
+                /*
                 if(NotEmpty.class.equals(annotationClass)) {
                     parameterModle.setEmpty(false);
+                    annotAtionString.append(annotationClass.getName()).append("()");
+                    NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
+                    String defaultValue = notEmpty.defaultValue();
+                    if(ToolsKit.isNotEmpty(defaultValue)) {
+                        annotAtionString.append("defaultValue=").append(defaultValue).append(",");
+                    }
                 }
+                */
                 if(Param.class.equals(annotationClass)) {
+                    annotAtionString.append(annotationClass.getName());
                     Param param = field.getAnnotation(Param.class);
                     String desc = param.desc();
                     parameterModle.setDesc(ToolsKit.isEmpty(desc) ? (ToolsKit.isEmpty(param.label()) ? field.getName() : param.label()) : desc);
@@ -457,14 +422,19 @@ public class ApiDocument {
                         parameterModle.setType(paramType.getSimpleName());
                     }
                 }
-                if(Mock.class.equals(annotationClass)) {
-                    Mock mock = field.getAnnotation(Mock.class);
-                    parameterModle.setDefaultValue(mock.value());
-                    parameterModle.setDesc(mock.desc());
+
+//                if(Mock.class.equals(annotationClass)) {
+//                    Mock mock = field.getAnnotation(Mock.class);
+//                    parameterModle.setDefaultValue(mock.value());
+//                    parameterModle.setDesc(mock.desc());
+//                }
+                String annotString = ParameterAnnotationsFactory.buildParameterAnnotationString(field, annotationClass);
+                if(ToolsKit.isNotEmpty(annotString)) {
+                    ruleList.add(annotString);
                 }
-                parameterModle.setRules(annotationClass.getName());
 //                builderParameterModleItem(parameterModle, annotationClass);
             }
+            parameterModle.setRules(ruleList);
         }
         return parameterModle;
     }

@@ -21,7 +21,7 @@ public class ParameterModle {
     /**属性说明*/
     private String desc;
     /**验证规则字符串*/
-    private String rules;
+    private List<String> rules;
 
     /**集合泛型的参数模型*/
     private List<ParameterModle> subModles;
@@ -30,7 +30,7 @@ public class ParameterModle {
 
     }
 
-    public ParameterModle(String type, String name, String defaultValue, boolean empty, String rules, String desc) {
+    public ParameterModle(String type, String name, String defaultValue, boolean empty, List<String> rules, String desc) {
         this.type = type;
         this.name = name;
         this.defaultValue = defaultValue;
@@ -55,11 +55,11 @@ public class ParameterModle {
         this.name = name;
     }
 
-    public String getRules() {
+    public List<String> getRules() {
         return rules;
     }
 
-    public void setRules(String rules) {
+    public void setRules(List<String> rules) {
         this.rules = rules;
     }
 
