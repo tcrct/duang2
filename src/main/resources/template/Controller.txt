@@ -6,7 +6,7 @@ import com.duangframework.vtor.annotation.*;
 import com.duangframework.mvc.dto.SearchListDto;
 import ${entityClassName};
 import ${basePackage}.service.${entityVarName}.${entityName}Service;
-
+import com.duangframework.mvc.dto.PageDto;
 /**
  *  ${entityName} 控制层
  *
@@ -59,7 +59,7 @@ public class ${entityName}Controller extends BaseController {
     @Mapping(value = "/findbyid", desc = "查找")
     public ${entityName} findById(@DuangId String id) {
         try {
-            returnSuccessJson(${entityVarName}Service.findById(id));
+            return ${entityVarName}Service.findById(id);
         } catch (Exception e) {
             throw new ServiceException(e.getMessage(), e);
         }

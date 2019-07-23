@@ -192,8 +192,6 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
 
     private FindIterable<Document> builderQueryDoc(FindIterable<Document> documents, Query mongoQuery) {
         PageDto<T> page = mongoQuery.getPageObj();
-        int pageNo = page.getPageNo();
-        int pageSize = page.getPageSize();
         BasicDBObject fieldDbo = (BasicDBObject)MongoUtils.convert2DBFields(mongoQuery.getFields());
         if(ToolsKit.isNotEmpty(fieldDbo) && !fieldDbo.isEmpty()) {
             documents.projection(fieldDbo);
@@ -202,10 +200,8 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         if(ToolsKit.isNotEmpty(orderDbo) && !orderDbo.isEmpty()) {
             documents.sort(orderDbo);
         }
-        if(pageNo>0 && pageSize>1){
-            documents.skip( (pageNo-1) * pageSize );
-            documents.limit(pageSize);
-        }
+        documents.skip(getSkipNum(page));
+        documents.limit(page.getPageSize());
         BasicDBObject hintDbo = new BasicDBObject(mongoQuery.getHint());
         if(ToolsKit.isNotEmpty(hintDbo) && !hintDbo.isEmpty()) {
             documents.hint(hintDbo);
@@ -228,14 +224,12 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         }
         Bson queryDoc = new BasicDBObject(mongoQuery.getQuery());
         PageDto<T> page = mongoQuery.getPageObj();
-        int pageNo = page.getPageNo();
-        int pageSize = page.getPageSize();
         final List<T> resultList = new ArrayList<T>();
         collection.find(queryDoc)
                 .projection((BasicDBObject)MongoUtils.convert2DBFields(mongoQuery.getFields()))
                 .sort((BasicDBObject)MongoUtils.convert2DBOrder(mongoQuery.getOrderObj()))
-                .skip( (pageNo>0 ? (pageNo-1) : pageNo)*pageSize)
-                .limit(pageSize)
+                .skip(getSkipNum(page))
+                .limit(page.getPageSize())
                 .hint(new BasicDBObject(mongoQuery.getHint()))
                 .forEach(new Block<Document>() {
                     @Override
@@ -248,6 +242,22 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
             page.setTotalCount(count(mongoQuery));
         }
         return page;
+    }
+
+    /**
+     * 确定跳过的行数
+     * @param page
+     * @return
+     */
+    private int getSkipNum(PageDto<T> page) {
+        int skipNum = page.getSkipNum();
+        int pageNo = page.getPageNo();
+        int pageSize = page.getPageSize();
+        if(skipNum > -1) {
+            return skipNum;
+        } else {
+            return (pageNo>0 ? (pageNo-1) : pageNo) * pageSize;
+        }
     }
 
     /**

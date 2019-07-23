@@ -38,6 +38,10 @@ public class Query<T> {
     private Map hintObj;
 
     public Query() {
+        this(true);
+    }
+
+    public Query(boolean isAddSuccessStatus) {
         queryObj = new LinkedHashMap();
         orderObj = new Order();
         fieldObj = new Field();
@@ -45,7 +49,9 @@ public class Query<T> {
         pageObj = new PageDto<T>(0, 1);
 
         // 默认查询审核通过的数据
-        queryObj.put(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
+        if(isAddSuccessStatus) {
+            queryObj.put(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
+        }
     }
 
     public Query(DBCollection coll, Class<T> clazz, LinkedHashMap keys) {
@@ -318,6 +324,12 @@ public class Query<T> {
     @Deprecated
     public Query<T> pageSize(int pageSize) {
         this.pageObj.pageSize(pageSize);
+        return this;
+    }
+
+    @Deprecated
+    public Query<T> skip(int skip) {
+        this.pageObj.setSkipNum(skip);
         return this;
     }
 

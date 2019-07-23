@@ -111,7 +111,7 @@ public class ${entityName}Service extends CurdService<${entityName}> {
      */
     public PageDto<${entityName}> search(SearchListDto searchListDto) {
         try {
-            return super.search(searchListDto, ${entityVarName}Dao, ${entityVarName}CacheService);
+            return super.search(searchListDto, ${entityVarName}Dao, ${entityName}.class);
         } catch (Exception e) {
             throw new ServiceException("search for ${entityName} is fail: "+ e.getMessage(), e);
         }

@@ -62,7 +62,7 @@ public class LoginDto  {
         this(account,password,captcha, phone, companyId, projectId, null, loginType);
     }
 
-    public LoginDto(String account, String password, String captcha, String companyId, String projectId, String phone, String securityServiceUrl, String loginType) {
+    public LoginDto(String account, String password, String captcha, String phone, String companyId, String projectId, String securityServiceUrl, String loginType) {
         this.account = account;
         this.password = password;
         this.captcha = captcha;

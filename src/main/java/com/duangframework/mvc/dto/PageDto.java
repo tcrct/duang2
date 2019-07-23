@@ -20,6 +20,8 @@ public class PageDto<T> implements java.io.Serializable {
 	protected int pageNo = 1;
 	@Param(label = "页行数", defaultValue = "1", desc = "当前页行数")
 	protected int pageSize = 1;
+	@Param(label = "跳过行数", defaultValue = "-1", desc = "跳过行数")
+	protected int skipNum = -1;
 	@Param(label = "统计总行数", defaultValue = "true", desc = "否是开启自动统计总行数,true为开启")
 	protected boolean autoCount = true;
 	@Param(label = "分页结果集", desc = "查询后返回的分页结果集")
@@ -39,6 +41,10 @@ public class PageDto<T> implements java.io.Serializable {
 	public PageDto(int pageNo, int pageSize) {
 		setPageNo(pageNo);
 		setPageSize(pageSize);
+	}
+
+	public PageDto(int skipNum) {
+		setSkipNum(skipNum);
 	}
 	
 	//-- 访问查询参数函数 --//
@@ -196,5 +202,17 @@ public class PageDto<T> implements java.io.Serializable {
 			return pageNo;
 		}
 	}
-	
+
+
+	public int getSkipNum() {
+		return skipNum;
+	}
+
+	/**
+	 * 跳过行数，如果设置该值，则pageNo与pageSize将失效
+	 * @return
+	 */
+	public void setSkipNum(int skipNum) {
+		this.skipNum = skipNum;
+	}
 }
