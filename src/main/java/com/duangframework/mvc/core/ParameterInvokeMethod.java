@@ -190,6 +190,10 @@ public class ParameterInvokeMethod {
         Object entity = null;
         // 如果是继承了IdEntity或对象有设置Bean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
+        // 如果不是以json的方式提交，则取看request.parameterMap里值
+        if(ToolsKit.isEmpty(json)) {
+            json = ToolsKit.toJsonString(request.getParameterMap());
+        }
 //        System.out.println("genricTypeClass: " + parameterType);
         if(ApiDto.class.equals(parameterType) && ToolsKit.isNotEmpty(type)){
             Map<String,Object> jsonMap = ToolsKit.jsonParseObject(json, Map.class);
