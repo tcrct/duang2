@@ -7,6 +7,7 @@ import java.util.List;
  */
 public abstract class BeforeHandlerChain extends HandlerChain {
 
+    @Override
     public abstract void before(List<IHandler> beforeHandlerList);
 
     @Override

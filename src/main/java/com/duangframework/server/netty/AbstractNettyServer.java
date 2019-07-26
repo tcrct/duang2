@@ -101,6 +101,7 @@ public abstract class AbstractNettyServer implements IServer {
 
     public void shutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 shutdown();
             }

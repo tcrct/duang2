@@ -76,24 +76,29 @@ public class ParameterInvokeMethod {
                 // 方法有参数，但请求没有传递参数值时，要设置该参数类型的默认值，以防抛出空指针异常
             } else if(ToolsKit.isEmpty(paramValue)) {
                 requestParamValueObj[i] = getDefualtValueOnType(parameterType);
+                checkAnnotationValidator(annotations, parameterType, paramNameArray[i], paramValue);
                 continue;
             } else {
                 requestParamValueObj[i] = TypeConverter.convert(parameterType, paramValue);
             }
-            //返回前，根据验证注解，进行参数数据验证
-            if (ToolsKit.isNotEmpty(annotations)) {
-                try {
-                    // 有可能会有多个注解，所以要遍历一下
-                    for (Annotation annotation : annotations) {
-//                        System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i] + "              " + paramValue);
-                        VtorFactory.validator(annotation, parameterType, paramNameArray[i], paramValue);
-                    }
-                } catch (Exception e) {
-                    throw new ValidatorException(e.getMessage(), e);
-                }
-            }
+            checkAnnotationValidator(annotations, parameterType, paramNameArray[i], paramValue);
         }
         return requestParamValueObj;
+    }
+
+    private static void checkAnnotationValidator(Annotation[] annotations, Class<?> parameterType, String paramName, Object paramValue ) {
+        //返回前，根据验证注解，进行参数数据验证
+        if (ToolsKit.isNotEmpty(annotations)) {
+            try {
+                // 有可能会有多个注解，所以要遍历一下
+                for (Annotation annotation : annotations) {
+//                        System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i] + "              " + paramValue);
+                    VtorFactory.validator(annotation, parameterType, paramName, paramValue);
+                }
+            } catch (Exception e) {
+                throw new ValidatorException(e.getMessage(), e);
+            }
+        }
     }
 
     /**

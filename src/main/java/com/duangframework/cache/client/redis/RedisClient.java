@@ -782,7 +782,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
         return call(new JedisAction<Long >(){
             @Override
             public Long  execute(Jedis jedis) {
-                long isok = 0l;
+                long isok = 0L;
                 if(value instanceof String){
                     isok = jedis.hset(options.getKey(), field, (String)value);
                 } else {

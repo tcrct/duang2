@@ -200,8 +200,10 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         if(ToolsKit.isNotEmpty(orderDbo) && !orderDbo.isEmpty()) {
             documents.sort(orderDbo);
         }
-        documents.skip(getSkipNum(page));
-        documents.limit(page.getPageSize());
+        if((page.getSkipNum() > -1 || page.getPageNo() > 0) && page.getPageSize() > 1) {
+            documents.skip(getSkipNum(page));
+            documents.limit(page.getPageSize());
+        }
         BasicDBObject hintDbo = new BasicDBObject(mongoQuery.getHint());
         if(ToolsKit.isNotEmpty(hintDbo) && !hintDbo.isEmpty()) {
             documents.hint(hintDbo);

@@ -61,6 +61,16 @@ public class ProxyChain {
         return targetMethod;
     }
 
+    public Object getTargetObject() {
+        return targetObject;
+    }
+
+    public Object getOriginObject() {
+        return originObject;
+    }
+
+
+
     /**
      * 执行代理链
      * @return
@@ -77,10 +87,10 @@ public class ProxyChain {
                 if(null != methodProxy) {
                     methodResult = methodProxy.invokeSuper(targetObject, methodParams);
                 }
-                if (null != originObject) {
-                    // jdk代理，这里会有个问题，就是被代理对象自己方法调用类中其他方法，其他方法不会被切面拦截
-                    return targetMethod.invoke(originObject, methodParams);
-                }
+//                if (null != originObject) {
+//                    // jdk代理，这里会有个问题，就是被代理对象自己方法调用类中其他方法，其他方法不会被切面拦截
+//                    return targetMethod.invoke(originObject, methodParams);
+//                }
 
             }
         } catch (InvocationTargetException ite) {

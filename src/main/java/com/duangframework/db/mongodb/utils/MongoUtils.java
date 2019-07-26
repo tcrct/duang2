@@ -9,6 +9,7 @@ import com.duangframework.db.mongodb.convert.EncodeConvetor;
 import com.duangframework.db.mongodb.convert.decode.MongodbDecodeValueFilter;
 import com.duangframework.exception.MongodbException;
 import com.duangframework.kit.ClassKit;
+import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.proxy.IProxy;
 import com.duangframework.mvc.proxy.ProxyManager;
@@ -186,7 +187,7 @@ public class MongoUtils {
                 if(proxyList.isEmpty()) {
                     mongoDao = new MongoDao<T>(db, database, cls);
                 }else {
-                    mongoDao = ProxyManager.createProxy(MongoDao.class, proxyList);
+                    mongoDao = ProxyManager.createProxy(MongoDao.class, proxyList, ObjectKit.newInstance(cls));
                     if (null != mongoDao) {
                         mongoDao.init(db,database, cls);
                         logger.info("Create MongoDao Proxy: " + cls.getName() + " is Success!");

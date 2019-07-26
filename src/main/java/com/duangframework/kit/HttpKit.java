@@ -151,7 +151,7 @@ public class HttpKit {
             FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
                 @Override
                 public HttpResult call() throws Exception {
-                    HttpRequest httpRequest = HttpRequest.get(_url, _paramMap, _encode).headers(_headerMap);
+                    HttpRequest httpRequest = HttpRequest.get(_url, _paramMap, _encode).trustAllCerts().trustAllHosts().headers(_headerMap);
                     return new HttpResult(httpRequest);
                 }
             });
@@ -178,8 +178,8 @@ public class HttpKit {
                     } else {
                         httpRequest = HttpRequest.post(_url, _encode);
                     }
-                    httpRequest = _body.isEmpty() ? httpRequest.headers(_headerMap).form(_paramMap)
-                            : httpRequest.headers(_headerMap).send(_body.getBytes());
+                    httpRequest = _body.isEmpty() ? httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().form(_paramMap)
+                            : httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().send(_body.getBytes());
                     return new HttpResult(httpRequest);
                 }
             });
@@ -200,7 +200,7 @@ public class HttpKit {
             FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
                 @Override
                 public HttpResult call() throws Exception {
-                    HttpRequest httpRequest = HttpRequest.options(_url);
+                    HttpRequest httpRequest = HttpRequest.options(_url).trustAllCerts().trustAllHosts();
                     return new HttpResult(httpRequest);
                 }
             });
