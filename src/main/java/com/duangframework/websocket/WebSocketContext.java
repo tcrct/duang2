@@ -9,6 +9,9 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
+import java.util.Iterator;
+import java.util.function.Consumer;
+
 /**
  * 自定义的WebSocketContext对象，用来封装ctx, session及message等对象
  * @author laotang
@@ -45,7 +48,15 @@ public class WebSocketContext {
     }
 
     public IWebSocket getWebSocketObj() {
-        Class<? extends IWebSocket> webSocketClass = WebSocketHandlerHelper.getWebSocketHandlerMap().get(getWebSocketSession().getUri());
+        Class<? extends IWebSocket> webSocketClass = null;
+        Iterator<String> iterator = WebSocketHandlerHelper.getWebSocketHandlerMap().keySet().iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if(getWebSocketSession().getUri().startsWith(key)) {
+                webSocketClass = WebSocketHandlerHelper.getWebSocketHandlerMap().get(key);
+                break;
+            }
+        }
         return ToolsKit.isEmpty(webSocketClass) ? null : (IWebSocket) BeanHelper.getBean(webSocketClass);
     }
 }

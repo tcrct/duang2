@@ -10,6 +10,7 @@ import java.util.*;
 public class WebSocketHandlerHelper {
 
     private static final Map<String, Class<? extends IWebSocket>> webSocketHandlerMap = new HashMap<>();
+    private static final Map<String, WebSocketContext> webSocketContextMap = new HashMap<>();
     /**
      * websocket处理器集合
      * @param webSocketMap key为uri, value为实现了IWebSocket的子类
@@ -23,4 +24,11 @@ public class WebSocketHandlerHelper {
         return webSocketHandlerMap;
     }
 
+    public static void setWebSocketContextMap(WebSocketContext webSocketContext) {
+        webSocketContextMap.put(webSocketContext.getWebSocketSession().getUri(), webSocketContext);
+    }
+
+    public static Map<String,WebSocketContext> getWebSocketContextMap() {
+        return webSocketContextMap;
+    }
 }

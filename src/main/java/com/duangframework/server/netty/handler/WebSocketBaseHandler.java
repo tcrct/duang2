@@ -7,6 +7,7 @@ import com.duangframework.server.common.BootStrap;
 import com.duangframework.utils.DataType;
 import com.duangframework.websocket.IWebSocket;
 import com.duangframework.websocket.WebSocketContext;
+import com.duangframework.websocket.WebSocketHandlerHelper;
 import com.duangframework.websocket.WebSocketSession;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -144,7 +145,9 @@ public class WebSocketBaseHandler {
                 WebSocketSession socketSession = webSocketContext.getWebSocketSession();
                 String queryString = isQueryParams ? target.substring(target.indexOf("?")+1, target.length()) : "";
                 socketSession.setMessage(queryString);
-                webSocketContext.getWebSocketObj().onConnect(socketSession);       // 链接成功，调用业务方法
+                // 链接成功，调用业务方法
+                webSocketContext.getWebSocketObj().onConnect(socketSession);
+                WebSocketHandlerHelper.setWebSocketContextMap(webSocketContext);
                 logger.warn("websocket connect["+target+"] is success");
 
 //                handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
@@ -164,6 +167,7 @@ public class WebSocketBaseHandler {
             socketSession.setCause(cause);
             try {
                 webSocketContext.getWebSocketObj().onException(socketSession);
+                WebSocketHandlerHelper.getWebSocketContextMap().remove(socketSession.getUri());
                 ctx.channel().close();
             } catch (Exception e) {
                 logger.warn(e.getMessage());

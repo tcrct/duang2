@@ -77,8 +77,8 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             channelPipeline.addLast("ssl", new SslHandler(sslEngine));
         }
         // 真正处理业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
-//        channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
-        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
+        channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
+//        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
     }
 
     @Override

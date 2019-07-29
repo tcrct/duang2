@@ -1,7 +1,5 @@
 package com.duangframework.websocket;
 
-import com.duangframework.mvc.dto.ReturnDto;
-
 /**
  * 定义WebSocket接口
  * @author laotang

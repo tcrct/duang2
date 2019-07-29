@@ -31,8 +31,8 @@ import java.util.concurrent.TimeoutException;
  * @author laotang
  * @date 2017/10/30
  */
-//public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequest> {
-public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequest> {
+//public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static Logger logger = LoggerFactory.getLogger(HttpBaseHandler.class);
     private static BootStrap bootStrap;
@@ -40,10 +40,12 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
     public HttpBaseHandler(BootStrap bs) {
         bootStrap = bs;
     }
-//    public void channelRead(BootStrap bs, final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-    @Override
-    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-//        if(ToolsKit.isEmpty(bootStrap)) bootStrap = bs;
+    public void channelRead(BootStrap bs, final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+//    @Override
+//    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+        if(ToolsKit.isEmpty(bootStrap)){
+            bootStrap = bs;
+        }
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;
