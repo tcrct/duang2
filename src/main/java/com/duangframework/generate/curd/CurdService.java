@@ -8,13 +8,16 @@ import com.duangframework.db.convetor.KvItem;
 import com.duangframework.db.mongodb.common.MongoDao;
 import com.duangframework.db.mysql.common.Operator;
 import com.duangframework.exception.ServiceException;
+import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Param;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.mvc.dto.SearchListDto;
 import com.duangframework.utils.DuangId;
 import com.duangframework.vtor.annotation.VtorKit;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -212,13 +215,13 @@ public abstract  class CurdService<T> implements IService<T> {
      * @return 查找成功返回泛型对象列表集合, 否则抛出异常
      */
     public List<T> findAllByKey(MongoDao<T> mongoDao, ICacheService cacheService, List<String> fieldList, KvItem... kvItems) {
-        if(ToolsKit.isEmpty(kvItems)) {
-            throw new ServiceException("findAllByKey for ${entityName} is fail: kvItems is null");
+        if(null == kvItems) {
+            throw new ServiceException("findAllByKey is fail: kvItems is null");
         }
         try {
             return mongoDao.findList(createQuery(fieldList, kvItems));
         } catch (Exception e) {
-            throw new ServiceException("findAllByKey for ${entityName} is fail: "+ e.getMessage(), e);
+            throw new ServiceException("findAllByKey is fail: "+ e.getMessage(), e);
         }
     }
 
@@ -252,8 +255,37 @@ public abstract  class CurdService<T> implements IService<T> {
             else if(Operator.LT.equals(kvItem.getOperator())) {
                 query.lt(kvItem.getKey(), kvItem.getValue());
             }
+            else if(Operator.IN.equals(kvItem.getOperator())) {
+                query.in(kvItem.getKey(), kvItem.getValue());
+            }
+            else if(Operator.NIN.equals(kvItem.getOperator())) {
+                query.nin(kvItem.getKey(), kvItem.getValue());
+            }
         }
         return query;
+    }
+
+    /**
+     * 通过类名，反射取出Param注解里的中文显示属性值，可用于导出Excel时，指定导出的字段
+     *
+     * @param tClass 要取得字段名的类
+     * @return
+     */
+    public List<KvItem> getFieldMapping(Class<T> tClass) {
+        if(!ToolsKit.isDuangBean(tClass)) {
+            throw new ServiceException("参数不正确，请提交一个符合DuangBean规则的类");
+        }
+        java.lang.reflect.Field[] fields = ClassKit.getFields(tClass);
+        List<KvItem> exportFieldList = new ArrayList<>(fields.length);
+        for (java.lang.reflect.Field field : fields) {
+            Param param = field.getAnnotation(Param.class);
+            // 字段名
+            String fieldName = field.getName();
+            // 中文显示的字段名
+            String fieldCnName = ToolsKit.isEmpty(param) ? fieldName: param.label();
+            exportFieldList.add(new KvItem(fieldName, fieldCnName));
+        }
+        return exportFieldList;
     }
 
 }

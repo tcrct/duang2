@@ -60,6 +60,7 @@ public abstract class ClassTemplate {
      */
     public List<Class<?>> getList() {
         String[] packagePathArray = packageName.split(",");
+        logger.warn("sacn packagePathArray: " + ToolsKit.toJsonString(packagePathArray));
         List<Class<?>> classList = new ArrayList<>();
         for (String packagePathItem : packagePathArray) {
             List<Class<?>> classListItem = allClassMap.get(packagePathItem);

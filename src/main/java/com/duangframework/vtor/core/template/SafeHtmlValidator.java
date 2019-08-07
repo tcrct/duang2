@@ -25,8 +25,9 @@ public class SafeHtmlValidator extends AbstractValidatorTemplate<SafeHtml> {
         if(ToolsKit.isEmpty(paramValue)) {
             throw new ValidatorException(paramName + "不能为空");
         }
-        if(ToolsKit.isNotEmpty(paramValue)) {
-            paramValue = ToolsKit.toHTMLChar(paramValue.toString());
-        }
+        // 这里不做处理，直接传入到controller层，在dao层保存时处理
+//        if(ToolsKit.isNotEmpty(paramValue)) {
+//            paramValue = ToolsKit.toHTMLChar(paramValue.toString());
+//        }
     }
 }

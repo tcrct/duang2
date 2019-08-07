@@ -18,6 +18,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedFile;
+import org.apache.http.client.methods.HttpHead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -48,13 +50,20 @@ public class WebKit {
         boolean isKeepAlive = HttpHeaders.isKeepAlive(fullHttpRequest);
         if(response.isFile()) {
             try {
-                builderResponseStream(ctx, isKeepAlive, response);
+                builderResponseStream(ctx, isKeepAlive, fullHttpRequest, response);
             } catch (Exception e) {
                 logger.warn("返回下载文件时异常: " + e.getMessage(), e);
             }
         } else {
             // 构建请求返回对象，并设置返回主体内容结果
-            HttpResponseStatus status = response.getStatus() == HttpResponseStatus.OK.code() ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
+            HttpResponseStatus status = null;
+            try {
+                status = HttpResponseStatus.valueOf(response.getStatus());
+            } catch (Exception e) {
+                logger.warn("response status["+response.getStatus()+"] is not existence, so return 500 status");
+                status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+            }
+//            HttpResponseStatus status = response.getStatus() == HttpResponseStatus.OK.code() ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
             FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(response.toString(), HttpConstants.DEFAULT_CHARSET));
             builderResponseHeader(fullHttpRequest, fullHttpResponse, response);
             ChannelFuture channelFutureListener = ctx.channel().writeAndFlush(fullHttpResponse);
@@ -98,7 +107,7 @@ public class WebKit {
     /**
      * 文件流返回
      * */
-    private static void builderResponseStream(ChannelHandlerContext ctx, boolean keepAlive, IResponse response) {
+    private static void builderResponseStream(ChannelHandlerContext ctx, boolean keepAlive, FullHttpRequest httpRequest , IResponse response) {
         File file = response.getFile();
         if(ToolsKit.isEmpty(file)) {
             throw new NullPointerException("download file is null");
@@ -112,7 +121,7 @@ public class WebKit {
             throw new IllegalArgumentException("构建RandomAccessFile失败");
         }
         HttpResponse httpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-        setDownloadFileContentHeader(httpResponse, file);
+        setDownloadFileContentHeader(ctx, httpRequest, httpResponse, file);
         httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH.toString(), fileLength);
         if (keepAlive) {
             httpResponse.headers().set(HttpHeaderNames.CONNECTION.toString(), HttpHeaderNames.KEEP_ALIVE.toString());
@@ -151,7 +160,7 @@ public class WebKit {
         }
     }
 
-    private static void setDownloadFileContentHeader(HttpResponse response, File file) {
+    private static void setDownloadFileContentHeader(ChannelHandlerContext ctx, FullHttpRequest request, HttpResponse response, File file) {
         MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
         SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
@@ -166,6 +175,11 @@ public class WebKit {
         response.headers().set(HttpHeaderNames.EXPIRES, dateFormatter.format(time.getTime()));
         response.headers().set(HttpHeaderNames.CACHE_CONTROL, "private, max-age=60");
         response.headers().set(HttpHeaderNames.LAST_MODIFIED, dateFormatter.format(new Date(file.lastModified())));
+
+        // CORS
+        String origin = getAllowOrigin(ctx, request);
+        response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+        response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 
         // 加了以下代码才会弹窗
         try {
@@ -264,6 +278,32 @@ public class WebKit {
             headerMap.put(tokenIdFieldName, tokenId);
         }
         response.setHeader(tokenIdFieldName, tokenId);
+    }
+
+
+    public static String getAllowOrigin(ChannelHandlerContext ctx, FullHttpRequest request) {
+        HttpHeaders headers = request.headers();
+        String origin = headers.get(HttpHeaderNames.ORIGIN);
+        if(ToolsKit.isEmpty(origin)) {
+            origin = headers.get(HttpHeaderNames.HOST);
+            if (ToolsKit.isEmpty(origin)) {
+                origin = headers.get(HttpHeaderNames.REFERER);
+            } else if(ToolsKit.isEmpty(origin)) {
+                InetSocketAddress remoteAddress = (InetSocketAddress)ctx.channel().remoteAddress();
+                origin = remoteAddress.getHostString();
+            }
+        }
+//        origin = origin.toLowerCase().replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace("*", "");
+//        String protocol = request.protocolVersion().protocolName().toLowerCase();
+//        System.out.println("protocol: " + protocol);
+
+        origin = origin.toLowerCase().trim();
+//        for (String originItem : ORIGIN_SET) {
+//            if(origin.contains(originItem)){
+//                return origin;
+//            }
+//        }
+        return origin;
     }
 
 }

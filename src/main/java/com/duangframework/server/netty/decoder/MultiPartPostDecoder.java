@@ -32,9 +32,10 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
         long startTime = System.currentTimeMillis();
         logger.warn("文件读取开始时间: " + ToolsKit.getCurrentDateString());
         HttpPostMultipartRequestDecoder requestDecoder = new HttpPostMultipartRequestDecoder(HTTP_DATA_FACTORY,request);
-//        logger.warn("$$$$$$$$$$共耗时："+(System.currentTimeMillis() - startTime)+" ms");
+//        HttpPostRequestDecoder requestDecoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY,request);
+        logger.warn("$$$$$$$$$$共耗时："+(System.currentTimeMillis() - startTime)+" ms");
         List<InterfaceHttpData> paramsList = requestDecoder.getBodyHttpDatas();
-//        logger.warn("#########共耗时："+(System.currentTimeMillis() - startTime)+" ms");
+        logger.warn("#########共耗时："+(System.currentTimeMillis() - startTime)+" ms");
         if (null != paramsList && !paramsList.isEmpty()) {
             for (InterfaceHttpData httpData : paramsList) {
                 InterfaceHttpData.HttpDataType dataType = httpData.getHttpDataType();

@@ -142,28 +142,7 @@ public class CorsHandler extends ChannelDuplexHandler {
     }
 */
     private String getAllowOrigin(ChannelHandlerContext ctx, FullHttpRequest request) {
-        HttpHeaders headers = request.headers();
-        String origin = headers.get(HttpHeaderNames.ORIGIN);
-        if(ToolsKit.isEmpty(origin)) {
-            origin = headers.get(HttpHeaderNames.HOST);
-            if (ToolsKit.isEmpty(origin)) {
-                origin = headers.get(HttpHeaderNames.REFERER);
-            } else if(ToolsKit.isEmpty(origin)) {
-                InetSocketAddress remoteAddress = (InetSocketAddress)ctx.channel().remoteAddress();
-                origin = remoteAddress.getHostString();
-            }
-        }
-//        origin = origin.toLowerCase().replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace("*", "");
-//        String protocol = request.protocolVersion().protocolName().toLowerCase();
-//        System.out.println("protocol: " + protocol);
-
-        origin = origin.toLowerCase().trim();
-//        for (String originItem : ORIGIN_SET) {
-//            if(origin.contains(originItem)){
-//                return origin;
-//            }
-//        }
-        return origin;
+      return WebKit.getAllowOrigin(ctx, request);
     }
 
 
