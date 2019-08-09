@@ -2,7 +2,6 @@ package com.duangframework.mvc.http;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import com.duangframework.utils.DuangId;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -20,7 +19,7 @@ public class HttpResponse implements IResponse {
 
     private IRequest request;
     private Map<String,String> headers;
-    private int status;
+    private int status = 200;
     private String contentType;
     private String charset;
     private Object returnObj = null;
@@ -131,7 +130,7 @@ public class HttpResponse implements IResponse {
             if(returnObj instanceof String) {
                 return (String)returnObj;
             } else {
-                return ToolsKit.toJsonString(returnObj);
+                return ToolsKit.toJsonString(returnObj, ToolsKit.getCustomSerializeFilter());
             }
         } else{
             Map<String, String> map = new HashMap<>();

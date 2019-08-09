@@ -227,13 +227,14 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         Bson queryDoc = new BasicDBObject(mongoQuery.getQuery());
         PageDto<T> page = mongoQuery.getPageObj();
         final List<T> resultList = new ArrayList<T>();
-        collection.find(queryDoc)
+        FindIterable findIterable = collection.find(queryDoc)
                 .projection((BasicDBObject)MongoUtils.convert2DBFields(mongoQuery.getFields()))
                 .sort((BasicDBObject)MongoUtils.convert2DBOrder(mongoQuery.getOrderObj()))
-                .skip(getSkipNum(page))
-                .limit(page.getPageSize())
-                .hint(new BasicDBObject(mongoQuery.getHint()))
-                .forEach(new Block<Document>() {
+                .hint(new BasicDBObject(mongoQuery.getHint()));
+        if(page.getPageSize() != -100) {
+            findIterable.skip(getSkipNum(page)).limit(page.getPageSize());
+        }
+        findIterable.forEach(new Block<Document>() {
                     @Override
                     public void apply(Document document) {
                         resultList.add((T)MongoUtils.toEntity(document, cls));
@@ -257,6 +258,8 @@ public class MongoBaseDao<T> implements IDao<Query, Update> {
         int pageSize = page.getPageSize();
         if(skipNum > -1) {
             return skipNum;
+        } else if(pageSize == -1) {
+            return 0;
         } else {
             return (pageNo>0 ? (pageNo-1) : pageNo) * pageSize;
         }

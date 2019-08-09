@@ -16,7 +16,7 @@ public class SearchDto implements java.io.Serializable {
     @Param(name="field", label = "搜索字段", desc = "需要参与搜索的字段名称")
     private String field;
 
-    @Param(name="operator", label = "表达式", desc = "==, >, >= , <, <=, !=, like, 默认为 ==")
+    @Param(name="operator", label = "表达式", desc = "==, >, >= , <, <=, !=, like, in, nin 默认为 ==")
     private String operator;
 
     @NotEmpty

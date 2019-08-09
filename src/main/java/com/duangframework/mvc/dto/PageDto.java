@@ -78,12 +78,12 @@ public class PageDto<T> implements java.io.Serializable {
 	}
 
 	/**
-	 * 设置每页的记录数量,低于1时自动调整为1.
+	 * 设置每页的记录数量, 低于1且不等于-100时自动设置为1， -100代表查询全部
 	 */
 	public void setPageSize(final int pageSize) {
 		this.pageSize = pageSize;
 
-		if (pageSize < 1) {
+		if (pageSize < 1 && pageSize != -100) {
 			this.pageSize = 1;
 		}
 	}

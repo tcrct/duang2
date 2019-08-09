@@ -63,7 +63,7 @@ public abstract class Render implements Serializable {
 		response.setHeader(ConstEnums.FRAMEWORK_OWNER_FILED.getValue(), ConstEnums.FRAMEWORK_OWNER.getValue());
 		response.setHeader(ConstEnums.RESPONSE_STATUS.getValue(), HttpResponseStatus.OK.codeAsText().toString());
 		response.setHeader(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
-		response.setStatus(HttpResponseStatus.OK.code());
+		response.setStatus((response.getStatus()==200) ? HttpResponseStatus.OK.code() : response.getStatus());
         response.setContentType(contentType);
         response.setCharacterEncoding(ENCODING);
 	}

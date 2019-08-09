@@ -20,7 +20,6 @@ import com.duangframework.exception.ServiceException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.dto.*;
-import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.SecurityUser;
 import com.duangframework.utils.*;
@@ -48,6 +47,7 @@ public final class ToolsKit {
     private static final String HASH_ALGORITHM = "SHA-1";
     private static final int HASH_INTERATIONS = 1024;
     private static final int SALT_SIZE = 8;
+    private static SerializeFilter[] serializeFilters;
 
     private static SerializeConfig jsonConfig = new SerializeConfig();
 
@@ -175,8 +175,17 @@ public final class ToolsKit {
         return JSON.toJSONString(obj, jsonConfig, serializerFeatureArray);
     }
 
-    public static String toJsonString(Object obj, SerializeFilter filter) {
+    public static String toJsonString(Object obj, SerializeFilter[] filter) {
         return JSON.toJSONString(obj, jsonConfig, filter, serializerFeatureArray);
+    }
+
+    public static SerializeFilter[] getCustomSerializeFilter() {
+        if(ToolsKit.isEmpty(serializeFilters)) {
+            serializeFilters = new SerializeFilter[1];
+            serializeFilters[0] = new IdNameFilter();
+//            serializeFilters[1] =  new HostFilter();
+        }
+        return serializeFilters;
     }
 
     public static String toJsonString2(Object obj) {
@@ -570,6 +579,12 @@ public final class ToolsKit {
                         case "like":
                             query.like(fieldName, value);
                             break;
+                        case "in":
+                            query.in(fieldName, value);
+                            break;
+                        case "nin":
+                            query.nin(fieldName, value);
+                            break;
                         default:
                             query.eq(fieldName, value);
                             break;
@@ -673,12 +688,26 @@ public final class ToolsKit {
      * @param obj 要修改的对象
      */
     private static void updateIdEntityData(Object obj, String userId, String source, String departimentId, String projectId, String companyId) throws Exception {
+        Field deptField = getIdEntityField(IdEntity.DEPARTIMENTID_FIELD);
+        Field projectIdField = getIdEntityField(IdEntity.PROJECTID_FIELD);
+        Field companyIdField = getIdEntityField(IdEntity.COMPANYID_FIELD);
+        // 必须更新，不允许更改
         ObjectKit.setField(obj, getIdEntityField(IdEntity.UPDATETIME_FIELD), new Date());
         ObjectKit.setField(obj, getIdEntityField(IdEntity.UPDATEUSERID_FIELD), userId);
         ObjectKit.setField(obj, getIdEntityField(IdEntity.SOURCE_FIELD), source);
-        ObjectKit.setField(obj, getIdEntityField(IdEntity.DEPARTIMENTID_FIELD), departimentId);
-        ObjectKit.setField(obj, getIdEntityField(IdEntity.PROJECTID_FIELD), projectId);
-        ObjectKit.setField(obj, getIdEntityField(IdEntity.COMPANYID_FIELD), companyId);
+        // 可以自定义值更改
+        Object value = ObjectKit.getFieldValue(obj, deptField);
+        if(ToolsKit.isEmpty(value)) {
+            ObjectKit.setField(obj, getIdEntityField(IdEntity.DEPARTIMENTID_FIELD), departimentId);
+        }
+        value = ObjectKit.getFieldValue(obj, projectIdField);
+        if(ToolsKit.isEmpty(value)) {
+            ObjectKit.setField(obj, getIdEntityField(IdEntity.PROJECTID_FIELD), projectId);
+        }
+        value = ObjectKit.getFieldValue(obj, companyIdField);
+        if(ToolsKit.isEmpty(value)) {
+            ObjectKit.setField(obj, getIdEntityField(IdEntity.COMPANYID_FIELD), companyId);
+        }
     }
 
     private static Field getIdEntityField(String key) throws Exception{
