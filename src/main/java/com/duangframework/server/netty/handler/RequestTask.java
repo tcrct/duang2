@@ -9,7 +9,6 @@ import com.duangframework.mvc.http.HttpResponse;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.concurrent.Callable;
@@ -21,19 +20,19 @@ import java.util.concurrent.Callable;
 public class RequestTask implements Callable<IResponse> {
 
     private ChannelHandlerContext ctx;
-    private FullHttpRequest fullHttpRequest;
+    private HttpRequest httpRequest;
     private IRequest  iRequest;
     private IResponse iResponse;
 
-    public RequestTask(ChannelHandlerContext ctx, FullHttpRequest request) {
+    public RequestTask(ChannelHandlerContext ctx, HttpRequest request) {
         this.ctx = ctx;
-        this.fullHttpRequest = request;
+        this.httpRequest = request;
     }
 
     @Override
     public IResponse call() {
-        verificationRequest(fullHttpRequest);
-        iRequest = HttpRequest.build(ctx, fullHttpRequest);
+        verificationRequest(httpRequest);
+        iRequest = httpRequest.init();
         iResponse = HttpResponse.build(iRequest);
         if(ToolsKit.isEmpty(iRequest) || ToolsKit.isEmpty(iResponse)) {
             throw new NettyStartUpException("build duangframework request or response fail");
@@ -48,22 +47,22 @@ public class RequestTask implements Callable<IResponse> {
      * 验证请求是否正确
      * @return
      */
-    private void verificationRequest(FullHttpRequest request) {
+    private void verificationRequest(HttpRequest request) {
 
         // 保证解析结果正确,否则直接退出
-        if (!request.decoderResult().isSuccess()) {
-            throw new ValidatorException("request decoderParams is not success, so exit...");
-        }
+//        if (!request.decoderResult().isSuccess()) {
+//            throw new ValidatorException("request decoderParams is not success, so exit...");
+//        }
 
         // 支持的的请求方式
-        String method = request.method().toString();
+        String method = request.getMethod();
         HttpMethod httpMethod = HttpMethod.valueOf(method);
         if(ToolsKit.isEmpty(httpMethod)) {
             throw new ValidatorException("request method["+ httpMethod.toString() +"] is not support, so exit...");
         }
 
         // uri是有长度的
-        String uri = request.uri();
+        String uri = request.getRequestURI();
         if (uri == null || uri.trim().length() == 0) {
             throw new ValidatorException("request uri length is 0 , so exit...");
         } else {

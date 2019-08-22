@@ -22,7 +22,7 @@ import java.util.*;
 public class CorsHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CorsHandler.class);
-    private FullHttpRequest request;
+    private HttpRequest request;
     private static boolean IS_ADD_ALLOW = false;
     private static Set<String> ORIGIN_SET = new HashSet<String>(){{
         this.add("127.0.0");
@@ -63,8 +63,8 @@ public class CorsHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if(msg instanceof FullHttpRequest) {
-            this.request = (FullHttpRequest) msg;
+        if(msg instanceof HttpRequest) {
+            this.request = (HttpRequest) msg;
             // 如果请求地址里带有.的，则视为静态文件请求，退出
             if(request.uri().contains(".")) {
                 DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK);
@@ -81,16 +81,17 @@ public class CorsHandler extends ChannelDuplexHandler {
             }
         }
 
-        ctx.channel().attr(AttributeKey.valueOf("duangtype")).set("laotang_"+System.currentTimeMillis());
-        ctx.fireChannelRead(msg);  //调用下一个handle
+//        ctx.channel().attr(AttributeKey.valueOf("duangtype")).set("laotang_"+System.currentTimeMillis());
+        //调用下一个handle
+        ctx.fireChannelRead(msg);
     }
 
-    private boolean isOptionsRequest(FullHttpRequest request) {
+    private boolean isOptionsRequest(HttpRequest request) {
         return request.method().equals(HttpMethod.OPTIONS);
     }
 
 
-    private void handlePreflight(ChannelHandlerContext ctx, FullHttpRequest request, String origin ) {
+    private void handlePreflight(ChannelHandlerContext ctx, HttpRequest request, String origin ) {
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK, true, true);
         HttpHeaders responseHeaders = response.headers();
 
@@ -108,7 +109,7 @@ public class CorsHandler extends ChannelDuplexHandler {
         respond(ctx, request, response);
     }
 
-    private void allowOrigin(FullHttpRequest request, String origin) {
+    private void allowOrigin(HttpRequest request, String origin) {
         HttpHeaders headers = request.headers();
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
         headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
@@ -141,12 +142,12 @@ public class CorsHandler extends ChannelDuplexHandler {
         return ALLOW_STRING;
     }
 */
-    private String getAllowOrigin(ChannelHandlerContext ctx, FullHttpRequest request) {
+    private String getAllowOrigin(ChannelHandlerContext ctx, HttpRequest request) {
       return WebKit.getAllowOrigin(ctx, request);
     }
 
 
-    private static void respond(ChannelHandlerContext ctx, FullHttpRequest request, HttpResponse response) {
+    private void respond(ChannelHandlerContext ctx, HttpRequest request, HttpResponse response) {
         boolean keepAlive = HttpUtil.isKeepAlive(request);
         HttpUtil.setKeepAlive(response, keepAlive);
         ChannelFuture future = ctx.writeAndFlush(response);

@@ -84,6 +84,14 @@ public class ClassHelper {
     }
 
     /**
+     * 返回所有Bean类
+     * @return
+     */
+    public static List<Class<?>> getBeanClassList () {
+        return CLASS_MAP.get(ConstEnums.ANNOTATION_CLASS.BEAN_ANNOTATION.getName());
+    }
+
+    /**
      * 返回所有Plugin类
      * @return
      */

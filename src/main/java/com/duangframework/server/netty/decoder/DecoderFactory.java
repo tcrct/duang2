@@ -1,12 +1,11 @@
 package com.duangframework.server.netty.decoder;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.HttpRequest;
 import com.duangframework.mvc.http.enums.ContentTypeEnums;
 import io.netty.handler.codec.DecoderException;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.HttpMethod;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 解码工厂类
@@ -16,16 +15,16 @@ public class DecoderFactory {
 
     /**
      *  提交参数解码
-     * @param method             请求方式
-     * @param contentType     请求内容格式
      * @param request              请求对象
      * @return
      * @throws Exception
      */
-    public static AbstractDecoder create(String method, String contentType, FullHttpRequest request)  throws Exception{
+    public static AbstractDecoder create(HttpRequest request)  throws Exception{
         if(ToolsKit.isEmpty(request)) {
             throw new DecoderException("request is null");
         }
+        String method = request.getMethod();
+        String contentType = request.getContentType();
         if(ToolsKit.isEmpty(method)) {
             throw new DecoderException("request method is null");
         }
@@ -39,13 +38,14 @@ public class DecoderFactory {
                     decoder = new JsonDecoder(request);
                 } else if(contentType.contains(ContentTypeEnums.XML.getValue())) {
                     decoder = new XmlDecoder(request);
-                } else if (contentType.contains(ContentTypeEnums.MULTIPART.getValue())) {
-                    decoder = new MultiPartPostDecoder(request.copy());
+                }
+                else if (contentType.contains(ContentTypeEnums.MULTIPART.getValue())) {
+                    decoder = new MultiPartPostDecoder(request);
                 }
             }
             // 都不符合以上的默认为post form表单提交
             if(ToolsKit.isEmpty(decoder)) {
-                decoder = new PostDecoder(request.copy());
+                decoder = new PostDecoder(request);
             }
         } else if (HttpMethod.OPTIONS.name().equalsIgnoreCase(method)) {
             decoder = new OptionsDecoder(request);

@@ -15,42 +15,36 @@ import com.duangframework.mvc.route.Route;
 import com.duangframework.server.common.BootStrap;
 import com.duangframework.utils.IpUtils;
 import com.duangframework.utils.WebKit;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  *
  * @author laotang
  * @date 2017/10/30
  */
-public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequest> {
-//public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+/** 标注一个channel handler可以被多个channel安全地共享**/
+@ChannelHandler.Sharable
+public class HttpBaseHandler2 extends SimpleChannelInboundHandler<HttpRequest> {
 
-    private static Logger logger = LoggerFactory.getLogger(HttpBaseHandler.class);
-    private static BootStrap bootStrap;
+    private static Logger logger = LoggerFactory.getLogger(HttpBaseHandler2.class);
+    private BootStrap bootStrap;
 
-    public HttpBaseHandler(BootStrap bs) {
+    public HttpBaseHandler2(BootStrap bs) {
         bootStrap = bs;
     }
-    public void channelRead(BootStrap bs, final ChannelHandlerContext ctx, HttpRequest request) throws Exception {
-//    @Override
-//    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        if(ToolsKit.isEmpty(bootStrap)){
-            bootStrap = bs;
-        }
+    @Override
+    public void channelRead0(final ChannelHandlerContext ctx, HttpRequest request) throws Exception {
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;
-
         try {
             requestTask = new RequestTask(ctx, request);
             futureTask = ThreadPoolKit.execute(requestTask);
@@ -59,7 +53,7 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
                 response = futureTask.get();
             } else {
                 // 等待结果返回，如果超出指定时间，则抛出TimeoutException, 默认时间为3秒
-                response = futureTask.get(getTimeout(request.getRequestURI()), TimeUnit.MILLISECONDS);
+                response = futureTask.get(getTimeout(request.getNettyHttpRequest().uri()), TimeUnit.MILLISECONDS);
             }
         } catch (TimeoutException e) {
             // 超时时，会执行该异常
@@ -75,10 +69,6 @@ public class HttpBaseHandler {//extends SimpleChannelInboundHandler<FullHttpRequ
         } finally {
             if(null != request && null != response) {
                 WebKit.recoverClient(ctx, request.getNettyHttpRequest(), response);
-            }
-            if(request instanceof HttpRequest) {
-                // 释放对象
-                ReferenceCountUtil.release(request);
             }
         }
     }

@@ -6,8 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import io.netty.handler.codec.mqtt.MqttMessage;
-import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,21 +32,19 @@ public class ChannelBaseHandler extends SimpleChannelInboundHandler<Object> {
 //        System.out.println("attributeKey: " + str);
 
         //如果是HTTP请求，进行HTTP操作
-        if (object instanceof FullHttpRequest) {
-            FullHttpRequest request = (FullHttpRequest) object;
+        if (object instanceof HttpRequest) {
+            HttpRequest request = (HttpRequest) object;
             String upgrade = request.headers().get(HttpHeaderNames.UPGRADE.toString());
             // 如果是websocket链接且开启了，则将http转换为websocket
             if(HttpHeaderValues.WEBSOCKET.toString().equalsIgnoreCase(upgrade) &&  bootStrap.isEnableWebSocket()) {
-                WebSocketBaseHandler.conversion2WebSocketProtocol(bootStrap, ctx, request);
+                WebSocketBaseHandler_bak.conversion2WebSocketProtocol(bootStrap, ctx, (FullHttpRequest) request);
             } else {
                 HttpBaseHandler httpBaseHandler = new HttpBaseHandler(bootStrap);
-                httpBaseHandler.channelRead(bootStrap, ctx, request);
+//                httpBaseHandler.channelRead(bootStrap, ctx, (FullHttpRequest)request);
 
             }
         } else if (object instanceof WebSocketFrame) { //如果是Websocket请求，则进行websocket操作
-            WebSocketBaseHandler.channelRead(bootStrap, ctx, (WebSocketFrame) object);
-        } else if (object instanceof MqttMessage) {
-
+            WebSocketBaseHandler_bak.channelRead(bootStrap, ctx, (WebSocketFrame) object);
         }
     }
 
@@ -67,6 +63,6 @@ public class ChannelBaseHandler extends SimpleChannelInboundHandler<Object> {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        WebSocketBaseHandler.onException(bootStrap, ctx, cause);
+        WebSocketBaseHandler_bak.onException(bootStrap, ctx, cause);
     }
 }

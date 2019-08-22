@@ -41,7 +41,7 @@ final public class RequestAccessHandler{
 
         Class<?> controllerClass = route.getControllerClass();
         BaseController controller = null;
-        //是否单例, 默认是单例
+        //是否单例, 为保证线程安全，默认是多例
         RequestMapping requestMapping = route.getRequestMapping();
         if(route.isSingleton()){
             controller = (BaseController) BeanHelper.getBean(controllerClass);

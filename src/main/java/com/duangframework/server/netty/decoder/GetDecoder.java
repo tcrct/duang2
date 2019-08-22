@@ -1,8 +1,8 @@
 package com.duangframework.server.netty.decoder;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.HttpRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GetDecoder extends AbstractDecoder<Map<String, Object>> {
 
-    public GetDecoder(FullHttpRequest request) {
+    public GetDecoder(HttpRequest request) {
         super(request);
     }
 
     @Override
     public Map<String, Object> decoder() throws Exception {
-        String url = request.uri();
+        String url = request.getRequestURL();
         //先解码
         url = QueryStringDecoder.decodeComponent(url, HttpConstants.DEFAULT_CHARSET);
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(url);

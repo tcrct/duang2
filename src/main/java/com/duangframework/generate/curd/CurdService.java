@@ -54,7 +54,9 @@ public abstract  class CurdService<T> implements IService<T> {
                 query.eq(IdEntity.ID_FIELD, id);
                 entity = mongoDao.findOne(query);
             }
-            cacheService.save(entity);
+            if(ToolsKit.isNotEmpty(entity)) {
+                cacheService.save(entity);
+            }
             return entity;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage(), e);
@@ -70,7 +72,7 @@ public abstract  class CurdService<T> implements IService<T> {
      */
     public T findById(String id, MongoDao<T> mongoDao, ICacheService cacheService) {
         if(!ToolsKit.isValidDuangId(id)) {
-            throw new ServiceException("findById for ${entityName} is fail: id is not DuangId");
+            throw new ServiceException("findById is fail: id is not DuangId");
         }
         try {
             T entity = (T)cacheService.findById(id);
@@ -80,7 +82,9 @@ public abstract  class CurdService<T> implements IService<T> {
             Query<T> query = new Query<>();
             query.eq(IdEntity.ID_FIELD, new DuangId(id));
             T obj =  (T)mongoDao.findOne(query);
-            cacheService.save(obj);
+            if(ToolsKit.isNotEmpty(obj)) {
+                cacheService.save(obj);
+            }
             return obj;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage(), e);
@@ -114,12 +118,12 @@ public abstract  class CurdService<T> implements IService<T> {
      */
     public T findByKey(MongoDao<T> mongoDao, ICacheService cacheService, List<String> fieldList, KvItem... kvItems) {
         if(ToolsKit.isEmpty(kvItems)) {
-            throw new ServiceException("findByKey for ${entityName} is fail: kvItems is null");
+            throw new ServiceException("findByKey is fail: kvItems is null");
         }
         try {
             return (T)mongoDao.findOne(createQuery(fieldList, kvItems));
         } catch (Exception e) {
-            throw new ServiceException("findByKey for ${entityName} is fail: "+ e.getMessage(), e);
+            throw new ServiceException("findByKey is fail: "+ e.getMessage(), e);
         }
     }
 
@@ -132,7 +136,7 @@ public abstract  class CurdService<T> implements IService<T> {
      */
     protected boolean deleteById(String id, MongoDao<T> mongoDao, ICacheService cacheService) {
         if(!ToolsKit.isValidDuangId(id)) {
-            throw new ServiceException("deleteById for ${entityName} is fail: id is not DuangId");
+            throw new ServiceException("deleteById for is fail: id is not DuangId");
         }
         try {
             Query<T> query = new Query<>();
@@ -157,13 +161,13 @@ public abstract  class CurdService<T> implements IService<T> {
      */
     protected boolean deleteByIds(String[] ids, MongoDao<T> mongoDao, ICacheService cacheService) {
         if(ToolsKit.isEmpty(ids)) {
-            throw new ServiceException("deleteByIds for ${entityName} is fail: ids is null");
+            throw new ServiceException("deleteByIds for is fail: ids is null");
         }
         ObjectId[] objectIds = new ObjectId[ids.length];
         for(int i=0; i<ids.length; i++) {
             String id = ids[i];
             if (!ToolsKit.isValidDuangId(id)) {
-                throw new ServiceException("deleteByIds for ${entityName} is fail: id is not ObjectId");
+                throw new ServiceException("deleteByIds for is fail: id is not ObjectId");
             }
             objectIds[i] = new ObjectId(id);
         }

@@ -1,8 +1,8 @@
 package com.duangframework.server.netty.decoder;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.HttpRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -25,24 +25,18 @@ import java.util.Map;
  */
 public class XmlDecoder extends AbstractDecoder<Map<String, Object>> {
 
-    public XmlDecoder(FullHttpRequest request) {
+    public XmlDecoder(HttpRequest request) {
         super(request);
     }
 
     @Override
     public Map<String, Object> decoder() throws Exception {
-        String xml = request.content().toString(HttpConstants.DEFAULT_CHARSET);
+        String xml = new String(request.content(),HttpConstants.DEFAULT_CHARSET);
         if (ToolsKit.isNotEmpty(xml)){
             requestParamsMap.putAll(getMapFromXML(xml));
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), Collections.singletonList(xml));
         }
-        // 如果URI里存在参数，则提取参数值到request里
-        if(request.uri().contains("?")) {
-            Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
-            GetDecoder getDecoder = new GetDecoder(request);
-            paramsMap.putAll(getDecoder.decoder());
-            return paramsMap;
-        }
+        mergeRequestParamMap();
         return requestParamsMap;
     }
 

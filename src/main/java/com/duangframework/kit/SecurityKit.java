@@ -57,7 +57,7 @@ public class SecurityKit {
 
     /**
      * 设置ID
-     * @param id
+     * @param id    可以是tokenId或userId，先根据tokenId取，若不存在再根据userId取
      * @return
      */
     public SecurityKit id(Object id) {
@@ -171,7 +171,7 @@ public class SecurityKit {
         return authHashMap.get(key);
     }
 
-    private void setAuths(String key , Collection<String> authList) {
+    public void setAuths(String key , Collection<String> authList) {
         if(ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
             throw new SecurityException("设置权限值时,参数不能为空");
         }

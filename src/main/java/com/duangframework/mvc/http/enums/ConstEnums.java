@@ -58,9 +58,12 @@ public enum ConstEnums {
 
     /**
      * 注解类枚举
-     * 注解类，是否需要实例化(BeanHelper时使用)，说明
      */
     public enum ANNOTATION_CLASS {
+
+        /**
+         * 注解类，是否需要实例化(BeanHelper时使用)，说明
+         */
         CONTROLLER_ANNOTATION(Controller.class, true,"所有Controller类的注解，必须在类添加该注解否则框架忽略扫描"),
         SERVICE_ANNOTATION(Service.class, true,"所有Service类的注解，必须在类添加该注解否则框架忽略扫描"),
         ENTITY_ANNOTATION(Entity.class, false,"所有Entity类的注解，必须在类添加该注解否则框架忽略扫描"),
@@ -68,6 +71,7 @@ public enum ConstEnums {
         PLUGIN_ANNOTATION(Plugin.class, false, "所有Plugin类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
         HANDLER_ANNOTATION(Handler.class, false, "所有Handler类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
         LISTENER_ANNOTATION(Listener.class, true, "所有Listener类的注解，必须在类添加该注解否则框架忽略扫描"),
+        BEAN_ANNOTATION(Bean.class, false, "所有Bean类的注解，必须在类添加该注解否则框架忽略扫描"),
         ;
 
         Class<? extends Annotation> clazz;

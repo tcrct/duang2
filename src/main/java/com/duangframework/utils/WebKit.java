@@ -43,14 +43,14 @@ public class WebKit {
     /**
      * 将请求结果返回到客户端
      * @param ctx                               context上下文
-     * @param fullHttpRequest         netty请求对象
+     * @param httpRequest         netty请求对象
      * @param response                      自定义返回对象
      */
-    public static void recoverClient(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest, IResponse response) {
-        boolean isKeepAlive = HttpHeaders.isKeepAlive(fullHttpRequest);
+    public static void recoverClient(ChannelHandlerContext ctx, HttpRequest httpRequest, IResponse response) {
+        boolean isKeepAlive = HttpHeaders.isKeepAlive(httpRequest);
         if(response.isFile()) {
             try {
-                builderResponseStream(ctx, isKeepAlive, fullHttpRequest, response);
+                builderResponseStream(ctx, isKeepAlive, httpRequest, response);
             } catch (Exception e) {
                 logger.warn("返回下载文件时异常: " + e.getMessage(), e);
             }
@@ -65,21 +65,22 @@ public class WebKit {
             }
 //            HttpResponseStatus status = response.getStatus() == HttpResponseStatus.OK.code() ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
             FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(response.toString(), HttpConstants.DEFAULT_CHARSET));
-            builderResponseHeader(fullHttpRequest, fullHttpResponse, response);
+            builderResponseHeader(httpRequest, fullHttpResponse, response);
             ChannelFuture channelFutureListener = ctx.channel().writeAndFlush(fullHttpResponse);
             //如果不支持keep-Alive，服务器端主动关闭请求
-            if (!isKeepAlive) {
+            //强制关闭，否则可能会导致第二个请求返回值被覆盖
+//            if (!isKeepAlive) {
                 channelFutureListener.addListener(ChannelFutureListener.CLOSE);
-            }
+//            }
         }
     }
 
     /**
      * 构建返回信息头内容
-     * @param fullHttpResponse
+     * @param httpRequest
      * @param response
      */
-    private static void builderResponseHeader(FullHttpRequest fullHttpRequest, FullHttpResponse fullHttpResponse, IResponse response) {
+    private static void builderResponseHeader(HttpRequest httpRequest, FullHttpResponse fullHttpResponse, IResponse response) {
         HttpHeaders responseHeaders = fullHttpResponse.headers();
 
         for(Iterator<Map.Entry<String, String>> iterator = response.getHeaders().entrySet().iterator(); iterator.hasNext();) {
@@ -98,7 +99,7 @@ public class WebKit {
         } catch (Exception e) {logger.warn(e.getMessage(), e);}
         responseHeaders.set(HttpHeaderNames.CONTENT_LENGTH.toString(), readableBytesLength);
         // 如果不是GET请求且Content-Type不存在，则设置默认的form
-        if(!HttpMethod.GET.name().equalsIgnoreCase(fullHttpRequest.method().name()) &&
+        if(!HttpMethod.GET.name().equalsIgnoreCase(httpRequest.method().name()) &&
                 ToolsKit.isEmpty(responseHeaders.get(HttpHeaderNames.CONTENT_TYPE.toString()))) {
             responseHeaders.set(HttpHeaderNames.CONTENT_TYPE.toString(), ContentTypeEnums.FORM.getValue());
         }
@@ -107,7 +108,7 @@ public class WebKit {
     /**
      * 文件流返回
      * */
-    private static void builderResponseStream(ChannelHandlerContext ctx, boolean keepAlive, FullHttpRequest httpRequest , IResponse response) {
+    private static void builderResponseStream(ChannelHandlerContext ctx, boolean keepAlive, HttpRequest httpRequest , IResponse response) {
         File file = response.getFile();
         if(ToolsKit.isEmpty(file)) {
             throw new NullPointerException("download file is null");
@@ -155,12 +156,12 @@ public class WebKit {
         }
         sendFileFuture.addListener(ProgressiveFutureListener.build(raf, file, response.isDeleteFile()));
         // Decide whether to close the connection or not.
-        if (!keepAlive) {
+//        if (!keepAlive) { //强制关闭，否则可能会导致第二个请求返回值被覆盖
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-        }
+//        }
     }
 
-    private static void setDownloadFileContentHeader(ChannelHandlerContext ctx, FullHttpRequest request, HttpResponse response, File file) {
+    private static void setDownloadFileContentHeader(ChannelHandlerContext ctx, HttpRequest request, HttpResponse response, File file) {
         MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
         SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
@@ -281,7 +282,7 @@ public class WebKit {
     }
 
 
-    public static String getAllowOrigin(ChannelHandlerContext ctx, FullHttpRequest request) {
+    public static String getAllowOrigin(ChannelHandlerContext ctx, HttpRequest request) {
         HttpHeaders headers = request.headers();
         String origin = headers.get(HttpHeaderNames.ORIGIN);
         if(ToolsKit.isEmpty(origin)) {

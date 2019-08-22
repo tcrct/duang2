@@ -3,22 +3,15 @@ package com.duangframework.server.netty.decoder;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.duangframework.encrypt.core.EncryptFactory;
-import com.duangframework.encrypt.core.EncryptUtils;
 import com.duangframework.kit.ToolsKit;
-import com.duangframework.mvc.annotation.Mapping;
 import com.duangframework.mvc.dto.ReturnDto;
 import com.duangframework.mvc.http.HttpRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  *POST请求，内容格式为JSON的解码类
@@ -29,7 +22,7 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonDecoder.class);
 
-    public JsonDecoder(FullHttpRequest request) {
+    public JsonDecoder(HttpRequest request) {
         super(request);
     }
 
@@ -39,6 +32,10 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
 
     @Override
     public Map<String, Object> decoder() throws Exception {
+        byte[] content = request.content();
+        if(content != null){
+            json = new String(content, HttpConstants.DEFAULT_CHARSET);
+        }
         json = ToolsKit.isNotEmpty(json) ? json.trim() : "";
         // 如果是开启参数加密，则添加到Map后直接退出
         if(isEncryptParam) {
@@ -59,13 +56,7 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         if(ToolsKit.isNotEmpty(json)) {
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
         }
-        // 如果URI里存在参数，则提取参数值到request里
-        if(request.uri().contains("?")) {
-            Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
-            GetDecoder getDecoder = new GetDecoder(request);
-            paramsMap.putAll(getDecoder.decoder());
-            requestParamsMap = paramsMap;
-        }
+        mergeRequestParamMap();
         return requestParamsMap;
     }
 

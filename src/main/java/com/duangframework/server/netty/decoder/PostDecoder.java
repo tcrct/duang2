@@ -1,8 +1,8 @@
 package com.duangframework.server.netty.decoder;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.http.HttpRequest;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
 
-    public PostDecoder(FullHttpRequest request) {
+    public PostDecoder(HttpRequest request) {
         super(request);
     }
     private static boolean isMiddleBrackets = false;
@@ -24,8 +24,8 @@ public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
     @Override
     public Map<String, Object> decoder() throws Exception {
         isMiddleBrackets = false;
-        HttpPostRequestDecoder requestDecoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, request);
-        List<InterfaceHttpData> paramsList = requestDecoder.getBodyHttpDatas();
+//        HttpPostRequestDecoder requestDecoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, request.getNettyHttpRequest());
+        List<InterfaceHttpData> paramsList = request.getBodyHttpDatas();
         if (null != paramsList && !paramsList.isEmpty()) {
             for (InterfaceHttpData httpData : paramsList) {
                 Attribute attribute = (Attribute) httpData;
@@ -62,13 +62,7 @@ public class PostDecoder extends AbstractDecoder<Map<String, Object>> {
             }
             requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), ToolsKit.toJsonString(tmpMap));
         }
-        // 如果URI里存在参数，则提取参数值到request里
-        if(request.uri().contains("?")) {
-            Map<String, Object>  paramsMap = new HashMap<>(requestParamsMap);
-            GetDecoder getDecoder = new GetDecoder(request);
-            paramsMap.putAll(getDecoder.decoder());
-            return paramsMap;
-        }
+        mergeRequestParamMap();
         return requestParamsMap;
     }
 }

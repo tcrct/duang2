@@ -1,19 +1,20 @@
 package com.duangframework.server.netty;
 
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.server.common.BootStrap;
-import com.duangframework.server.netty.handler.ChannelBaseHandler;
-import com.duangframework.server.netty.handler.CorsHandler;
-import com.duangframework.server.netty.handler.HttpBaseHandler;
+import com.duangframework.server.netty.handler.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpContentCompressor;
-import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +32,11 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private BootStrap bootStrap;
     private SslContext sslContext;
+    private HttpBaseHandler2 httpBaseHandler;
 
     public HttpChannelInitializer(BootStrap bootStrap) {
         this.bootStrap = bootStrap;
+        httpBaseHandler = new HttpBaseHandler2(bootStrap);
     }
 
     @Override
@@ -44,6 +47,9 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             sslContext = bootStrap.getSslContext();
             if (sslContext != null) {
                 channelPipeline.addLast(sslContext.newHandler(socketChannel.alloc()));
+            } else {
+                SelfSignedCertificate ssc = new SelfSignedCertificate();
+                sslContext = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
             }
         }
         // 为http响应内容添加gizp压缩器
@@ -52,22 +58,23 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
         }
         // HttpServerCodec包含了默认的HttpRequestDecoder(请求消息解码器)和HttpResponseEncoder(响应解码器)
         channelPipeline.addLast(new HttpServerCodec());
-        //目的是将多个消息转换为单一的request或者response对象
-        channelPipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         //目的是支持异步大文件传输
         channelPipeline.addLast(new ChunkedWriteHandler());
         channelPipeline.addLast(new HttpServerExpectContinueHandler());
+        //目的是将多个消息转换为单一的request或者response对象(开启这个之后，会导致上传文件时很慢很慢)
+//        channelPipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         if (bootStrap.isEnableCors()) {
 //            CorsConfig corsConfig = CorsConfigBuilder.forOrigins(bootStrap.getCorsOrigins()).allowNullOrigin().allowCredentials().shortCircuit().build();
 //            channelPipeline.addLast(new CorsHandler(corsConfig));
             channelPipeline.addLast(new CorsHandler());
         }
 //        channelPipeline.addLast(new HttpFilterRuleHandler());
-        // 如果有设置了WebSocket的路径，则将请求按ws协调来处理
-//        if (ToolsKit.isNotEmpty(bootStrap.getWebSocketPath())) {
+        // 如果有设置了WebSocket的路径，则将请求按ws协议来处理
+        if (ToolsKit.isNotEmpty(bootStrap.isEnableWebSocket())) {
 //            channelPipeline.addLast(new WebSocketServerProtocolHandler(bootStrap.getWebSocketPath(), null, true));
-//            channelPipeline.addLast(new WebSocketBaseHandler_bak(bootStrap));
-//        }
+            channelPipeline.addLast(new WebSocketServerCompressionHandler());
+            channelPipeline.addLast(new WebSocketBaseHandler(bootStrap));
+        }
         if (bootStrap.isSslEnabled()) {
             SSLEngine sslEngine = sslContext.newEngine(socketChannel.alloc());
             // 服务端模式
@@ -76,8 +83,10 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             sslEngine.setNeedClientAuth(false);
             channelPipeline.addLast("ssl", new SslHandler(sslEngine));
         }
+        // 因为取消了HttpObjectAggregator，所以要处理一下请求，将多个请求的内容存放在HttpRequest对象里
+        channelPipeline.addLast(new MergeRequestHandler(bootStrap));
         // 真正处理业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
-        channelPipeline.addLast(new ChannelBaseHandler(bootStrap));
+        channelPipeline.addLast(httpBaseHandler);
 //        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
     }
 

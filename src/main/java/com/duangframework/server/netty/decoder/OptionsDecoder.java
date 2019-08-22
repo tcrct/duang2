@@ -1,6 +1,7 @@
 package com.duangframework.server.netty.decoder;
 
-import io.netty.handler.codec.http.FullHttpRequest;
+
+import com.duangframework.mvc.http.HttpRequest;
 
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 public class OptionsDecoder extends AbstractDecoder<Map<String, Object>> {
 
-    public OptionsDecoder(FullHttpRequest request) {
+    public OptionsDecoder(HttpRequest request) {
         super(request);
     }
 

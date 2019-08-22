@@ -181,9 +181,9 @@ public final class ToolsKit {
 
     public static SerializeFilter[] getCustomSerializeFilter() {
         if(ToolsKit.isEmpty(serializeFilters)) {
-            serializeFilters = new SerializeFilter[1];
+            serializeFilters = new SerializeFilter[2];
             serializeFilters[0] = new IdNameFilter();
-//            serializeFilters[1] =  new HostFilter();
+            serializeFilters[1] =  new HostFilter();
         }
         return serializeFilters;
     }
