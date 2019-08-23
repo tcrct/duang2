@@ -15,7 +15,7 @@ public enum ConstEnums {
     INPUTSTREAM_STR_NAME("duang_inputstream_str", "以JSON或XML方式提交参数时，暂存在Request里的key"),
     CLASS_URL_PROTOCOL_FILE_FIELD("file", "calss类文件URL对象的类型"),
     CLASS_URL_PROTOCOL_JAR_FIELD("jar", "calss类文件URL对象的类型"),
-    FRAMEWORK_OWNER_FILED("framework-x-owenr", "laotang"),
+    FRAMEWORK_OWNER_FILED("framework-x-owner", "laotang"),
     FRAMEWORK_MAPPING_KEY("duangframework", "包含该字段的映射路径不在控制台打印，一般都是作特殊用途"),
     FRAMEWORK_OWNER("duang", "框架名称"),
     FRAMEWORK_BASE_PACKAGE_PATH("com.duangframework", "框架包路径前缀"),
@@ -161,7 +161,8 @@ public enum ConstEnums {
         /** security*/
         SECURITY_URI_PREFIX("security.uri.prefix", "安全验证的URI前缀，左匹配方式"),
         SECURITY_CENTER_URL("security.center.url", "安全中心，即权限系统请求地址"),
-        AUTHORIZATION_PREFIX("security.authorization.prefix", "header请求头authorization的内容前缀"),
+        AUTHORIZATION_KEY("security.authorization.key", "header请求头的关键字"),
+        AUTHORIZATION_VALUE("security.authorization.value", "header请求头authorization的内容前缀"),
         FILTER_URI_FIELD("security.filter.uri", "允许没有tokenId值请求的URI,多个时以小写,号分隔"),
 
         /** cors*/

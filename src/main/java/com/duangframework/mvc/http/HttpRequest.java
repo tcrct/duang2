@@ -419,7 +419,7 @@ public class HttpRequest implements IRequest{
                 }
                try {
                    decoder.offer(content);
-                   while (decoder.hasNext()) {
+                   while (null != decoder && decoder.hasNext()) {
                        InterfaceHttpData interfaceHttpData = decoder.next();
                        if (null != interfaceHttpData) {
                            httpMultipartDataList.add(interfaceHttpData);

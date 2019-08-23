@@ -11,7 +11,8 @@ import java.util.*;
 
 /**
  * 安全工具类
- * Created by laotang on 2018/11/29.
+ * @author laotang
+ * @date 2018/11/29.
  */
 public class SecurityKit {
 
@@ -165,7 +166,7 @@ public class SecurityKit {
     }
 
     public Set<String> getAuths() {
-        if(ToolsKit.isNotEmpty(key)) {
+        if(ToolsKit.isEmpty(key)) {
             throw new SecurityException("请先设置Id值");
         }
         return authHashMap.get(key);

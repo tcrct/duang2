@@ -3,7 +3,9 @@ package com.duangframework.security;
 import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.helper.HandlerHelper;
+import com.duangframework.mvc.http.handler.IHandler;
 import com.duangframework.mvc.plugin.IPlugin;
+import com.duangframework.utils.WebKit;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,22 +21,23 @@ public class SecurityPlugin implements IPlugin {
 
     private Set<String> uriPrefixSet = new HashSet<>();
     private ISecurity authObj;
+    private IHandler handler;
 
-    public SecurityPlugin(){
-        List<String> filterUrl = PropKit.getList("security.filter.uri");
-        uriPrefixSet.addAll(filterUrl);
+    public SecurityPlugin(IHandler securityHandler){
+        this.handler = securityHandler;
     }
 
-    public SecurityPlugin(Set<String> uriPrefixSet){
+    public SecurityPlugin(IHandler securityHandler, Set<String> uriPrefixSet){
         this.uriPrefixSet.addAll(uriPrefixSet);
+        this.handler = securityHandler;
     }
 
     @Override
     public void start() throws Exception {
         // 如果不为null
-        if(ToolsKit.isNotEmpty(uriPrefixSet)) {
+        if(ToolsKit.isNotEmpty(handler)) {
             // 添加到第一位
-            HandlerHelper.getBeforeHandlerList().add(0, new SecurityHandler(uriPrefixSet));
+            HandlerHelper.getBeforeHandlerList().add(0, handler);
         }
     }
 

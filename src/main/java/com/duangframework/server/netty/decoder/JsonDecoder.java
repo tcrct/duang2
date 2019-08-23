@@ -32,11 +32,17 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
 
     @Override
     public Map<String, Object> decoder() throws Exception {
-        byte[] content = request.content();
-        if(content != null){
-            json = new String(content, HttpConstants.DEFAULT_CHARSET);
+        try {
+            byte[] content = request.content();
+            if (content != null) {
+                json = new String(content, HttpConstants.DEFAULT_CHARSET);
+            }
+        } catch (Exception e) {
+            logger.warn("JsonDecoder is Fail: " + e.getMessage(), e);
         }
-        json = ToolsKit.isNotEmpty(json) ? json.trim() : "";
+        if(ToolsKit.isEmpty(json)){
+            return requestParamsMap;
+        }
         // 如果是开启参数加密，则添加到Map后直接退出
         if(isEncryptParam) {
             logger.warn("encrypt string: " + json);

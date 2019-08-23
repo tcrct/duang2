@@ -307,4 +307,24 @@ public class WebKit {
         return origin;
     }
 
+    /**
+     * 取过滤的URI，即不需要tokenId验证的
+     * @return
+     */
+    public static Set<String> getFilterUrls() {
+        List<String> tmpList = PropKit.getList(ConstEnums.PROPERTIES.FILTER_URI_FIELD.getValue());
+        Set fileterTargetSet = new HashSet();
+        if (ToolsKit.isNotEmpty(tmpList)) {
+            //TODO..URL不允许第一位就是{}，待处理
+            for (String filterUrl : tmpList) {
+                int index = filterUrl.indexOf("{");
+                if ((index > -1) && filterUrl.contains("}")) {
+                    filterUrl = filterUrl.substring(0, index - 1);
+                }
+                fileterTargetSet.add(filterUrl);
+            }
+        }
+        return fileterTargetSet;
+    }
+
 }

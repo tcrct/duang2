@@ -178,7 +178,7 @@ public class HttpKit {
                     } else {
                         httpRequest = HttpRequest.post(_url, _encode);
                     }
-                    httpRequest = _body.isEmpty() ? httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().form(_paramMap)
+                    httpRequest = ToolsKit.isEmpty(_body) ? httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().form(_paramMap)
                             : httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().send(_body.getBytes());
                     return new HttpResult(httpRequest);
                 }

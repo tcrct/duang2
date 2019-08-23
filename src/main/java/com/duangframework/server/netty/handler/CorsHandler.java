@@ -29,7 +29,7 @@ public class CorsHandler extends ChannelDuplexHandler {
         this.add("192.168");
         this.add("localhost");
     }};
-    private static String ALLOW_STRING = "Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId";
+    private static String ALLOW_STRING = "Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId,duang-auth";
 //    private static final String HTTP_METHOD_STRING = HttpMethod.GET+","+HttpMethod.POST+","+HttpMethod.OPTIONS;
 
     public CorsHandler() {
