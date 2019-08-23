@@ -33,7 +33,12 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
         if(!request.isEnd()) {
             return new HashMap<>(1);
         }
-        List<InterfaceHttpData> paramsList = request.getBodyHttpDatas();
+        List<InterfaceHttpData> paramsList = null;
+        try {
+            paramsList = request.getBodyHttpDatas();
+        } catch (Exception e) {
+            logger.warn("MultiPartPostDecoder is Fail: "+e.getMessage(), e);
+        }
         if (null != paramsList && !paramsList.isEmpty()) {
             for (InterfaceHttpData httpData : paramsList) {
                 InterfaceHttpData.HttpDataType dataType = httpData.getHttpDataType();
