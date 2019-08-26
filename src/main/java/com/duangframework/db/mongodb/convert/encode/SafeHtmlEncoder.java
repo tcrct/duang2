@@ -5,7 +5,7 @@ import com.duangframework.kit.ToolsKit;
 import java.lang.reflect.Field;
 
 /**
- * 普通属性转换
+ * SafeHtml字段注解属性转换
  * @author laotang
  */
 public class SafeHtmlEncoder extends Encoder {

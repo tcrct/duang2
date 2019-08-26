@@ -6,6 +6,7 @@ import com.duangframework.db.annotation.VoColl;
 import com.duangframework.db.mongodb.convert.encode.*;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.vtor.annotation.Host;
 import com.duangframework.vtor.annotation.SafeHtml;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -50,6 +51,8 @@ public class EncodeConvetor {
             encoder = new VoCollEncoder(obj, field);
         } else if (null != field.getAnnotation(SafeHtml.class)) {
             encoder = new SafeHtmlEncoder(obj, field);
+        } else if (null != field.getAnnotation(Host.class)) {
+            encoder = new HostEncoder(obj, field);
         } else {
             encoder = new PropertyEncoder(obj, field);
         }

@@ -3,6 +3,7 @@ package com.duangframework.db.mongodb.convert.encode;
 
 import com.duangframework.db.annotation.Tran;
 import com.duangframework.kit.ObjectKit;
+import com.duangframework.vtor.annotation.Host;
 
 import java.lang.reflect.Field;
 
