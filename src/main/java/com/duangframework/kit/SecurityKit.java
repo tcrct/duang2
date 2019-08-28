@@ -1,5 +1,7 @@
 package com.duangframework.kit;
 
+import com.duangframework.exception.ExceptionEnums;
+import com.duangframework.exception.ServiceException;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.AbstractSecurity;
 import com.duangframework.security.dto.LoginDto;
@@ -155,7 +157,7 @@ public class SecurityKit {
         if(ToolsKit.isEmpty(securityUser)) {
             securityUser = securityHelperClass.getSecurityUser(key.toString());
             if(ToolsKit.isEmpty(securityUser)) {
-                throw new SecurityException("token已经过期, 请重新登录!");
+                throw new ServiceException(ExceptionEnums.TOKEN_EXPIRE);
             }
             String tokenId = securityUser.getTokenId();
             userId = securityUser.getUserId();
@@ -167,14 +169,14 @@ public class SecurityKit {
 
     public Set<String> getAuths() {
         if(ToolsKit.isEmpty(key)) {
-            throw new SecurityException("请先设置Id值");
+            throw new ServiceException("请先设置Id值");
         }
         return authHashMap.get(key);
     }
 
     public void setAuths(String key , Collection<String> authList) {
         if(ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
-            throw new SecurityException("设置权限值时,参数不能为空");
+            throw new ServiceException("设置权限值时,参数不能为空");
         }
         authHashMap.put(key, new HashSet<>(authList));
     }
