@@ -19,6 +19,14 @@ MaxNewSize=300
 PROJECT_PATH=`pwd`
 pid=""
 
+#
+#if [ -f $PROJECT_PATH/xxxxx.war ]
+#then
+  #rm -rf WEB-INF
+  #jar -xvf xxxx.war
+#fi
+#
+
 #get log path
 LOG_DIR=$PROJECT_PATH/logs
 mkdir -p $LOG_DIR
