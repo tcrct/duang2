@@ -6,6 +6,7 @@ import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.security.AbstractSecurity;
 import com.duangframework.security.dto.LoginDto;
 import com.duangframework.security.SecurityUser;
+import com.duangframework.server.common.BootStrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,8 +176,10 @@ public class SecurityKit {
     }
 
     public void setAuths(String key , Collection<String> authList) {
-        if(ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
-            throw new ServiceException("设置权限值时,参数不能为空");
+        if(BootStrap.getInstants().isDevModel()) {
+            if (ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
+                throw new ServiceException("设置权限值时,参数不能为空");
+            }
         }
         authHashMap.put(key, new HashSet<>(authList));
     }
