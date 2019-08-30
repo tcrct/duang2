@@ -55,23 +55,27 @@ public class WebKit {
                 logger.warn("返回下载文件时异常: " + e.getMessage(), e);
             }
         } else {
-            // 构建请求返回对象，并设置返回主体内容结果
-            HttpResponseStatus status = null;
-            try {
-                status = HttpResponseStatus.valueOf(response.getStatus());
-            } catch (Exception e) {
-                logger.warn("response status["+response.getStatus()+"] is not existence, so return 500 status");
-                status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-            }
+            if (HttpResponseStatus.FOUND.code() == response.getStatus()) {
+                sendRedirect(ctx, response);
+            } else {
+                // 构建请求返回对象，并设置返回主体内容结果
+                HttpResponseStatus status = null;
+                try {
+                    status = HttpResponseStatus.valueOf(response.getStatus());
+                } catch (Exception e) {
+                    logger.warn("response status[" + response.getStatus() + "] is not existence, so return 500 status");
+                    status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+                }
 //            HttpResponseStatus status = response.getStatus() == HttpResponseStatus.OK.code() ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
-            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(response.toString(), HttpConstants.DEFAULT_CHARSET));
-            builderResponseHeader(httpRequest, fullHttpResponse, response);
-            ChannelFuture channelFutureListener = ctx.channel().writeAndFlush(fullHttpResponse);
-            //如果不支持keep-Alive，服务器端主动关闭请求
-            //强制关闭，否则可能会导致第二个请求返回值被覆盖
+                FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(response.toString(), HttpConstants.DEFAULT_CHARSET));
+                builderResponseHeader(httpRequest, fullHttpResponse, response);
+                ChannelFuture channelFutureListener = ctx.channel().writeAndFlush(fullHttpResponse);
+                //如果不支持keep-Alive，服务器端主动关闭请求
+                //强制关闭，否则可能会导致第二个请求返回值被覆盖
 //            if (!isKeepAlive) {
                 channelFutureListener.addListener(ChannelFutureListener.CLOSE);
 //            }
+            }
         }
     }
 
@@ -325,6 +329,18 @@ public class WebKit {
             }
         }
         return fileterTargetSet;
+    }
+
+
+    /**
+     * 重定向到指定的URI
+     * @param ctx netty上下文
+     * @param response 返回对象
+     */
+    private static void sendRedirect(ChannelHandlerContext ctx, IResponse response) {
+        FullHttpResponse httpResponse = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.valueOf(response.getStatus()));
+        httpResponse.headers().set(HttpHeaderNames.LOCATION, response.getHeader(HttpHeaderNames.LOCATION.toString()));
+        ctx.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
     }
 
 }

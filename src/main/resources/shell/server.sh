@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 basepath=$(cd `dirname $0`; pwd)
 echo $basepath
 export PATH=$JAVA_HOME/bin:$PATH:

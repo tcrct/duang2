@@ -113,4 +113,11 @@ public interface IResponse {
      * @param isDelete 是否删除
      */
     void setDeleteFile(boolean isDelete);
+
+    /**
+     * Redirect to newUri
+     *
+     * @param newUri new url
+     */
+    void redirect(String newUri);
 }

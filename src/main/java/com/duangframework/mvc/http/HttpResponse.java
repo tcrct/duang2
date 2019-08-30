@@ -125,6 +125,12 @@ public class HttpResponse implements IResponse {
     }
 
     @Override
+    public void redirect(String newUri) {
+        headers.put(HttpHeaderNames.LOCATION.toString(), newUri);
+        setStatus(HttpResponseStatus.FOUND.code());
+    }
+
+    @Override
     public String toString() {
         if(null != returnObj) {
             if(returnObj instanceof String) {

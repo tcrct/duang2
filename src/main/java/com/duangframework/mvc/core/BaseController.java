@@ -38,7 +38,9 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * Created by laotang on 2018/6/15.
+ * Controller基类
+ * @author laotang
+ * @date 2018/6/15.
  */
 public abstract class BaseController {
 
@@ -633,6 +635,10 @@ public abstract class BaseController {
             }
         }
         return uploadFileList;
+    }
+
+    public void sendRedirect(String url) {
+        response.redirect(url);
     }
 }
 

@@ -67,8 +67,6 @@ public class HttpRequest implements IRequest{
     private InetSocketAddress remoteAddress;
     /**本地IP**/
     private InetSocketAddress localAddress;
-    /**客户端IP**/
-    private String clientIp = "127.0.0.1";
     /** 是否文件提交form表单里的Content-Type是multipart/form-data,如果是则返回true**/
     private boolean isMultipart;
     /** 是否是LastHttpContent，如果是则返回true**/
@@ -248,6 +246,11 @@ public class HttpRequest implements IRequest{
                 break;
             }
         }
+
+        if(ToolsKit.isEmpty(remoteHost)) {
+            remoteHost = ctx.channel().remoteAddress().toString();
+        }
+
         return (remoteHost.startsWith(ConstEnums.HTTP_SCHEME_FIELD.getValue()) ||
                         remoteHost.startsWith(ConstEnums.HTTPS_SCHEME_FIELD.getValue()) ) ? remoteHost : getProtocol()+"://"+remoteHost;
     }
@@ -257,18 +260,24 @@ public class HttpRequest implements IRequest{
      */
     @Override
     public String getRemoteIp() {
+        /**客户端IP**/
+        String clientIp = "";
+        for (String headerName : headerIpNameList) {
+            clientIp = getHeader(headerName);
+            if (ToolsKit.isNotEmpty(clientIp)) {
+                clientIp = clientIp.split(",")[0];
+                break;
+            }
+        }
         if(ToolsKit.isEmpty(clientIp)) {
-            for (String headerName : headerIpNameList) {
-                clientIp = getHeader(headerName);
-                if (ToolsKit.isNotEmpty(clientIp)) {
-                    clientIp = clientIp.split(",")[0];
-                    break;
-                }
-            }
-            clientIp = clientIp.toLowerCase().replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "").replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "");
-            if("0:0:0:0:0:0:0:1".equals(clientIp) || ToolsKit.isEmpty(clientIp)){
-                clientIp = "127.0.0.1";
-            }
+            clientIp = remoteAddress.getAddress().getHostAddress();
+        }
+        if(ToolsKit.isNotEmpty(clientIp)) {
+            clientIp = clientIp.toLowerCase().replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "")
+                    .replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "");
+        }
+        if("0:0:0:0:0:0:0:1".equals(clientIp) || ToolsKit.isEmpty(clientIp)){
+            clientIp = "127.0.0.1";
         }
         return clientIp;
     }

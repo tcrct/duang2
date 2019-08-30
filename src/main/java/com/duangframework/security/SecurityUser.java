@@ -1,6 +1,7 @@
 package com.duangframework.security;
 
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Param;
 import com.duangframework.security.dto.RelationDto;
 import com.duangframework.vtor.annotation.NotEmpty;
 
@@ -16,16 +17,26 @@ import java.util.Set;
 public class SecurityUser implements java.io.Serializable {
 
     @NotEmpty
-    private String userId;            // 用户id
-    private String codeId;          // 标识码
-    private String account;  // 用户帐号
-    private String username;  // 用户真实姓名
-    private String tokenId; // 登录成功后的token
-    private String terminal;  //终端标识
-    private RelationDto relationDto;       //关联关系Dto对象
-    private String companyId;   // 公司ID
-    private String projectId;      // 项目ID
-    private String departmentId; //部门ID
+    @Param(label = "用户ID")
+    private String userId;
+    @Param(label = "标识码")
+    private String codeId;
+    @Param(label = "用户帐号")
+    private String account;
+    @Param(label = "用户真实姓名")
+    private String username;
+    @Param(label = "登录成功后的token")
+    private String tokenId;
+    @Param(label = "终端标识")
+    private String terminal;
+    @Param(label = "关联关系Dto对象")
+    private RelationDto relationDto = new RelationDto();
+    @Param(label = "公司ID")
+    private String companyId;
+    @Param(label = "项目ID")
+    private String projectId;
+    @Param(label = "部门ID")
+    private String departmentId;
 
     public SecurityUser() {
     }
