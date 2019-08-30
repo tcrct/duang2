@@ -94,12 +94,13 @@ public class CorsHandler extends ChannelDuplexHandler {
     private void handlePreflight(ChannelHandlerContext ctx, HttpRequest request, String origin ) {
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.OK, true, true);
         HttpHeaders responseHeaders = response.headers();
-
-        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
-        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
-        responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
+        if(ToolsKit.isNotEmpty(origin)) {
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
+        }
 
         if(!responseHeaders.contains(HttpHeaderNames.CONTENT_LENGTH)) {
             responseHeaders.set(HttpHeaderNames.CONTENT_LENGTH, HttpHeaderValues.ZERO);
@@ -111,11 +112,13 @@ public class CorsHandler extends ChannelDuplexHandler {
 
     private void allowOrigin(HttpRequest request, String origin) {
         HttpHeaders headers = request.headers();
-        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
-        headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
-        headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
+        if (ToolsKit.isNotEmpty(origin)) {
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
+        }
     }
 
     /*

@@ -302,7 +302,9 @@ public class WebKit {
 //        String protocol = request.protocolVersion().protocolName().toLowerCase();
 //        System.out.println("protocol: " + protocol);
 
-        origin = origin.toLowerCase().trim();
+        if(ToolsKit.isNotEmpty(origin)) {
+            origin = origin.toLowerCase().trim();
+        }
 //        for (String originItem : ORIGIN_SET) {
 //            if(origin.contains(originItem)){
 //                return origin;
