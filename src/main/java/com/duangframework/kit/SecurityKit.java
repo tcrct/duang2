@@ -176,7 +176,7 @@ public class SecurityKit {
     }
 
     public void setAuths(String key , Collection<String> authList) {
-        if(BootStrap.getInstants().isDevModel()) {
+        if(!BootStrap.getInstants().isDevModel()) {
             if (ToolsKit.isEmpty(key) || ToolsKit.isEmpty(authList)) {
                 throw new ServiceException("设置权限值时,参数不能为空");
             }
