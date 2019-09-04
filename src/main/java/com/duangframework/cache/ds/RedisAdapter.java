@@ -125,26 +125,22 @@ public class RedisAdapter extends AbstractCacheSource<JedisPool> implements ICli
         try{
             database = ToolsKit.isEmpty(database) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_DATABASE.getValue(),0) : database;
             host = ToolsKit.isEmpty(host) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_HOST.getValue(),"127.0.0.1") : host;
-            password =ToolsKit.isEmpty(password) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_PASSWORD.getValue(),"") : password;
+            password =ToolsKit.isEmpty(password) ? PropKit.get(ConstEnums.PROPERTIES.REDIS_PASSWORD.getValue(),null) : password;
             port = ToolsKit.isEmpty(port) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_PORT.getValue(),6371) : port;
             timeout = ToolsKit.isEmpty(timeout) ? PropKit.getInt(ConstEnums.PROPERTIES.REDIS_PORT.getValue(),2000) : timeout;
-            if(ToolsKit.isEmpty(password)) {
-                if(host.contains(":")) {
-                    String[] hostArray = host.split(":");
-                    if(ToolsKit.isNotEmpty(hostArray)) {
-                        try{
-                            host = hostArray[0];
-                            port = Integer.parseInt(hostArray[1]);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+            if(host.contains(":")) {
+                String[] hostArray = host.split(":");
+                if(ToolsKit.isNotEmpty(hostArray)) {
+                    try{
+                        host = hostArray[0];
+                        port = Integer.parseInt(hostArray[1]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-                pool = new JedisPool(config, host, port, timeout);
-            } else {
-                pool = new JedisPool(config, host, port, timeout, password, database);
             }
-            System.out.println("Connent  " + host + ":"+port +" Redis is Success...");
+            pool = new JedisPool(config, host, port, timeout, password, database);
+            System.out.println("Connent  " + host + ":"+port +" Redis["+database+"] is Success...");
             return pool;
         }catch(Exception e){
             e.printStackTrace();
