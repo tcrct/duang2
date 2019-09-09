@@ -45,7 +45,7 @@ public class WebKit {
      * @param request         duang框架的请求对象
      * @param response       duang框架的返回对象
      */
-    static void recoverClient(IRequest request, IResponse response) {
+    public static void recoverClient(IRequest request, IResponse response) {
         com.duangframework.mvc.http.HttpRequest httpRequest = (com.duangframework.mvc.http.HttpRequest)request;
         recoverClient(httpRequest.getCtx(), httpRequest.getNettyHttpRequest(), response);
     }
