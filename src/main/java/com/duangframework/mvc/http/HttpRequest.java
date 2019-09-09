@@ -133,6 +133,10 @@ public class HttpRequest implements IRequest{
         }
     }
 
+   public ChannelHandlerContext getCtx(){
+        return ctx;
+    }
+
     @Override
     public String getRequestId() {
         return requestId;

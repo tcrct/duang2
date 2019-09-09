@@ -42,6 +42,16 @@ public class WebKit {
 
     /**
      * 将请求结果返回到客户端
+     * @param request         duang框架的请求对象
+     * @param response       duang框架的返回对象
+     */
+    static void recoverClient(IRequest request, IResponse response) {
+        com.duangframework.mvc.http.HttpRequest httpRequest = (com.duangframework.mvc.http.HttpRequest)request;
+        recoverClient(httpRequest.getCtx(), httpRequest.getNettyHttpRequest(), response);
+    }
+
+    /**
+     * 将请求结果返回到客户端
      * @param ctx                               context上下文
      * @param httpRequest         netty请求对象
      * @param response                      自定义返回对象
