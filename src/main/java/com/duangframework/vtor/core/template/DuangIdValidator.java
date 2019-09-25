@@ -22,7 +22,7 @@ public class DuangIdValidator extends AbstractValidatorTemplate<DuangId> {
     public void handle(DuangId annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
 
         boolean isEmapy = annonation.isEmpty();
-        if(isEmapy) {
+        if(isEmapy && ToolsKit.isEmpty(paramValue)) {
             return;
         }
         if(ToolsKit.isEmpty(paramValue)) {
