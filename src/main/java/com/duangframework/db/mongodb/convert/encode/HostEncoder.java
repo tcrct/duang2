@@ -33,14 +33,18 @@ public class HostEncoder extends Encoder {
     }
 
     private String filterHostUrl(String url) {
-        if (url.startsWith("http") || url.startsWith("https")) {
+        if (isHttpStart(url)) {
             String startUrl = PropKit.get(ConstEnums.PROPERTIES.IMAGE_HOST.getValue());
             if (ToolsKit.isNotEmpty(startUrl) && url.startsWith(startUrl)) {
                 url = url.replace(startUrl, "");
             }
-            url = url.startsWith("/") ? url : "/"+url;
+            url = url.startsWith("/") ? url : isHttpStart(url) ? url : "/" + url;
             return url;
         }
         return url;
+    }
+
+    private boolean isHttpStart(String url) {
+        return url.startsWith("http") || url.startsWith("https");
     }
 }
