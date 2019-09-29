@@ -168,6 +168,19 @@ public class SecurityKit {
         return securityUser;
     }
 
+    /**
+     * 根据key删除本地缓存对象
+     * @return
+     */
+    public void remove() {
+        if(ToolsKit.isEmpty(key)) {
+            throw new NullPointerException("key is null");
+        }
+        TOKENID_USERID_MAP.remove(key);
+        SECURITY_USER_MAP.remove(key);
+        authHashMap.remove(key);
+    }
+
     public Set<String> getAuths() {
         if(ToolsKit.isEmpty(key)) {
             throw new ServiceException("请先设置Id值");
