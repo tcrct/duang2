@@ -29,7 +29,7 @@ public class PageDto<T> implements java.io.Serializable {
 	@Param(label = "总行数", desc = "查询后返回结果集的总行数")
 	protected long totalCount = -1;
 	@Param(label = "搜索关键字说明", desc = "可搜索的属性字段说明")
-	private List<String> searchField;
+    protected List<String> searchField;
 
 //	private Class<T> genricTypeClass;
 	
