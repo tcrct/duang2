@@ -28,6 +28,8 @@ public class PageDto<T> implements java.io.Serializable {
 	protected List<T> result = Collections.emptyList();
 	@Param(label = "总行数", desc = "查询后返回结果集的总行数")
 	protected long totalCount = -1;
+	@Param(label = "搜索关键字说明", desc = "可搜索的属性字段说明")
+	private List<String> searchField;
 
 //	private Class<T> genricTypeClass;
 	
@@ -214,5 +216,17 @@ public class PageDto<T> implements java.io.Serializable {
 	 */
 	public void setSkipNum(int skipNum) {
 		this.skipNum = skipNum;
+	}
+
+	/**
+	 * 可支持搜索字段的中文说明
+	 * @return
+	 */
+	public List<String> getSearchField() {
+		return searchField;
+	}
+
+	public void setSearchField(List<String> searchField) {
+		this.searchField = searchField;
 	}
 }
