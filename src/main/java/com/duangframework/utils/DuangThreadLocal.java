@@ -52,7 +52,7 @@ public abstract  class DuangThreadLocal<T> {
                         if ((System.currentTimeMillis() - duangId.getTime()) > 3000L) {
                             iterator.remove();
                         }
-                    }  else {
+                    } else {
                         iterator.remove();
                     }
                 } else {
