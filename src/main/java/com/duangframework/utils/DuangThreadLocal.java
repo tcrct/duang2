@@ -2,8 +2,6 @@ package com.duangframework.utils;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.dto.HeadDto;
-import com.duangframework.vtor.annotation.*;
-import com.duangframework.utils.DuangId;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,6 +47,10 @@ public abstract  class DuangThreadLocal<T> {
                 if(threadLocalObject instanceof HeadDto) {
                     isHeadDtoObject = true;
                     HeadDto headDto = (HeadDto)threadLocalObject;
+                    String requestId = headDto.getRequestId();
+                    if(ToolsKit.isEmpty(requestId)) {
+                    	continue;
+					}
                     DuangId duangId = new DuangId(headDto.getRequestId());
                     if ((System.currentTimeMillis() - duangId.getTime()) > 3000L) {
                         iterator.remove();
