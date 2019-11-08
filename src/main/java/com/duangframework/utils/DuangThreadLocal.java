@@ -39,27 +39,29 @@ public abstract  class DuangThreadLocal<T> {
 	}
 
 	private void reset(Thread thread, T value) {
-		if(duangThreadLocalMap.size() > MAX_THREAD_NUMBER) {
-            for(Iterator<Map.Entry<Thread, T>> iterator = duangThreadLocalMap.entrySet().iterator(); iterator.hasNext();) {
-                Map.Entry<Thread, T> entry = iterator.next();
-                T threadLocalObject = entry.getValue();
-                // 如果是HeadDto，则判断存放时长是否大于3秒(默认3秒内返回)，如果是则清除
-                if(threadLocalObject instanceof HeadDto) {
-                    HeadDto headDto = (HeadDto)threadLocalObject;
-                    String requestId = headDto.getRequestId();
-                    if(ToolsKit.isNotEmpty(requestId)) {
-                        DuangId duangId = new DuangId(headDto.getRequestId());
-                        if ((System.currentTimeMillis() - duangId.getTime()) > 3000L) {
+	    synchronized (this) {
+            if (duangThreadLocalMap.size() > MAX_THREAD_NUMBER) {
+                for (Iterator<Map.Entry<Thread, T>> iterator = duangThreadLocalMap.entrySet().iterator(); iterator.hasNext(); ) {
+                    Map.Entry<Thread, T> entry = iterator.next();
+                    T threadLocalObject = entry.getValue();
+                    // 如果是HeadDto，则判断存放时长是否大于3秒(默认3秒内返回)，如果是则清除
+                    if (threadLocalObject instanceof HeadDto) {
+                        HeadDto headDto = (HeadDto) threadLocalObject;
+                        String requestId = headDto.getRequestId();
+                        if (ToolsKit.isNotEmpty(requestId)) {
+                            DuangId duangId = new DuangId(headDto.getRequestId());
+                            if ((System.currentTimeMillis() - duangId.getTime()) > 3000L) {
+                                iterator.remove();
+                            }
+                        } else {
                             iterator.remove();
                         }
                     } else {
                         iterator.remove();
                     }
-                } else {
-                    iterator.remove();
                 }
             }
-		}
+        }
 	}
 
 	protected abstract T initialValue() ;
