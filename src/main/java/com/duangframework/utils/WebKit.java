@@ -18,7 +18,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedFile;
-import org.apache.http.client.methods.HttpHead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
