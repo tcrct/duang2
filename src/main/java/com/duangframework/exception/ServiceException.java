@@ -24,7 +24,11 @@ public class ServiceException extends AbstractDuangException implements IExcepti
 
     public ServiceException(String msg , Throwable cause) {
         super(msg, cause);
-        this.code = ExceptionEnums.ERROR.getCode();
+        if (cause instanceof ServiceException) {
+            this.code = ((ServiceException)cause).getCode();
+        } else {
+            this.code = ExceptionEnums.ERROR.getCode();
+        }
     }
 
     public ServiceException(int code, String msg , Throwable cause) {
