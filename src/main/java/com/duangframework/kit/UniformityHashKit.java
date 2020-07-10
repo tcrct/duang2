@@ -19,7 +19,7 @@ public class UniformityHashKit {
     private ConcurrentSkipListMap<Integer, String> skipListMap;
     private static final String SEPARATE = "_virtual_";
     // 虚拟节点数量
-    private int virtualSize;
+    private int virtualSize = 16384;
     private String nodeKey;
     // 真实节点集合
     private List<String> nodeHostList;
@@ -38,7 +38,7 @@ public class UniformityHashKit {
         if (ToolsKit.isEmpty(nodeHostList)) {
             throw new NullPointerException("服务器地址没有设置[server.host]，请先在配置文件里设置");
         }
-        virtualSize = getVirtualSize(nodeHostList.size());
+//        virtualSize = getVirtualSize(nodeHostList.size());
         for (String serverHost : nodeHostList) {
             put(serverHost);
         }
@@ -46,13 +46,14 @@ public class UniformityHashKit {
 
     /**
      * 计算虚拟节点
-     * 这里用实际节点数乘以5
      *
      * @param size
      * @return
      */
     private int getVirtualSize(int size) {
-        return size * 5;
+        //CRC16(Key) % 16384 //redis的算法
+
+        return 16384; //size * 5;
     }
 
     private void put(String nodeHost) {
@@ -111,11 +112,11 @@ public class UniformityHashKit {
      */
     private int getHash(String key) {
         // 直接使用String对象的hashCode
-        int hash = key.hashCode();
-        return (hash<0) ? Math.abs(hash) : hash;
+//        int hash = key.hashCode();
+//        return (hash<0) ? Math.abs(hash) : hash;
 
         // 使用FNV1_32_HASH算法
-        // return getHash2(key);
+         return getHash2(key);
     }
 
     /**
