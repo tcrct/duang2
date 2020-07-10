@@ -115,8 +115,8 @@ public class CorsHandler extends ChannelDuplexHandler {
         if (ToolsKit.isNotEmpty(origin)) {
             headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, Arrays.asList(ALLOW_STRING.split(","));
-            headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, Arrays.asList(ALLOW_STRING.split(","));
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, Arrays.asList(ALLOW_STRING.split(",")));
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, Arrays.asList(ALLOW_STRING.split(",")));
             headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
         }
     }
