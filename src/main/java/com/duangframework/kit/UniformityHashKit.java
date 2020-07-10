@@ -1,6 +1,5 @@
 package com.duangframework.kit;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -18,7 +17,7 @@ public class UniformityHashKit {
 
     private ConcurrentSkipListMap<Integer, String> skipListMap;
     private static final String SEPARATE = "_virtual_";
-    // 虚拟节点数量
+    // 虚拟节点数量(模拟与redis槽的数量一致)
     private int virtualSize = 16384;
     private String nodeKey;
     // 真实节点集合
