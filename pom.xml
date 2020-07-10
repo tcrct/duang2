@@ -22,7 +22,7 @@
         <configuration.version>1.10</configuration.version>
         <mongodb.version>3.10.1</mongodb.version>
         <druid.version>1.0.29</druid.version>
-        <mysql.version>5.1.44</mysql.version>
+        <mysql.version>8.0.16</mysql.version>
         <jedis.version>2.9.0</jedis.version>
         <ehcache.version>3.5.2</ehcache.version>
         <shiro.version>1.2.4</shiro.version>
