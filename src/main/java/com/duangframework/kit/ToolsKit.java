@@ -884,4 +884,21 @@ public final class ToolsKit {
         return kvItem.getKey().equals(paramsName) ? (Type)kvItem.getValue() : null;
     }
 
+    /**
+     * 十六进制字符串转byte[]
+     *https://blog.csdn.net/csdn_ds/article/details/79106006
+     *
+     * @param str 十六进制字符串
+     * @return
+     */
+    public static byte[] hexToBytes(String str) {
+        byte[] bytes = new byte[str.length()/2];
+        for(int i = 0; i < str.length() / 2; i++) {
+            String tmpStr = str.substring(i * 2, i * 2 + 2);
+            // 字节数& 0xff实现
+            bytes[i] = (byte) (Integer.parseInt(tmpStr, 16) & 0xff);
+        }
+        return bytes;
+    }
+
 }
