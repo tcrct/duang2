@@ -201,7 +201,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
      * @param keys
      * @return
      */
-    public Long del(final String... keys){
+    public Long del(final String... keys) {
         return call(new JedisAction<Long>(){
             @Override
             public Long execute(Jedis jedis) {
@@ -313,7 +313,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
      * @param options                        CacheModelOptions对象
      * @return
      *  1 如果成功设置过期时间。
-    0  如果key不存在或者不能设置过期时间。
+        0  如果key不存在或者不能设置过期时间。
      */
     public Long expire(final CacheModelOptions options) {
         return call(new JedisAction<Long>(){
