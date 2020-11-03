@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  数据实体类注解
+ * 数据实体类注解
+ *
  * @author Created by laotang
  * @date on 2017/11/16.
  */
@@ -14,6 +15,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Entity {
     String name() default "";
+
     String label() default "";
+
     String database() default "";
 }

@@ -3,10 +3,10 @@ package com.duangframework.db.enums;
 /**
  * Created by laotang on 2018/9/26.
  */
-public enum  OperatorEnum {
+public enum OperatorEnum {
 
-    ID("_id", "id","主键ID字段名称"),
-    GT("$gt",">", "大于"),
+    ID("_id", "id", "主键ID字段名称"),
+    GT("$gt", ">", "大于"),
     ;
 
 

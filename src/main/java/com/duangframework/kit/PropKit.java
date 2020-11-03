@@ -13,13 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date createed in 2018/6/19.
  */
 public class PropKit {
-    private static Prop prop = null;
     private static final ConcurrentHashMap<String, Prop> map = new ConcurrentHashMap<String, Prop>();
+    private static Prop prop = null;
 
-    private PropKit() {}
+    private PropKit() {
+    }
 
     /**
      * Using the properties file. It will loading the properties file if not loading.
+     *
      * @see #use(String, String)
      */
     public static Prop use(String fileName) {
@@ -34,10 +36,10 @@ public class PropKit {
      * PropKit.use("other_config.txt", "UTF-8");<br><br>
      * String userName = PropKit.get("userName");<br>
      * String password = PropKit.get("password");<br><br>
-     *
+     * <p>
      * userName = PropKit.use("other_config.txt").get("userName");<br>
      * password = PropKit.use("other_config.txt").get("password");<br><br>
-     *
+     * <p>
      * PropKit.use("com/jfinal/config_in_sub_directory_of_classpath.txt");
      *
      * @param fileName the properties file's name in classpath or the sub directory of classpath
@@ -62,6 +64,7 @@ public class PropKit {
 
     /**
      * Using the properties file bye File object. It will loading the properties file if not loading.
+     *
      * @see #use(File, String)
      */
     public static Prop use(File file) {
@@ -75,7 +78,7 @@ public class PropKit {
      * PropKit.use(new File("/var/config/my_config.txt"), "UTF-8");<br>
      * Strig userName = PropKit.use("my_config.txt").get("userName");
      *
-     * @param file the properties File object
+     * @param file     the properties File object
      * @param encoding the encoding
      */
     public static Prop use(File file, String encoding) {
@@ -207,7 +210,7 @@ public class PropKit {
 
     public static List<String> getList(String key) {
         String value = get(key);
-        if(ToolsKit.isEmpty(value)) {
+        if (ToolsKit.isEmpty(value)) {
             return new ArrayList<>();
         }
         String[] arrayValue = value.split(",");

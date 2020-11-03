@@ -3,12 +3,14 @@ package com.duangframework.mvc.dto;
 import com.duangframework.db.annotation.VoColl;
 import com.duangframework.mvc.annotation.Bean;
 import com.duangframework.mvc.annotation.Param;
-//import com.duangframework.vtor.annotation.FieldName;
 
 import java.util.List;
 
+//import com.duangframework.vtor.annotation.FieldName;
+
 /**
  * 搜索条件集合Dto
+ *
  * @author laotang
  */
 @Bean
@@ -26,14 +28,14 @@ public class SearchListDto extends ApiDto {
     private int pageSize = 10;
     /**
      * 搜索字段集合
-      */
+     */
     @Param(label = "搜索对象集合", desc = "将搜索条件封装成SearchDto", defaultValue = "SearchDto")
     @Bean
     @VoColl
     private List<SearchDto> searchDtos;
     /**
      * 多条件查询时，and 或 or 链接 SearchDto对象值, 如果值为空，默认为and查询
-      */
+     */
     @Param(label = "查询模式", desc = "多条件查询时，and 或 or 链接 SearchDto对象值, 如果值为空，默认为and查询", defaultValue = "and")
     private String operator = "and";
 

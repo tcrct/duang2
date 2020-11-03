@@ -16,7 +16,7 @@ public class CreateCollectionOptions {
 
     public CreateCollectionOptions() {
         engine = EngineEnums.InnoDB.toString();
-        charset = ConstEnums.DEFAULT_CHAR_ENCODE.getValue().toLowerCase().replace("-","");
+        charset = ConstEnums.DEFAULT_CHAR_ENCODE.getValue().toLowerCase().replace("-", "");
         collate = "utf8_general_ci";
     }
 

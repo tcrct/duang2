@@ -12,14 +12,14 @@ public class IocFactory {
     private static final Logger logger = LoggerFactory.getLogger(IocFactory.class);
 
     /**
-     *  框架启动时初始化依赖注入
+     * 框架启动时初始化依赖注入
      */
     public static void initIoc() {
 
     }
 
 
-    public static void ioc(Class<?> beanClass) throws Exception{
+    public static void ioc(Class<?> beanClass) throws Exception {
 
     }
 }

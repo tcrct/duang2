@@ -14,7 +14,6 @@ import com.duangframework.exception.MysqlException;
 import com.duangframework.kit.ToolsKit;
 import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
-import org.bson.BsonValue;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import java.util.Map;
 /**
  * Created by laotang on 2018/12/2.
  */
-public class DBCollection  {
+public class DBCollection {
 
     private static final Logger logger = LoggerFactory.getLogger(DBCollection.class);
 
@@ -34,11 +33,10 @@ public class DBCollection  {
 
     public DBCollection(String name, DB database) {
         this.name = name;
-        this.database =database;
+        this.database = database;
     }
 
     /**
-     *
      * @param document
      * @return
      */
@@ -47,29 +45,30 @@ public class DBCollection  {
         int row = 0;
         try {
             row = DBSession.execute(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
-            logger.info("insert "+row+" data to " + database.getName() + "."+name+" is success");
+            logger.info("insert " + row + " data to " + database.getName() + "." + name + " is success");
             return new WriteResult(row, false, row);
         } catch (Exception e) {
-            throw  new MysqlException(e.getMessage(), e);
+            throw new MysqlException(e.getMessage(), e);
         }
     }
 
     /**
      * 更新记录
-     * @param queryDoc      更新条件
-     * @param updateDoc       更新对象
+     *
+     * @param queryDoc  更新条件
+     * @param updateDoc 更新对象
      * @return
      */
     public UpdateResult updateOne(Document queryDoc, Document updateDoc) {
         updateDoc.remove(IdEntity.ID_FIELD); //更新时，将updateDoc里的ID字段去掉，以queryDoc里的字段为准，避免语句生成出错
-        ConvetorObject convetorObject = ConvetorFactory.convetor(new UpdateConvetorTemplate( new ConvetorObject(name, queryDoc, updateDoc)));
+        ConvetorObject convetorObject = ConvetorFactory.convetor(new UpdateConvetorTemplate(new ConvetorObject(name, queryDoc, updateDoc)));
         int row = 0;
         try {
             row = DBSession.execute(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
-            logger.info("update "+row+" data to " + database.getName() + "."+name+" is success");
-            return UpdateResult.acknowledged(row, (long)row, null);
+            logger.info("update " + row + " data to " + database.getName() + "." + name + " is success");
+            return UpdateResult.acknowledged(row, (long) row, null);
         } catch (Exception e) {
-            throw  new MysqlException(e.getMessage(), e);
+            throw new MysqlException(e.getMessage(), e);
         }
 //        System.out.println(convetorObject.getStatement());
 //        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
@@ -79,6 +78,7 @@ public class DBCollection  {
 
     /**
      * 删除
+     *
      * @param queryDoc
      * @return
      */
@@ -91,15 +91,16 @@ public class DBCollection  {
 
     /**
      * 查找
+     *
      * @param queryDoc
      * @return
      */
-    public List<Map<String,Object>> find(Document queryDoc) {
+    public List<Map<String, Object>> find(Document queryDoc) {
         ConvetorObject convetorObject = ConvetorFactory.convetor(new ReadConvetorTemplate(new ConvetorObject(name, queryDoc, null)));
 //        System.out.println(convetorObject.getStatement());
 //        System.out.println(ToolsKit.toJsonString(convetorObject.getParams()));
         try {
-            List<Map<String,Object>> resultList = DBSession.query(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
+            List<Map<String, Object>> resultList = DBSession.query(database.getId(), convetorObject.getStatement(), convetorObject.getParams());
             return resultList;
         } catch (Exception e) {
             throw new MongodbException(e.getMessage(), e);
@@ -108,22 +109,21 @@ public class DBCollection  {
 
     /**
      * 直接执行SQL语句
-     * @param statement     SQL语句
-     * @param params          参数
-     * @param <T>
-     * @return
-     *      <p> select语句返回List<Map<String,Object> </p>
-     *      <p> update delete语句返回WriteResult </p>
      *
+     * @param statement SQL语句
+     * @param params    参数
+     * @param <T>
+     * @return <p> select语句返回List<Map<String,Object> </p>
+     * <p> update delete语句返回WriteResult </p>
      */
     public <T> T execute(String statement, Object[] params) {
         int row = 0;
         try {
-            if(statement.toLowerCase().trim().startsWith(AbstractConvetorTemplate.SELECT_FIELD)) {
-                return (T)DBSession.query(database.getId(), statement, params);
+            if (statement.toLowerCase().trim().startsWith(AbstractConvetorTemplate.SELECT_FIELD)) {
+                return (T) DBSession.query(database.getId(), statement, params);
             } else {
                 row = DBSession.execute(database.getId(), statement, params);
-                return (T)new WriteResult(row, false, row);
+                return (T) new WriteResult(row, false, row);
             }
         } catch (Exception e) {
             throw new MongodbException(e.getMessage(), e);

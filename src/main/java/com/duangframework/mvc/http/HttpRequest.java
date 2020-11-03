@@ -438,7 +438,9 @@ public class HttpRequest implements IRequest{
                            httpMultipartDataList.add(interfaceHttpData);
                        }
                    }
-               } catch (Exception e) { logger.warn(e.getMessage(),e);}
+               } catch (Exception e) {
+                   logger.warn(e.getMessage(),e);
+               }
                 content.release();
             }
             if (!byteBuffs.isEmpty()) {
@@ -447,6 +449,8 @@ public class HttpRequest implements IRequest{
             return content;
         } catch (HttpPostRequestDecoder.EndOfDataDecoderException e) {
             throw new HttpDecoderException("build decoder fail: "+e.getMessage() ,  e);
+        } finally {
+            HTTP_DATA_FACTORY.cleanRequestHttpData(nettyRequest);
         }
     }
 

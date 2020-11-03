@@ -1,8 +1,8 @@
 package com.duangframework.db.mongodb.utils;
 
+import com.duangframework.db.annotation.Index;
 import com.duangframework.db.annotation.Vo;
 import com.duangframework.db.annotation.VoColl;
-import com.duangframework.db.annotation.Index;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
 import com.mongodb.BasicDBObject;
@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * 索引创建工具类
+ *
  * @author Created by laotang
  * @date on 2017/11/22.
  */
@@ -34,10 +35,8 @@ public class MongoIndexUtils {
     /**
      * 创建索引
      *
-     * @param coll
-     *            collection
-     * @param cls
-     *            entity class
+     * @param coll collection
+     * @param cls  entity class
      */
     public static void createIndex(DBCollection coll, Class<?> cls) throws Exception {
         Field[] fields = ClassKit.getFields(cls);
@@ -47,8 +46,8 @@ public class MongoIndexUtils {
 
         Set<String> indexNames = new HashSet<>();
         List<DBObject> indexList = coll.getIndexInfo();
-        for(DBObject indexDbo : indexList) {
-            indexNames.add(indexDbo.get("name")+"");
+        for (DBObject indexDbo : indexList) {
+            indexNames.add(indexDbo.get("name") + "");
         }
         INDEX_NAME_MAP.put(coll.getFullName(), indexNames);
 
@@ -68,7 +67,7 @@ public class MongoIndexUtils {
                 }
                 createVoIndexKey(clazz, key + ".");
                 if (INDEX_MAP.size() > 0) {
-                    for (Iterator<Map.Entry<String, Index>> it = INDEX_MAP.entrySet().iterator(); it.hasNext();) {
+                    for (Iterator<Map.Entry<String, Index>> it = INDEX_MAP.entrySet().iterator(); it.hasNext(); ) {
                         Map.Entry<String, Index> entry = it.next();
                         createIndex(coll, entry.getKey(), entry.getValue());
                     }
@@ -84,12 +83,12 @@ public class MongoIndexUtils {
 
     private static void createIndex(DBCollection coll, String key, Index index) throws Exception {
         String name = ToolsKit.isEmpty(index.name()) ? "_" + key + "_" : index.name();
-        if (name.length() < 3 && name.length()>120) {
+        if (name.length() < 3 && name.length() > 120) {
             return;
         }
         Set<String> indexNameSet = INDEX_NAME_MAP.get(coll.getFullName());
         // 如果包含有该索引名称则退出创建
-        if(ToolsKit.isNotEmpty(indexNameSet) && indexNameSet.contains(name)) {
+        if (ToolsKit.isNotEmpty(indexNameSet) && indexNameSet.contains(name)) {
             return;
         }
         String type = "text".equalsIgnoreCase(index.type()) ? "1" : "2d";
@@ -101,7 +100,7 @@ public class MongoIndexUtils {
         DBObject options = new BasicDBObject("background", true);
         options.put("name", name.toLowerCase()); // 将index的name全部统一设置为小写
         options.put("unique", index.unique());
-		 logger.debug("#########MongoKit CreateIndex Key: "+keys.toString()+"["+key.length()+"] Options: " + options.toString()+" Coll Name: " + coll.getFullName());
+        logger.debug("#########MongoKit CreateIndex Key: " + keys.toString() + "[" + key.length() + "] Options: " + options.toString() + " Coll Name: " + coll.getFullName());
         coll.createIndex(keys, options);
     }
 
@@ -118,7 +117,9 @@ public class MongoIndexUtils {
                     } else if (isVoCollField) {
                         clazz = getVoCollFieldClass(field);
                     }
-                    if (ToolsKit.isEmpty(clazz)) {  continue; }
+                    if (ToolsKit.isEmpty(clazz)) {
+                        continue;
+                    }
                     String key2 = key + field.getName() + ".";
                     createVoIndexKey(clazz, key2);
                 } else {
@@ -136,7 +137,8 @@ public class MongoIndexUtils {
 
     /**
      * 取属性里指定的泛型对象类型
-     * @param field     属性
+     *
+     * @param field 属性
      * @return
      */
     private static Class<?> getVoCollFieldClass(Field field) {

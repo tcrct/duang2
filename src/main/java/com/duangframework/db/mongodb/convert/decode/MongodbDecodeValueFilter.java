@@ -2,7 +2,6 @@ package com.duangframework.db.mongodb.convert.decode;
 
 import com.alibaba.fastjson.serializer.ValueFilter;
 import com.duangframework.db.IdEntity;
-import com.duangframework.kit.ObjectKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.DataType;
@@ -21,8 +20,8 @@ public class MongodbDecodeValueFilter implements ValueFilter {
         if (IdEntity.ID_FIELD.equals(name) && ToolsKit.isNotEmpty(value)) {
             return (value instanceof ObjectId) ? ((ObjectId) value).toString() : value.toString();
         }
-        if(DataType.isDate(value.getClass()) || DataType.isTimestamp(value.getClass())) {
-            Date date = (Date)value;
+        if (DataType.isDate(value.getClass()) || DataType.isTimestamp(value.getClass())) {
+            Date date = (Date) value;
             return ToolsKit.formatDate(date, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
         }
         return value;

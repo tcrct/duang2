@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 一致性hash工具类
- *https://juejin.im/post/5cfdf4e5f265da1bd260e04c
+ * https://juejin.im/post/5cfdf4e5f265da1bd260e04c
  * https://juejin.im/post/5b8f93576fb9a05d11175b8d
  *
  * @author Laotang
@@ -15,25 +15,17 @@ import java.util.concurrent.ConcurrentSkipListMap;
  */
 public class UniformityHashKit {
 
-    private ConcurrentSkipListMap<Integer, String> skipListMap;
     private static final String SEPARATE = "_virtual_";
+    private ConcurrentSkipListMap<Integer, String> skipListMap;
     // 虚拟节点数量(模拟与redis槽的数量一致)
     private int virtualSize = 16384;
     private String nodeKey;
     // 真实节点集合
     private List<String> nodeHostList;
 
-    private static class UniformityHashKitHolder {
-        private static final UniformityHashKit INSTANCE = new UniformityHashKit();
-    }
-
-    public static final UniformityHashKit duang() {
-        return UniformityHashKitHolder.INSTANCE;
-    }
-
     private UniformityHashKit() {
         skipListMap = new ConcurrentSkipListMap();
-        nodeHostList= PropKit.getList("node.hosts");
+        nodeHostList = PropKit.getList("node.hosts");
         if (ToolsKit.isEmpty(nodeHostList)) {
             throw new NullPointerException("服务器地址没有设置[server.host]，请先在配置文件里设置");
         }
@@ -41,6 +33,16 @@ public class UniformityHashKit {
         for (String serverHost : nodeHostList) {
             put(serverHost);
         }
+    }
+
+    public static final UniformityHashKit duang() {
+        return UniformityHashKitHolder.INSTANCE;
+    }
+
+    public static void main(String[] args) {
+        String key = UUID.randomUUID().toString();
+        String nodeName = UniformityHashKit.duang().param(key).getNode();
+        System.out.println(nodeName);
     }
 
     /**
@@ -59,7 +61,7 @@ public class UniformityHashKit {
         if (ToolsKit.isEmpty(nodeHost)) {
             return;
         }
-        for (int i=0; i<virtualSize; i++) {
+        for (int i = 0; i < virtualSize; i++) {
             String virtualKey = nodeHost + SEPARATE + i;
             skipListMap.put(getHash(virtualKey), virtualKey);
         }
@@ -67,6 +69,7 @@ public class UniformityHashKit {
 
     /**
      * 设置参数
+     *
      * @param key
      * @return
      */
@@ -77,6 +80,7 @@ public class UniformityHashKit {
 
     /**
      * 根据参数取节点
+     *
      * @return 节点名称
      */
     public String getNode() {
@@ -98,7 +102,7 @@ public class UniformityHashKit {
         if (ToolsKit.isEmpty(nodeKey)) {
             return;
         }
-        for (int i=0; i<virtualSize; i++) {
+        for (int i = 0; i < virtualSize; i++) {
             String virtualKey = nodeKey + SEPARATE + i;
             skipListMap.remove(getHash(virtualKey), virtualKey);
         }
@@ -106,6 +110,7 @@ public class UniformityHashKit {
 
     /**
      * 取字符串的hash值
+     *
      * @param key
      * @return
      */
@@ -115,19 +120,20 @@ public class UniformityHashKit {
 //        return (hash<0) ? Math.abs(hash) : hash;
 
         // 使用FNV1_32_HASH算法
-         return getHash2(key);
+        return getHash2(key);
     }
 
     /**
      * 计算Hash值, 使用FNV1_32_HASH算法
+     *
      * @param str
      * @return
      */
     private int getHash2(String str) {
         final int p = 16777619;
-        int hash = (int)2166136261L;
+        int hash = (int) 2166136261L;
         for (int i = 0; i < str.length(); i++) {
-            hash =( hash ^ str.charAt(i) ) * p;
+            hash = (hash ^ str.charAt(i)) * p;
         }
         hash += hash << 13;
         hash ^= hash >> 7;
@@ -135,14 +141,11 @@ public class UniformityHashKit {
         hash ^= hash >> 17;
         hash += hash << 5;
 
-        return (hash < 0) ?Math.abs(hash) : hash;
+        return (hash < 0) ? Math.abs(hash) : hash;
     }
 
-
-    public static void main(String[] args) {
-        String key = UUID.randomUUID().toString();
-        String nodeName = UniformityHashKit.duang().param(key).getNode();
-        System.out.println(nodeName);
+    private static class UniformityHashKitHolder {
+        private static final UniformityHashKit INSTANCE = new UniformityHashKit();
     }
 
 }

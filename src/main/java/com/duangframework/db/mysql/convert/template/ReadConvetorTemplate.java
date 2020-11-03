@@ -21,7 +21,6 @@ public class ReadConvetorTemplate extends AbstractConvetorTemplate {
     }
 
     /**
-     *
      * @param convetorObject 转换对象
      * @return
      */
@@ -54,7 +53,7 @@ public class ReadConvetorTemplate extends AbstractConvetorTemplate {
                         .append("?").append(AND_FIELD);
             }
         });
-        selectSql.delete(selectSql.length()-4, selectSql.length());
+        selectSql.delete(selectSql.length() - 4, selectSql.length());
         return selectSql.toString();
     }
 

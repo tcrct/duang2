@@ -13,14 +13,14 @@ import com.duangframework.vtor.annotation.NotEmpty;
 public class SearchDto implements java.io.Serializable {
 
     @NotEmpty
-    @Param(name="field", label = "搜索字段", desc = "需要参与搜索的字段名称")
+    @Param(name = "field", label = "搜索字段", desc = "需要参与搜索的字段名称")
     private String field;
 
-    @Param(name="operator", label = "表达式", desc = "==, >, >= , <, <=, !=, like, in, nin 默认为 ==")
+    @Param(name = "operator", label = "表达式", desc = "==, >, >= , <, <=, !=, like, in, nin 默认为 ==")
     private String operator;
 
     @NotEmpty
-    @Param(name="value", label = "搜索值", desc = "需要参与搜索的字段值")
+    @Param(name = "value", label = "搜索值", desc = "需要参与搜索的字段值")
     private Object value;
 
 

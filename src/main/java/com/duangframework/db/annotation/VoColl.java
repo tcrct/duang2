@@ -7,11 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * java value object集合注解
- * @author laotang
  *
+ * @author laotang
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface VoColl {
-	 public String name() default "";
+    public String name() default "";
 }

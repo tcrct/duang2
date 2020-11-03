@@ -2,6 +2,7 @@ package com.duangframework.db;
 
 /**
  * 数据库链接对象
+ *
  * @author Created by laotang
  * @date createed in 2018/6/26.
  */
@@ -16,7 +17,6 @@ public abstract class DBConnect {
 
     protected String host;
     protected int port;
-
 
 
     protected String database;
@@ -42,11 +42,12 @@ public abstract class DBConnect {
         return port;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
-    }
     public String getDatabase() {
         return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
     public String getUsername() {

@@ -1,4 +1,3 @@
-
 package com.duangframework.mvc.core;
 
 /**
@@ -6,16 +5,18 @@ package com.duangframework.mvc.core;
  */
 public interface InitRun {
 
-	/**
-	 * 框架启动前执行
-	 * @throws Exception
-	 */
-	void before() throws Exception;
+    /**
+     * 框架启动前执行
+     *
+     * @throws Exception
+     */
+    void before() throws Exception;
 
 
-	/**
-	 * 框架启动完成后执行
-	 * @throws Exception
-	 */
-	void after() throws Exception;
+    /**
+     * 框架启动完成后执行
+     *
+     * @throws Exception
+     */
+    void after() throws Exception;
 }

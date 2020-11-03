@@ -8,7 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Created by laotang
@@ -35,13 +38,17 @@ public class ClassHelper {
     }
 
     private static void setClass2Map(List<Class<?>> clazzList) {
-        for(Class<?> clazz : clazzList) {
-            for(ConstEnums.ANNOTATION_CLASS classEnums : ConstEnums.ANNOTATION_CLASS.values()) {
+        for (Class<?> clazz : clazzList) {
+            for (ConstEnums.ANNOTATION_CLASS classEnums : ConstEnums.ANNOTATION_CLASS.values()) {
                 if (clazz.isAnnotationPresent(classEnums.getClazz())) {
                     String key = classEnums.getName();
                     List<Class<?>> tmpList = CLASS_MAP.get(key);
-                    if(ToolsKit.isEmpty(tmpList)) {
-                        CLASS_MAP.put(key, new ArrayList<Class<?>>(){ { this.add(clazz);} });
+                    if (ToolsKit.isEmpty(tmpList)) {
+                        CLASS_MAP.put(key, new ArrayList<Class<?>>() {
+                            {
+                                this.add(clazz);
+                            }
+                        });
                     } else {
                         tmpList.add(clazz);
                     }
@@ -53,6 +60,7 @@ public class ClassHelper {
 
     /**
      * 返回所有扫描过的类
+     *
      * @return
      */
     public static Map<String, List<Class<?>>> getClassMap() {
@@ -61,6 +69,7 @@ public class ClassHelper {
 
     /**
      * 返回所有Controller类
+     *
      * @return
      */
     public static List<Class<?>> getControllerClassList() {
@@ -69,49 +78,54 @@ public class ClassHelper {
 
     /**
      * 返回所有Service类
+     *
      * @return
      */
-    public static List<Class<?>> getServiceClassList () {
+    public static List<Class<?>> getServiceClassList() {
         return CLASS_MAP.get(ConstEnums.ANNOTATION_CLASS.SERVICE_ANNOTATION.getName());
     }
 
     /**
      * 返回所有Entity类
+     *
      * @return
      */
-    public static List<Class<?>> getEntityClassList () {
+    public static List<Class<?>> getEntityClassList() {
         return CLASS_MAP.get(ConstEnums.ANNOTATION_CLASS.ENTITY_ANNOTATION.getName());
     }
 
     /**
      * 返回所有Bean类
+     *
      * @return
      */
-    public static List<Class<?>> getBeanClassList () {
+    public static List<Class<?>> getBeanClassList() {
         return CLASS_MAP.get(ConstEnums.ANNOTATION_CLASS.BEAN_ANNOTATION.getName());
     }
 
     /**
      * 返回所有Plugin类
+     *
      * @return
      */
-    public static List<Class<?>> getPluginClassList () {
+    public static List<Class<?>> getPluginClassList() {
         return CLASS_MAP.get(ConstEnums.ANNOTATION_CLASS.PLUGIN_ANNOTATION.getName());
     }
 
     /**
      * 返回所有类集合
+     *
      * @return
      */
-    public static List<Class<?>> getClassList (Class<? extends Annotation> annotationClass) {
+    public static List<Class<?>> getClassList(Class<? extends Annotation> annotationClass) {
         return CLASS_MAP.get(annotationClass.getName());
     }
 
     /**
-     *  取出所有业务类代码，一般用于热替换(热部署)功能
-     *  不包括jar包下的类，仅包括classes文件下的所有class文件，一般是业务代码class
+     * 取出所有业务类代码，一般用于热替换(热部署)功能
+     * 不包括jar包下的类，仅包括classes文件下的所有class文件，一般是业务代码class
      *
-     * @param classList       包路径，在该路径下的所有Class会扫描
+     * @param classList 包路径，在该路径下的所有Class会扫描
      * @return
      */
     public static void reSetAllBizClass(List<Class<?>> classList) {

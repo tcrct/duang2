@@ -42,19 +42,17 @@ import java.util.*;
  */
 public final class ToolsKit {
 
-    private static Logger logger = LoggerFactory.getLogger(ToolsKit.class);
-
+    public final static Map<String, String> HTML_CHAR = new HashMap<>();
+    /**
+     * 设置方法参数的泛型
+     *
+     * @param key       请求的URI地址
+     * @param kvItem    key为参数变量名，value为泛型Type
+     */
+    public static final Map<String, KvItem> mehtodParamsGenericTypeMap = new HashMap<>();
     private static final String HASH_ALGORITHM = "SHA-1";
     private static final int HASH_INTERATIONS = 1024;
     private static final int SALT_SIZE = 8;
-    private static SerializeFilter[] serializeFilters;
-
-    private static SerializeConfig jsonConfig = new SerializeConfig();
-
-    private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-
-    public final static Map<String, String> HTML_CHAR = new HashMap<>();
-
     public static SerializerFeature[] serializerFeatureArray = {
             SerializerFeature.QuoteFieldNames,
             SerializerFeature.WriteNonStringKeyAsString,
@@ -62,7 +60,10 @@ public final class ToolsKit {
             SerializerFeature.NotWriteRootClassName,
             SerializerFeature.WriteDateUseDateFormat
     };
-
+    private static Logger logger = LoggerFactory.getLogger(ToolsKit.class);
+    private static SerializeFilter[] serializeFilters;
+    private static SerializeConfig jsonConfig = new SerializeConfig();
+    private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private static SerializerFeature[] serializerFeatureArray2 = {
             SerializerFeature.QuoteFieldNames,
             SerializerFeature.UseISO8601DateFormat,
@@ -73,6 +74,13 @@ public final class ToolsKit {
             SerializerFeature.WriteNullNumberAsZero,
             SerializerFeature.WriteNullBooleanAsFalse,
             SerializerFeature.NotWriteRootClassName
+    };
+    // 定义一个请求对象安全线程类
+    private static DuangThreadLocal<HeadDto> requestHeaderThreadLocal = new DuangThreadLocal<HeadDto>() {
+        @Override
+        public HeadDto initialValue() {
+            return new HeadDto();
+        }
     };
 
     static {
@@ -89,7 +97,7 @@ public final class ToolsKit {
      *
      * @param obj
      *            待检查的对象
-     * @return 返回的布尔值,为空或等于0时返回true
+     * @return 返回的布尔值, 为空或等于0时返回true
      */
     public static boolean isEmpty(Object obj) {
         return checkObjectIsEmpty(obj, true);
@@ -100,7 +108,7 @@ public final class ToolsKit {
      *
      * @param obj
      *            待检查的对象
-     * @return 返回的布尔值,不为空或不等于0时返回true
+     * @return 返回的布尔值, 不为空或不等于0时返回true
      */
     public static boolean isNotEmpty(Object obj) {
         return checkObjectIsEmpty(obj, false);
@@ -110,11 +118,9 @@ public final class ToolsKit {
     private static boolean checkObjectIsEmpty(Object obj, boolean bool) {
         if (null == obj) {
             return bool;
-        }
-        else if (obj == "" || "".equals(obj)) {
+        } else if (obj == "" || "".equals(obj)) {
             return bool;
-        }
-        else if (obj instanceof Integer || obj instanceof Long || obj instanceof Double) {
+        } else if (obj instanceof Integer || obj instanceof Long || obj instanceof Double) {
             try {
                 Double.parseDouble(obj + "");
             } catch (Exception e) {
@@ -124,7 +130,7 @@ public final class ToolsKit {
             if (((String) obj).length() <= 0) {
                 return bool;
             }
-            if ("null".equalsIgnoreCase(obj+"")) {
+            if ("null".equalsIgnoreCase(obj + "")) {
                 return bool;
             }
         } else if (obj instanceof Map) {
@@ -145,6 +151,7 @@ public final class ToolsKit {
 
     /**
      * 判断是否JSON字符串
+     *
      * @param jsonString
      * @return
      */
@@ -154,6 +161,7 @@ public final class ToolsKit {
 
     /**
      * 判断是否数据JSON字符串
+     *
      * @param jsonString
      * @return
      */
@@ -163,13 +171,13 @@ public final class ToolsKit {
 
     /**
      * 判断是否是数组
+     *
      * @param obj
      * @return
      */
     public static boolean isArray(Object obj) {
         return obj instanceof List || obj instanceof Array || obj.getClass().isArray();
     }
-
 
     public static String toJsonString(Object obj) {
         return JSON.toJSONString(obj, jsonConfig, serializerFeatureArray);
@@ -180,10 +188,10 @@ public final class ToolsKit {
     }
 
     public static SerializeFilter[] getCustomSerializeFilter() {
-        if(ToolsKit.isEmpty(serializeFilters)) {
+        if (ToolsKit.isEmpty(serializeFilters)) {
             serializeFilters = new SerializeFilter[2];
             serializeFilters[0] = new IdNameFilter();
-            serializeFilters[1] =  new HostFilter();
+            serializeFilters[1] = new HostFilter();
         }
         return serializeFilters;
     }
@@ -256,9 +264,8 @@ public final class ToolsKit {
     /**
      * 验证是否为MongoDB 的ObjectId
      *
-     * @param str
-     *            待验证字符串
-     * @return  如果是则返回true
+     * @param str 待验证字符串
+     * @return 如果是则返回true
      */
     public static boolean isValidDuangId(String str) {
         if (ToolsKit.isEmpty(str)) {
@@ -284,8 +291,9 @@ public final class ToolsKit {
 
     /**
      * 根据format字段，格式化日期
-     * @param date          日期
-     * @param format        格式化字段
+     *
+     * @param date   日期
+     * @param format 格式化字段
      * @return
      */
     public static String formatDate(Date date, String format) {
@@ -299,9 +307,10 @@ public final class ToolsKit {
     }
 
     /**
-     *  将字符串日期根据format格式化字段转换成日期类型
-     * @param stringDate    字符串日期
-     * @param format           格式化日期
+     * 将字符串日期根据format格式化字段转换成日期类型
+     *
+     * @param stringDate 字符串日期
+     * @param format     格式化日期
      * @return
      */
     public static Date parseDate(String stringDate, String format) {
@@ -314,10 +323,9 @@ public final class ToolsKit {
         }
     }
 
-
     public static String getFieldName(Field field) {
         ConvertField convertField = field.getAnnotation(ConvertField.class);
-        if(null != convertField) {
+        if (null != convertField) {
             return convertField.name();
         }
         return field.getName();
@@ -326,21 +334,20 @@ public final class ToolsKit {
 //                (ToolsKit.isEmpty(jsonField.format()) ? jsonField.name() : jsonField.format());
     }
 
-    public static FileFilter fileFilter(final File dir, final String extName){
+    public static FileFilter fileFilter(final File dir, final String extName) {
         return new FileFilter() {
             @Override
             public boolean accept(File file) {
-                if(".class".equalsIgnoreCase(extName)) {
-                    return ( file.isFile() && file.getName().endsWith(extName) ) || file.isDirectory();
-                } else if(".jar".equalsIgnoreCase(extName)) {
-                    return ( file.isFile() && file.getName().endsWith(extName) ) || file.isFile();
+                if (".class".equalsIgnoreCase(extName)) {
+                    return (file.isFile() && file.getName().endsWith(extName)) || file.isDirectory();
+                } else if (".jar".equalsIgnoreCase(extName)) {
+                    return (file.isFile() && file.getName().endsWith(extName)) || file.isFile();
                 } else {
                     throw new IllegalArgumentException();
                 }
             }
         };
     }
-
 
     /**
      * HTML字符转换表
@@ -375,7 +382,6 @@ public final class ToolsKit {
     }
 
     /**
-     *
      * @param exception
      * @param obj
      * @return
@@ -383,7 +389,7 @@ public final class ToolsKit {
     public static ReturnDto<Object> buildReturnDto(IException exception, Object obj) {
         ReturnDto<Object> dto = new ReturnDto<Object>();
         HeadDto head = ToolsKit.getThreadLocalDto();
-        if(isEmpty(head)) {
+        if (isEmpty(head)) {
             head = new HeadDto();
         }
         if (ToolsKit.isEmpty(exception)) {
@@ -399,7 +405,7 @@ public final class ToolsKit {
     }
 
     public static boolean isDuangBean(Class<?> parameterType) {
-        if(DataType.isBaseType(parameterType)) {
+        if (DataType.isBaseType(parameterType)) {
             return false;
         }
         return parameterType.isAnnotationPresent(Bean.class)
@@ -459,20 +465,21 @@ public final class ToolsKit {
 
     /**
      * 去掉不符合指定字符串里包含的字符
+     *
      * @param password
      * @return
      */
-    private static String vaildPassword(String password){
+    private static String vaildPassword(String password) {
         char[] charArray = password.toCharArray();
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<charArray.length; i++){
-            for(int j=0; j<Encodes.BASE62.length; j++){
-                if(charArray[i] == Encodes.BASE62[j]){
+        for (int i = 0; i < charArray.length; i++) {
+            for (int j = 0; j < Encodes.BASE62.length; j++) {
+                if (charArray[i] == Encodes.BASE62[j]) {
                     sb.append(charArray[i]);
                 }
             }
         }
-        if(sb.length() > 0){
+        if (sb.length() > 0) {
             password = sb.toString();
         }
         return password;
@@ -504,9 +511,9 @@ public final class ToolsKit {
         return str;
     }
 
-
     /**
      * 设定安全的KEY
+     *
      * @param key
      * @param key2
      */
@@ -517,7 +524,8 @@ public final class ToolsKit {
 
     /**
      * 验证对象属性值是否正确
-     * @param validateObj   待验证的对象
+     *
+     * @param validateObj 待验证的对象
      * @return
      */
     public static void validatorObj(Object validateObj) {
@@ -533,32 +541,35 @@ public final class ToolsKit {
 
     /**
      * 将搜索对象转换为查询对象
+     *
      * @param searchListDto
      * @param searchListDto
      * @return
      */
     public static Query searchDto2Query(SearchListDto searchListDto, Class<?> tClass) throws Exception {
-        if(ToolsKit.isEmpty(searchListDto)) {
+        if (ToolsKit.isEmpty(searchListDto)) {
             throw new ServiceException("searchListDto is null");
         }
-        if(ToolsKit.isEmpty(tClass)) {
+        if (ToolsKit.isEmpty(tClass)) {
             throw new ServiceException("tClass is null");
         }
-        Map<String,Field> fieldMap = ClassKit.getFieldMap(tClass);
+        Map<String, Field> fieldMap = ClassKit.getFieldMap(tClass);
         Query query = new Query();
         int pageNo = searchListDto.getPageNo();
-        if(pageNo == 1) {pageNo = 0;}
+        if (pageNo == 1) {
+            pageNo = 0;
+        }
         query.page(new PageDto(pageNo, searchListDto.getPageSize()));
         query.order(new Order(IdEntity.ID_FIELD, OrderByEnum.DESC));
         List<SearchDto> searchDtoList = searchListDto.getSearchDtos();
         Class<?> typeClass = null;
-        if(ToolsKit.isNotEmpty(searchDtoList)) {
-            for(SearchDto searchDto : searchDtoList) {
+        if (ToolsKit.isNotEmpty(searchDtoList)) {
+            for (SearchDto searchDto : searchDtoList) {
                 String fieldName = searchDto.getField();
                 Field field = fieldMap.get(fieldName);
                 typeClass = (null == field) ? String.class : field.getType();
                 String operator = ToolsKit.isEmpty(searchDto.getOperator()) ? "==" : searchDto.getOperator();
-                Object value =  TypeConverter.convert(typeClass, searchDto.getValue());
+                Object value = TypeConverter.convert(typeClass, searchDto.getValue());
                 if (ToolsKit.isNotEmpty(fieldName) && ToolsKit.isNotEmpty(value)) {
                     switch (operator) {
                         case "!=":
@@ -595,14 +606,13 @@ public final class ToolsKit {
         return query;
     }
 
-
     /***
      * 新增记录时，填充基本数据到对象中
      *
      * @param obj 需要反射的对象
      */
     public static void addEntityData(Object obj) throws Exception {
-        Map<String,String> map = getRequestUserIdTerminal();
+        Map<String, String> map = getRequestUserIdTerminal();
         addIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
                 map.get(ConstEnums.TERMINAL_FIELD.getValue()),
@@ -670,10 +680,11 @@ public final class ToolsKit {
 
     /**
      * 修改记录时，修改更新时间，更新人ID到对象中
-     *@param obj 要修改的对象
+     *
+     * @param obj 要修改的对象
      */
     public static void updateEntityData(Object obj) throws Exception {
-        Map<String,String> map = getRequestUserIdTerminal();
+        Map<String, String> map = getRequestUserIdTerminal();
         updateIdEntityData(obj,
                 map.get(ConstEnums.REQUEST_ID_FIELD.getValue()),
                 map.get(ConstEnums.TERMINAL_FIELD.getValue()),
@@ -697,35 +708,36 @@ public final class ToolsKit {
         ObjectKit.setField(obj, getIdEntityField(IdEntity.SOURCE_FIELD), source);
         // 可以自定义值更改
         Object value = ObjectKit.getFieldValue(obj, deptField);
-        if(ToolsKit.isEmpty(value)) {
+        if (ToolsKit.isEmpty(value)) {
             ObjectKit.setField(obj, getIdEntityField(IdEntity.DEPARTIMENTID_FIELD), departimentId);
         }
         value = ObjectKit.getFieldValue(obj, projectIdField);
-        if(ToolsKit.isEmpty(value)) {
+        if (ToolsKit.isEmpty(value)) {
             ObjectKit.setField(obj, getIdEntityField(IdEntity.PROJECTID_FIELD), projectId);
         }
         value = ObjectKit.getFieldValue(obj, companyIdField);
-        if(ToolsKit.isEmpty(value)) {
+        if (ToolsKit.isEmpty(value)) {
             ObjectKit.setField(obj, getIdEntityField(IdEntity.COMPANYID_FIELD), companyId);
         }
     }
 
-    private static Field getIdEntityField(String key) throws Exception{
+    private static Field getIdEntityField(String key) throws Exception {
         return IdEntity.class.getDeclaredField(key);
     }
 
     /**
      * 取出请求里的userid及terminal
+     *
      * @return Map
      */
-    public static Map<String,String> getRequestUserIdTerminal() {
-        String userId = "", projectId = "", companyId="", terminal = "", departmentId="";
+    public static Map<String, String> getRequestUserIdTerminal() {
+        String userId = "", projectId = "", companyId = "", terminal = "", departmentId = "";
         try {
             HeadDto headDto = ToolsKit.getThreadLocalDto();
-            if(ToolsKit.isNotEmpty(headDto)) {
+            if (ToolsKit.isNotEmpty(headDto)) {
                 terminal = headDto.getHeaderMap().get(ConstEnums.TERMINAL_FIELD);
                 String tokenId = headDto.getTokenId();
-                if(ToolsKit.isNotEmpty(tokenId)) {
+                if (ToolsKit.isNotEmpty(tokenId)) {
                     SecurityUser securityUser = getSecurityUser(tokenId);
                     userId = securityUser.getUserId();
                     departmentId = securityUser.getDepartmentId();
@@ -740,7 +752,7 @@ public final class ToolsKit {
         terminal = ToolsKit.isEmpty(terminal) ? "console" : terminal;
         projectId = ToolsKit.isEmpty(projectId) ? PropKit.get(ConstEnums.PROPERTIES.PRODUCT_APPID.getValue()) : projectId;
         companyId = ToolsKit.isEmpty(companyId) ? "0" : companyId;
-        Map<String, String> map =  new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put(ConstEnums.REQUEST_ID_FIELD.getValue(), userId);
         map.put(ConstEnums.TERMINAL_FIELD.getValue(), terminal);
         map.put(IdEntity.DEPARTIMENTID_FIELD, departmentId);
@@ -751,7 +763,8 @@ public final class ToolsKit {
 
     /**
      * 取已经当前登录的SecurityUser对象
-     * @return      SecurityUser对象
+     *
+     * @return SecurityUser对象
      * @Exception SecurityUser对象不存在，则抛出空指针异常
      */
     public static SecurityUser getSecurityUser() {
@@ -761,10 +774,12 @@ public final class ToolsKit {
             throw new MvcException(e.getMessage(), e);
         }
     }
+
     /**
      * 根据key参数，取已经登录的SecurityUser对象
-     * @param key   参数值为userId或tokenId
-     * @return      SecurityUser对象
+     *
+     * @param key 参数值为userId或tokenId
+     * @return SecurityUser对象
      * @Exception SecurityUser对象不存在，则抛出空指针异常
      */
     public static SecurityUser getSecurityUser(String key) {
@@ -779,51 +794,45 @@ public final class ToolsKit {
         }
     }
 
-    // 定义一个请求对象安全线程类
-    private static DuangThreadLocal<HeadDto> requestHeaderThreadLocal = new DuangThreadLocal<HeadDto>() {
-        @Override
-        public HeadDto initialValue() {
-            return new HeadDto();
-        }
-    };
+    /**
+     * 取ThreadLocal里的HeadDto对象
+     *
+     * @return
+     */
+    public static HeadDto getThreadLocalDto() {
+        return requestHeaderThreadLocal.get();
+    }
 
     /**
      * 设置请求头DTO到ThreadLocal变量
-     * @param headDto       请求头DTO
+     *
+     * @param headDto 请求头DTO
      */
     public static void setThreadLocalDto(HeadDto headDto) {
         requestHeaderThreadLocal.set(headDto);
     }
 
     /**
-     *  取ThreadLocal里的HeadDto对象
-     * @return
-     */
-    public static HeadDto getThreadLocalDto() {
-        return  requestHeaderThreadLocal.get();
-    }
-
-    /**
      * 简单判断是否duang请求
-     *  为了防止恶意请求，对于此类不带tokenId的请求
-     *  客户端必须增加HTTP基本认证。
-     *  默认用户名是 duang  密码是 duangduangduang
-     *  如需要自定义，则在duang.properties里，设置base.auth.username及base.auth.password
-     *  同时亦须对security.filter.uri设置允许访问的uri ，如有多个uri，以小写的,号分隔
-     *  即需要在客户端设置http基本认证， 在服务器的duang.properties文件里对security.filter.uri设置允许访问的uri
+     * 为了防止恶意请求，对于此类不带tokenId的请求
+     * 客户端必须增加HTTP基本认证。
+     * 默认用户名是 duang  密码是 duangduangduang
+     * 如需要自定义，则在duang.properties里，设置base.auth.username及base.auth.password
+     * 同时亦须对security.filter.uri设置允许访问的uri ，如有多个uri，以小写的,号分隔
+     * 即需要在客户端设置http基本认证， 在服务器的duang.properties文件里对security.filter.uri设置允许访问的uri
      *
-     * @param headMap   head头信息
-     * @return    正确的请求返回true
+     * @param headMap head头信息
+     * @return 正确的请求返回true
      */
-    public static boolean isDuangRequest(Map<String,String> headMap) {
+    public static boolean isDuangRequest(Map<String, String> headMap) {
         String authorization = headMap.get(HttpHeaderNames.AUTHORIZATION);
-        if(ToolsKit.isEmpty(authorization)) {
+        if (ToolsKit.isEmpty(authorization)) {
             throw new SecurityException("current request duangframework is not allowed access!");
         }
         String duang = ConstEnums.FRAMEWORK_OWNER.getValue();
         String account = PropKit.get(ConstEnums.PROPERTIES.BASE_AUTH_USERNAME.getValue(), duang);
-        String password = PropKit.get(ConstEnums.PROPERTIES.BASE_AUTH_PASSWORD.getValue(), duang+duang+duang);
-        if(!authorization.equals(createBaseAuthHeaderString(account, password))) {
+        String password = PropKit.get(ConstEnums.PROPERTIES.BASE_AUTH_PASSWORD.getValue(), duang + duang + duang);
+        if (!authorization.equals(createBaseAuthHeaderString(account, password))) {
             throw new SecurityException("current request duangframework is not allowed access!");
         }
         return true;
@@ -831,12 +840,13 @@ public final class ToolsKit {
 
     /**
      * 创建HTTP基本认证头信息
-     * @param account       用户名
-     * @param password     密码
+     *
+     * @param account  用户名
+     * @param password 密码
      * @return
      */
     public static String createBaseAuthHeaderString(String account, String password) {
-        String auth = account+":"+password;
+        String auth = account + ":" + password;
         return "Basic " + Encodes.encodeBase64(auth.getBytes()); //Charset.forName("US-ASCII")
     }
 
@@ -845,13 +855,13 @@ public final class ToolsKit {
     }
 
     public static boolean hasText(CharSequence str) {
-        return hasLength(str)  && containsText(str);
+        return hasLength(str) && containsText(str);
     }
 
     private static boolean containsText(CharSequence str) {
         int strLen = str.length();
 
-        for(int i = 0; i < strLen; ++i) {
+        for (int i = 0; i < strLen; ++i) {
             if (!Character.isWhitespace(str.charAt(i))) {
                 return true;
             }
@@ -860,40 +870,35 @@ public final class ToolsKit {
         return false;
     }
 
-    /**
-     * 设置方法参数的泛型
-     * @param key       请求的URI地址
-     * @param kvItem    key为参数变量名，value为泛型Type
-     */
-    public static final Map<String,KvItem> mehtodParamsGenericTypeMap = new HashMap<>();
     public static void setMehtodParamsGenericType(String key, KvItem kvItem) {
         mehtodParamsGenericTypeMap.put(key, kvItem);
     }
 
     /**
      * 根据请求地址URI，取出指定变量名称的泛型值
-     * @param uri   请求URI地址
-     * @param paramsName    变量名
+     *
+     * @param uri        请求URI地址
+     * @param paramsName 变量名
      * @return
      */
     public static Type getMehtodParamsGenericTypeMap(String uri, String paramsName) {
         KvItem kvItem = mehtodParamsGenericTypeMap.get(uri);
-        if(ToolsKit.isEmpty(kvItem)) {
+        if (ToolsKit.isEmpty(kvItem)) {
             return null;
         }
-        return kvItem.getKey().equals(paramsName) ? (Type)kvItem.getValue() : null;
+        return kvItem.getKey().equals(paramsName) ? (Type) kvItem.getValue() : null;
     }
 
     /**
      * 十六进制字符串转byte[]
-     *https://blog.csdn.net/csdn_ds/article/details/79106006
+     * https://blog.csdn.net/csdn_ds/article/details/79106006
      *
      * @param str 十六进制字符串
      * @return
      */
     public static byte[] hexToBytes(String str) {
-        byte[] bytes = new byte[str.length()/2];
-        for(int i = 0; i < str.length() / 2; i++) {
+        byte[] bytes = new byte[str.length() / 2];
+        for (int i = 0; i < str.length() / 2; i++) {
             String tmpStr = str.substring(i * 2, i * 2 + 2);
             // 字节数& 0xff实现
             bytes[i] = (byte) (Integer.parseInt(tmpStr, 16) & 0xff);

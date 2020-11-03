@@ -20,7 +20,6 @@ public class DeleteConvetorTemplate extends AbstractConvetorTemplate {
     }
 
     /**
-     *
      * @param convetorObject 转换对象
      * @return
      */
@@ -47,7 +46,7 @@ public class DeleteConvetorTemplate extends AbstractConvetorTemplate {
                 deleteSql.append(kvItem.getKey()).append("=?").append(AND_FIELD);
             }
         });
-        deleteSql.delete(deleteSql.length()-4, deleteSql.length());
+        deleteSql.delete(deleteSql.length() - 4, deleteSql.length());
         return deleteSql.toString();
     }
 

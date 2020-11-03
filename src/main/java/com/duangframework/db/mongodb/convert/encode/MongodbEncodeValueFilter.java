@@ -18,32 +18,27 @@ public class MongodbEncodeValueFilter implements ContextValueFilter {
 //        if(object != null && null != value) {
 //            System.out.println(object + "           " + name + "           " + value + "      " + value.getClass());
 //        }
-        if(null == value) {
-           return value;
+        if (null == value) {
+            return value;
         }
         Class type = value.getClass();
         if (DataType.isString(type) &&
                 (IdEntity.ID_FIELD.equals(name) || IdEntity.ENTITY_ID_FIELD.equals(name))) {
-            String idString = (String)value;
-            if(ObjectId.isValid(idString)) {
+            String idString = (String) value;
+            if (ObjectId.isValid(idString)) {
                 return new ObjectId(idString);
             }
             return idString;
-        }
-        else if(DataType.isShort(type) || DataType.isShortObject(type)) {
+        } else if (DataType.isShort(type) || DataType.isShortObject(type)) {
             return Short.parseShort(value.toString());
-        }
-        else if(DataType.isInteger(type) || DataType.isIntegerObject(type)) {
+        } else if (DataType.isInteger(type) || DataType.isIntegerObject(type)) {
             return Integer.parseInt(value.toString());
-        }
-        else if(DataType.isLong(type) || DataType.isLongObject(type)) {
+        } else if (DataType.isLong(type) || DataType.isLongObject(type)) {
             return Long.parseLong(value.toString());
-        }
-        else if(DataType.isDouble(type) || DataType.isDoubleObject(type)) {
+        } else if (DataType.isDouble(type) || DataType.isDoubleObject(type)) {
             return Double.parseDouble(value.toString());
-        }
-        else if(DataType.isDate(value.getClass()) || DataType.isTimestamp(value.getClass())) {
-            return (Date)value;
+        } else if (DataType.isDate(value.getClass()) || DataType.isTimestamp(value.getClass())) {
+            return (Date) value;
         }
         return value;
     }

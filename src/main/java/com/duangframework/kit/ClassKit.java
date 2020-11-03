@@ -9,7 +9,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -30,7 +33,8 @@ public final class ClassKit {
 
     /**
      * 实例化类文件, 默认实例化
-     * @param className  类文件，包括包路径
+     *
+     * @param className 类文件，包括包路径
      * @return
      */
     public static Class<?> loadClass(String className) {
@@ -47,16 +51,19 @@ public final class ClassKit {
 
     /**
      * 实例化类文件, 默认实例化
-     * @param clazz  类文件
+     *
+     * @param clazz 类文件
      * @return
      */
     public static Class<?> loadClass(Class<?> clazz) {
         return loadClass(clazz, true);
     }
+
     /**
      * 实例化类文件
+     *
      * @param clazz  类文件
-     * @param isInit  是否实例
+     * @param isInit 是否实例
      * @return
      */
     public static Class<?> loadClass(Class<?> clazz, boolean isInit) {
@@ -65,7 +72,7 @@ public final class ClassKit {
         }
         try {
             // 要初始化且支持实例化
-            if(isInit && supportInstance(clazz)) {
+            if (isInit && supportInstance(clazz)) {
                 clazz = Class.forName(clazz.getName(), isInit, ClassKit.getClassLoader());
             }
         } catch (ClassNotFoundException e) {
@@ -87,11 +94,11 @@ public final class ClassKit {
      * @return
      */
     public static boolean supportInstance(Class<?> clazz) {
-        if(null == clazz) {
+        if (null == clazz) {
             return false;
         }
         //
-        if(Modifier.isAbstract(clazz.getModifiers()) || Modifier.isInterface(clazz.getModifiers())) {
+        if (Modifier.isAbstract(clazz.getModifiers()) || Modifier.isInterface(clazz.getModifiers())) {
             return false;
         }
 //        BaseController controller = clazz.getAnnotation(BaseController.class);
@@ -109,22 +116,22 @@ public final class ClassKit {
     @SuppressWarnings("rawtypes")
     public static boolean isExtends(Class<?> cls, String topClassName) {
         String clsName = cls.getCanonicalName();
-        if("java.lang.Object".equals(clsName)) {
+        if ("java.lang.Object".equals(clsName)) {
             return true;
         }
         Class parent = cls.getSuperclass();
-        if(ToolsKit.isNotEmpty(parent)){
+        if (ToolsKit.isNotEmpty(parent)) {
             String name = parent.getCanonicalName();
-            if(name.equals(topClassName)) {
+            if (name.equals(topClassName)) {
                 return true;
             }
-            while(ToolsKit.isNotEmpty(parent)){
+            while (ToolsKit.isNotEmpty(parent)) {
                 parent = parent.getSuperclass();
-                if(parent == null) {
+                if (parent == null) {
                     return false;
                 }
                 name = parent.getCanonicalName();
-                if(name.equals(topClassName)){
+                if (name.equals(topClassName)) {
                     return true;
                 }
             }
@@ -134,6 +141,7 @@ public final class ClassKit {
 
     /**
      * 取得Bean的名字,如果有指定则用指定的,没有则用小写的类名作表名用
+     *
      * @param cls
      * @return
      */
@@ -143,9 +151,10 @@ public final class ClassKit {
 
     /**
      * 取类的简短名称
-     * @param cls			类对象
-     * @param isLowerCase	是否返回小写,true时返回小写
-     * @return				简短名称
+     *
+     * @param cls         类对象
+     * @param isLowerCase 是否返回小写,true时返回小写
+     * @return 简短名称
      */
     public static String getClassSimpleName(Class<?> cls, boolean isLowerCase) {
         String name = cls.getSimpleName();
@@ -155,8 +164,8 @@ public final class ClassKit {
     public static String getEntityName(Class<?> cls, boolean isLowerCase) {
         Entity entity = cls.getAnnotation(Entity.class);
         // TODO 兼容Duang2.0版的Entity
-        String name =  getClassSimpleName(cls, isLowerCase);
-        if(null != entity && ToolsKit.isNotEmpty(entity.name())) {
+        String name = getClassSimpleName(cls, isLowerCase);
+        if (null != entity && ToolsKit.isNotEmpty(entity.name())) {
             name = entity.name();
         }
         return isLowerCase ? name.toLowerCase() : name;
@@ -164,8 +173,9 @@ public final class ClassKit {
 
     /**
      * 取出类的全名，包括包名
-     * @param cls                       类
-     * @param isLowerCase       是否转为小写
+     *
+     * @param cls         类
+     * @param isLowerCase 是否转为小写
      * @return
      */
     public static String getClassName(Class<?> cls, boolean isLowerCase) {
@@ -175,24 +185,26 @@ public final class ClassKit {
 
     /**
      * 取出类的全名，包括包名
+     *
      * @param cls
      * @return
      */
     public static String getClassName(Class<?> cls) {
-        return getClassName(cls ,true);
+        return getClassName(cls, true);
     }
 
     /**
      * 根据class对象反射出所有属性字段，静态字段除外
+     *
      * @param cls
      * @return
      */
-    public static Field[] getFields(Class<?> cls){
+    public static Field[] getFields(Class<?> cls) {
         String key = getClassName(cls);
         Field[] field = null;
-        if(FIELD_MAPPING_MAP.containsKey(key)){
+        if (FIELD_MAPPING_MAP.containsKey(key)) {
             field = FIELD_MAPPING_MAP.get(key);
-        }else{
+        } else {
             field = getAllFields(cls);
             FIELD_MAPPING_MAP.put(key, field);
         }
@@ -201,17 +213,18 @@ public final class ClassKit {
 
     /**
      * 根据class对象反射出所有属性字段，静态字段除外
+     *
      * @param cls
-     * @return  Map集合，key为field.getName()
+     * @return Map集合，key为field.getName()
      */
     public static Map<String, Field> getFieldMap(Class<?> cls) {
         Field[] fileds = getFields(cls);
-        if(null == fileds) {
+        if (null == fileds) {
             return null;
         }
         Map<String, Field> map = new HashMap<>(fileds.length);
-        for(Field field : fileds) {
-            if(null != field) {
+        for (Field field : fileds) {
+            if (null != field) {
                 map.put(field.getName(), field);
             }
         }
@@ -220,15 +233,16 @@ public final class ClassKit {
 
     /**
      * 取出类里的所有字段
+     *
      * @param cls
-     * @return	Field[]
+     * @return Field[]
      */
     private static Field[] getAllFields(Class<?> cls) {
         List<Field> fieldList = new ArrayList<Field>();
         fieldList.addAll(filterStaticFields(cls.getDeclaredFields()));
         Class<?> parent = cls.getSuperclass();
         //查找父类里的属性字段
-        while(null != parent && parent != Object.class){
+        while (null != parent && parent != Object.class) {
             fieldList.addAll(filterStaticFields(parent.getDeclaredFields()));
             parent = parent.getSuperclass();
         }
@@ -237,14 +251,15 @@ public final class ClassKit {
 
     /**
      * 过滤静态方法
+     *
      * @param fields
      * @return
      */
-    private static List<Field> filterStaticFields(Field[] fields){
+    private static List<Field> filterStaticFields(Field[] fields) {
         List<Field> result = new ArrayList<Field>();
         for (Field field : fields) {
-            if(!Modifier.isStatic(field.getModifiers())){		//静态字段不取
-                field.setAccessible(true);	//设置可访问私有变量
+            if (!Modifier.isStatic(field.getModifiers())) {        //静态字段不取
+                field.setAccessible(true);    //设置可访问私有变量
                 result.add(field);
             }
         }
@@ -267,7 +282,7 @@ public final class ClassKit {
     /**
      * 通过反射, 获得Class定义中声明的父类的泛型参数的类型.
      * 如无法找到, 返回Object.class.
-     *
+     * <p>
      * 如public UserDao extends MongodbBaseDao<User,String>
      *
      * @param clazz clazz The class to introspect

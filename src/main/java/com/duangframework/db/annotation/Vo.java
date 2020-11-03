@@ -7,11 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * java value注解
- * @author laotang
  *
+ * @author laotang
  */
-@Target(value={ElementType.TYPE, ElementType.FIELD})
+@Target(value = {ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Vo {
-	 public String name() default "";
+    public String name() default "";
 }

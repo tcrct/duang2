@@ -6,30 +6,30 @@ package com.duangframework.db.enums;
  * @author laotang
  */
 public enum OrderByEnum {
-	ASC(1,"asc"),
-	DESC(-1, "desc");
+    ASC(1, "asc"),
+    DESC(-1, "desc");
 
-	private final int value;
-	private final String key;
+    private final int value;
+    private final String key;
 
-	/**
-	 * Constructor.
-	 */
-	private OrderByEnum(int value, String key) {
-		this.value = value;
-		this.key = key;
-	}
+    /**
+     * Constructor.
+     */
+    private OrderByEnum(int value, String key) {
+        this.value = value;
+        this.key = key;
+    }
 
-	/**
-	 * Get the value.
-	 *
-	 * @return the value
-	 */
-	public int getValue() {
-		return value;
-	}
+    /**
+     * Get the value.
+     *
+     * @return the value
+     */
+    public int getValue() {
+        return value;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 }

@@ -7,17 +7,15 @@ import java.sql.SQLException;
  */
 public interface DBAction<T> {
 
-	/**
-	 *
-	 * @param dbRunner
-	 * @return
-	 * @throws SQLException
-	 */
-	T execute(DBRunner dbRunner) throws Exception;
+    /**
+     * @param dbRunner
+     * @return
+     * @throws SQLException
+     */
+    T execute(DBRunner dbRunner) throws Exception;
 
-	/**
-	 *
-	 * @return
-	 */
-	String dataSourceKey();
+    /**
+     * @return
+     */
+    String dataSourceKey();
 }

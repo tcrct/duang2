@@ -21,14 +21,14 @@ public class MysqlKit {
     private String _clientCode = "";
     private Class<?> _entityClass;
     private Object[] _params = null;
-    private List<Map<String,Object>> resultList = new ArrayList<>();
-
-    public static MysqlKit duang() {
-        return new MysqlKit();
-    }
+    private List<Map<String, Object>> resultList = new ArrayList<>();
 
     private MysqlKit() {
 
+    }
+
+    public static MysqlKit duang() {
+        return new MysqlKit();
     }
 
     private String getClientCode() {
@@ -63,30 +63,30 @@ public class MysqlKit {
         return this;
     }
 
-    public List<Map<String,Object>> query() throws Exception {
+    public List<Map<String, Object>> query() throws Exception {
         resultList = DBSession.query(getClientCode(), _executeSql, _params);
         return resultList;
     }
 
     private long count() throws Exception {
-        if(ToolsKit.isEmpty(_entityClass)) {
+        if (ToolsKit.isEmpty(_entityClass)) {
             throw new NullPointerException("entity class is null");
         }
         String entityName = ClassKit.getEntityName(_entityClass);
         String whereSql = "";
-        if(_executeSql.toLowerCase().startsWith("select")) {
+        if (_executeSql.toLowerCase().startsWith("select")) {
             int index = _executeSql.indexOf("where");
-            whereSql = (index > -1) ?_executeSql.substring(index, _executeSql.length()) : "";
+            whereSql = (index > -1) ? _executeSql.substring(index, _executeSql.length()) : "";
         }
-        String countSql = "select count(id) from " + entityName +" " + whereSql;
+        String countSql = "select count(id) from " + entityName + " " + whereSql;
         long count = 0L;
         try {
-            List<Map<String,Object>> results = DBSession.query(_clientCode, countSql, _params);
-            if(ToolsKit.isNotEmpty(results)){
+            List<Map<String, Object>> results = DBSession.query(_clientCode, countSql, _params);
+            if (ToolsKit.isNotEmpty(results)) {
                 Map<String, Object> result = results.get(0);
-                for(Iterator<Map.Entry<String,Object>> it = result.entrySet().iterator(); it.hasNext();){
-                    Map.Entry<String,Object> entry = it.next();
-                    count = (long)entry.getValue();
+                for (Iterator<Map.Entry<String, Object>> it = result.entrySet().iterator(); it.hasNext(); ) {
+                    Map.Entry<String, Object> entry = it.next();
+                    count = (long) entry.getValue();
                 }
             }
         } catch (Exception e) {
@@ -94,6 +94,7 @@ public class MysqlKit {
         }
         return count;
     }
+
     public int add() throws Exception {
         return DBSession.execute(_clientCode, _executeSql, _params);
     }
@@ -103,32 +104,32 @@ public class MysqlKit {
     }
 
     public boolean delete() throws Exception {
-        int executeResultCount =  DBSession.execute(_clientCode, _executeSql, _params);
+        int executeResultCount = DBSession.execute(_clientCode, _executeSql, _params);
         return (executeResultCount > 0) ? true : false;
     }
 
 
     public <T> T findOne() throws Exception {
-        if(ToolsKit.isEmpty(_entityClass)) {
+        if (ToolsKit.isEmpty(_entityClass)) {
             throw new NullPointerException("entity class is null");
         }
         query();
-        if(ToolsKit.isEmpty(resultList) || ToolsKit.isEmpty(resultList.get(0))) {
-           return null;
+        if (ToolsKit.isEmpty(resultList) || ToolsKit.isEmpty(resultList.get(0))) {
+            return null;
         }
-        return (T)ToolsKit.jsonParseObject(ToolsKit.toJsonString(resultList.get(0)), _entityClass);
+        return (T) ToolsKit.jsonParseObject(ToolsKit.toJsonString(resultList.get(0)), _entityClass);
     }
 
 
     public <T> List<T> findList() throws Exception {
-        if(ToolsKit.isEmpty(_entityClass)) {
+        if (ToolsKit.isEmpty(_entityClass)) {
             throw new NullPointerException("entity class is null");
         }
         query();
-        if(ToolsKit.isEmpty(resultList)) {
+        if (ToolsKit.isEmpty(resultList)) {
             return null;
         }
-        return (List<T>)ToolsKit.jsonParseArray(ToolsKit.toJsonString(resultList), _entityClass);
+        return (List<T>) ToolsKit.jsonParseArray(ToolsKit.toJsonString(resultList), _entityClass);
     }
 
     public <T> PageDto<T> findPage() throws Exception {

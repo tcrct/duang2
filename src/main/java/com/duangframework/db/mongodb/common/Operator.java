@@ -2,13 +2,12 @@ package com.duangframework.db.mongodb.common;
 
 /**
  * mongoDB operation constant.
- * 
  */
 public final class Operator {
-    
+
     //id
     public static final String ID = "_id";
-    
+
     //query condition
     public static final String GT = "$gt";
     public static final String GTE = "$gte";
@@ -31,17 +30,17 @@ public final class Operator {
     public static final String LIKE = "like";
     //between 
     public static final String BETWEEN = "between";
-    
+
     //query logic
     public static final String AND = "$and";
     public static final String OR = "$or";
-    
+
     //2d and geo
     public static final String NEAR = "$near";
     public static final String WITHIN = "$within";
     public static final String CENTER = "$center";
     public static final String BOX = "$box";
-    
+
     //update
     public static final String SET = "$set";
     public static final String UNSET = "$unset";
@@ -54,7 +53,7 @@ public final class Operator {
     public static final String MIN = "$min";
     public static final String MAX = "$max";
     public static final String BIT = "$bit";
-    
+
     //aggregation
     public static final String PROJECT = "$project";
     public static final String MATCH = "$match";
@@ -67,6 +66,5 @@ public final class Operator {
 
     public static final String HINT = "$hint";
 
-    
-    
+
 }

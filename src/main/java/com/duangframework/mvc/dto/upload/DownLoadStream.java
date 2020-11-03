@@ -9,16 +9,16 @@ import java.io.OutputStream;
  */
 public class DownLoadStream {
 
-	private String fileName;
-	private OutputStream outputStream = new ByteArrayOutputStream();
+    private String fileName;
+    private OutputStream outputStream = new ByteArrayOutputStream();
 
-	public DownLoadStream() {
-	}
+    public DownLoadStream() {
+    }
 
-	public DownLoadStream(File file, String fileName, OutputStream outputStream) {
-		this.fileName = fileName;
-		this.outputStream = outputStream;
-	}
+    public DownLoadStream(File file, String fileName, OutputStream outputStream) {
+        this.fileName = fileName;
+        this.outputStream = outputStream;
+    }
 
     public String getFileName() {
         return fileName;
@@ -28,13 +28,13 @@ public class DownLoadStream {
         this.fileName = fileName;
     }
 
-	public OutputStream getOutputStream() {
-		return outputStream;
-	}
+    public OutputStream getOutputStream() {
+        return outputStream;
+    }
 
-	public void setOutputStream(OutputStream outputStream) {
-		this.outputStream = outputStream;
-	}
+    public void setOutputStream(OutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
 }
 
 

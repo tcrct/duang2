@@ -5,7 +5,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * HTTP multipart/form-data Request
- *
  */
 public class FileItem {
 
@@ -13,7 +12,7 @@ public class FileItem {
     private String contentTransferEncoding;
     private String fileName;
     private String contentType;
-    private Long   length;
+    private Long length;
     @JSONField(serialize = false, deserialize = false)
     private byte[] data;
 

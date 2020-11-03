@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  */
 public class HostEncoder extends Encoder {
 
-    public HostEncoder(Object value, Field field ) {
+    public HostEncoder(Object value, Field field) {
         super(value, field);
     }
 
@@ -26,7 +26,7 @@ public class HostEncoder extends Encoder {
     @Override
     public Object getValue() {
         String host = String.valueOf(value);
-        if(ToolsKit.isNotEmpty(host) && PatternKit.isURL(host)) {
+        if (ToolsKit.isNotEmpty(host) && PatternKit.isURL(host)) {
             return filterHostUrl(host);
         }
         return value;

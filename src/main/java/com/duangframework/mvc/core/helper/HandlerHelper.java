@@ -1,19 +1,20 @@
 package com.duangframework.mvc.core.helper;
 
 import com.duangframework.exception.MvcException;
-import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.handler.DuangHeadHandle;
 import com.duangframework.mvc.http.handler.IHandler;
-import com.duangframework.websocket.IWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 处理器链辅助类
+ *
  * @author Created by laotang
  * @date createed in 2018/6/12.
  */
@@ -25,6 +26,10 @@ public class HandlerHelper {
      * 前置处理器集合
      */
     private static final List<IHandler> beforeHandlerList = new ArrayList<>();
+    /**
+     * 后置处理器集合
+     */
+    private static final List<IHandler> afterHandlerList = new ArrayList<>();
 
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList.clear();
@@ -43,11 +48,6 @@ public class HandlerHelper {
     private static void addDefaultHandler2BeforeHandlerList() {
         beforeHandlerList.add(new DuangHeadHandle());  //检验tokenId及是否允许访问
     }
-
-    /**
-     * 后置处理器集合
-     */
-    private static final List<IHandler> afterHandlerList = new ArrayList<>();
 
     public static void setAfters(List<IHandler> afterHandlerList) {
         HandlerHelper.afterHandlerList.clear();
@@ -79,7 +79,7 @@ public class HandlerHelper {
      * @param request  请求对象
      * @param response 响应对象
      */
-    public static void doAfterChain(String target, IRequest request, IResponse response)  {
+    public static void doAfterChain(String target, IRequest request, IResponse response) {
         try {
             for (Iterator<IHandler> it = getAfterHandlerList().iterator(); it.hasNext(); ) {
                 it.next().doHandler(target, request, response);

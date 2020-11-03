@@ -29,13 +29,14 @@ public class MongoConnect extends DBConnect {
     /**
      * 取集群地址<br/>
      * 此时host字符串的格式为： ip:port,ip1:port1,ip2:port2，注意小写逗号分隔
+     *
      * @return
      */
     public List<String> getRepliCaset() {
         List<String> repliCaset = null;
         String[] hostArray = host.split(",");
         // 集群必须由两个节点组成
-        if(ToolsKit.isNotEmpty(hostArray) && hostArray.length > 1) {
+        if (ToolsKit.isNotEmpty(hostArray) && hostArray.length > 1) {
             repliCaset = Arrays.asList(hostArray);
         }
         return repliCaset;

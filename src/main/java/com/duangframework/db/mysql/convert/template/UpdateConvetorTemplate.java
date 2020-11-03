@@ -20,7 +20,6 @@ public class UpdateConvetorTemplate extends AbstractConvetorTemplate {
     }
 
     /**
-     *
      * @param convetorObject 转换对象
      * @return
      */
@@ -54,7 +53,7 @@ public class UpdateConvetorTemplate extends AbstractConvetorTemplate {
                 updateSql.append(kvItem.getKey()).append("=?").append(",");
             }
         });
-        updateSql.deleteCharAt(updateSql.length()-1);
+        updateSql.deleteCharAt(updateSql.length() - 1);
         updateSql.append(EMPTY_SPACE).append(WHERE_FIELD).append(EMPTY_SPACE);
 
         kvModle.getQueryKvItem().iterator().forEachRemaining(new Consumer<KvItem>() {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * Created by laotang on 2018/12/4.
  */
 public class KvModle implements java.io.Serializable {
@@ -38,6 +37,7 @@ public class KvModle implements java.io.Serializable {
     public void addQueryKvItems(KvItem kvItem) {
         queryKvItems.add(kvItem);
     }
+
     public void addUpdateKvItem(KvItem kvItem) {
         updateKvItems.add(kvItem);
     }
