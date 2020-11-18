@@ -15,6 +15,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.DefaultFileRegion;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedFile;
@@ -147,12 +148,13 @@ public class WebKit {
         ChannelFuture sendFileFuture = null;
         ChannelFuture lastContentFuture = null;
         if (ctx.pipeline().get(SslHandler.class) == null) {
-//            sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), ctx.newProgressivePromise());
-            try {
-                sendFileFuture = ctx.write(new HttpChunkedInput(new ChunkedFile(raf, 0, fileLength, 8192)), ctx.newProgressivePromise());;
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), ctx.newProgressivePromise());
+            //用以代码时，chrome下载大文件时，会报文件下载被截断的异常
+//            try {
+//                sendFileFuture = ctx.write(new HttpChunkedInput(new ChunkedFile(raf, 0, fileLength, 8192)), ctx.newProgressivePromise());
+//            } catch (Exception e) {
+//                throw new RuntimeException(e.getMessage(), e);
+//            }
 
             // Write the end marker.
             lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
