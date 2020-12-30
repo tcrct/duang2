@@ -28,6 +28,13 @@ public class Query<T> {
     private final static Logger logger = LoggerFactory.getLogger(Query.class);
 
     private Map queryObj;
+    /**
+     * or 查询的对象， 最后构建的查询语句: queryObj  and orQueryObj
+     * 添加 orQueryObj原因：
+     *      queryObj中原本可能就有 Operator.OR 的key了，如果 直接 or可能到至原本的or条件一个都不生效，
+     *      但是map中不能有两个  Operator.OR 的key，故 添加了orQueryObj
+     */
+    private Query<T> orQuery;
     private Order orderObj;
     private Field fieldObj;
     private PageDto<T> pageObj;
@@ -49,7 +56,7 @@ public class Query<T> {
         pageObj = new PageDto<T>(0, 1);
 
         // 默认查询审核通过的数据
-        if (isAddSuccessStatus) {
+        if(isAddSuccessStatus) {
             queryObj.put(IdEntity.STATUS_FIELD, IdEntity.STATUS_FIELD_SUCCESS);
         }
     }
@@ -346,6 +353,14 @@ public class Query<T> {
     public Map getOrderObj() {
         logger.debug(" orderObj: " + orderObj.toString());
         return orderObj.getOrderMap();
+    }
+
+    public Query<T> getOrQuery() {
+        return orQuery;
+    }
+
+    public void setOrQuery(Query<T> orQuery) {
+        this.orQuery = orQuery;
     }
 
     public Collection<String> getFields() {

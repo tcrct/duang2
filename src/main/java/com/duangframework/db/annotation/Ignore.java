@@ -6,12 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 忽略注解
- *
+ *  忽略注解
  * @author Created by laotang
  * @date on 2017/11/16.
  */
-@Target(value = {ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Target(value={ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Ignore {
 

@@ -33,6 +33,7 @@ public enum ExceptionEnums implements IException {
 
     ACCESS_DENIED(403, "拒绝访问"),
     DATABASE_ERROR(550,"数据库错误"),
+    login_ERROR(100,"登录错误"),
 
     ;
 

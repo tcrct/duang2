@@ -10,10 +10,13 @@ import com.duangframework.kit.PropKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.MD5;
+import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Created by laotang
@@ -41,6 +44,10 @@ public class MysqlClientAdapter implements IClient<DataSource> {
         this.mysqlConnect = mysqlConnect;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public boolean isDefaultClient() {
         return isDefaultClient;
     }
@@ -65,10 +72,6 @@ public class MysqlClientAdapter implements IClient<DataSource> {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Override
     public MysqlConnect getDbConnect() {
         return mysqlConnect;
@@ -76,7 +79,7 @@ public class MysqlClientAdapter implements IClient<DataSource> {
 
     @Override
     public DataSource getClient() {
-        if (null == dataSource) {
+        if(null == dataSource) {
             IDataSourceFactory dsFactory = null;
             try {
                 String dataSourceFactoryClassName = PropKit.get(ConstEnums.PROPERTIES.MYSQL_DATASOURCE.getValue());
@@ -91,7 +94,7 @@ public class MysqlClientAdapter implements IClient<DataSource> {
             try {
                 dataSource = dsFactory.getDataSource(mysqlConnect);
             } catch (Exception e) {
-                throw new MongodbException(e.getMessage(), e);
+                throw new  MongodbException(e.getMessage(), e);
             }
         }
         return dataSource;

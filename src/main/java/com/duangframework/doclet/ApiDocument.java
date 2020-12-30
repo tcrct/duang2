@@ -10,13 +10,11 @@ import com.duangframework.doclet.param.ParameterAnnotationsFactory;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.annotation.Mapping;
-import com.duangframework.mvc.annotation.Mock;
 import com.duangframework.mvc.annotation.Param;
 import com.duangframework.mvc.dto.PageDto;
 import com.duangframework.mvc.route.RequestMapping;
 import com.duangframework.utils.DataType;
 import com.duangframework.utils.GenericsUtils;
-//import com.duangframework.vtor.annotation.FieldName;
 import com.duangframework.vtor.annotation.DuangId;
 import com.duangframework.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
@@ -31,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+
+//import com.duangframework.vtor.annotation.FieldName;
 
 /**
  *
@@ -209,7 +209,16 @@ public class ApiDocument {
                         Class<?> parameterType = null;
                         if(typeString.indexOf(".") == -1) {
                             parameterType = ClassKit.loadClass(DataType.conversionBaseType(typeString));
-                        } else {
+                        } else if (typeString.contains("[]")){
+                            String replace = typeString.replace("[]", "");
+                            replace = "[L" + replace + ";";
+                            try {
+                                parameterType = Class.forName(replace);
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                                parameterType = Object.class;
+                            }
+                        }else {
                             parameterType = ClassKit.loadClass(type.toString());
                         }
                         // 如果是DuangBean的参数

@@ -13,7 +13,7 @@ public class DbClient<T> {
     }
 
     public T getClient() {
-        return (T) dbClient;
+        return (T)dbClient;
     }
 
 }

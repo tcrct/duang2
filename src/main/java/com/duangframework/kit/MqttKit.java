@@ -2,8 +2,10 @@ package com.duangframework.kit;
 
 import com.duangframework.mqtt.MqttClient;
 import com.duangframework.mqtt.core.IMqttMessageListener;
+import com.duangframework.mqtt.core.MqttOptions;
 import com.duangframework.mqtt.model.MqttMessage;
 import com.duangframework.mvc.http.enums.ConstEnums;
+import com.duangframework.server.common.BootStrap;
 
 /**
  * Created by laotang on 2019/1/29.
@@ -17,20 +19,22 @@ public class MqttKit {
     private IMqttMessageListener<MqttMessage> listener;
 
 
+    private static class MqttKitHolder {
+        private static final MqttKit INSTANCE = new MqttKit();
+    }
+
     private MqttKit() {
         String account = PropKit.get(ConstEnums.MQTT.ACCOUNT.getValue(), "admin");
         String password = PropKit.get(ConstEnums.MQTT.PASSWORD.getValue(), "1b88ab6d");
-        clientId = ConstEnums.FRAMEWORK_OWNER.getValue() + "." + ConstEnums.MQTT.CLIENT_ID.getValue();
+        clientId = ConstEnums.FRAMEWORK_OWNER.getValue()+"." + ConstEnums.MQTT.CLIENT_ID.getValue();
         mqttClient = new MqttClient(clientId, account, password);
     }
-
     public static final MqttKit duang() {
         return MqttKitHolder.INSTANCE;
     }
 
     /**
      * 指定客户端ID，不设置时，取Duang.java里指定的MqttOptions.getClientId()
-     *
      * @param clientId
      * @return
      */
@@ -41,7 +45,6 @@ public class MqttKit {
 
     /**
      * 主题
-     *
      * @param topic
      * @return
      */
@@ -52,7 +55,6 @@ public class MqttKit {
 
     /**
      * 要发布的消息
-     *
      * @param message
      * @return
      */
@@ -63,11 +65,10 @@ public class MqttKit {
 
     /**
      * 订阅监听器
-     *
      * @param listener
      * @return
      */
-    public MqttKit listener(IMqttMessageListener<MqttMessage> listener) {
+    public MqttKit  listener(IMqttMessageListener<MqttMessage> listener) {
         this.listener = listener;
         return this;
     }
@@ -91,9 +92,5 @@ public class MqttKit {
      */
     public void subscribe() {
         mqttClient.subscribe(clientId, topic, listener);
-    }
-
-    private static class MqttKitHolder {
-        private static final MqttKit INSTANCE = new MqttKit();
     }
 }

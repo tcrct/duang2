@@ -37,6 +37,7 @@ public abstract  class CurdService<T> implements IService<T> {
     public T save(T vo, MongoDao<T> mongoDao, ICacheService cacheService) {
         boolean isUpdate = false;
         try {
+
             VtorKit.validate(vo);
             String id = "";
             if(ToolsKit.isNotEmpty(vo) && vo instanceof IdEntity) {
@@ -49,13 +50,17 @@ public abstract  class CurdService<T> implements IService<T> {
                 }
             }
             T entity = mongoDao.save(vo);
-            if(isUpdate && ToolsKit.isNotEmpty(id)) {
-                Query query = new Query();
-                query.eq(IdEntity.ID_FIELD, id);
-                entity = mongoDao.findOne(query);
-            }
+//            if(isUpdate && ToolsKit.isNotEmpty(id)) {
+//                Query query = new Query();
+//                query.eq(IdEntity.ID_FIELD, id);
+//                entity = mongoDao.findOne(query);
+//            }
             if(ToolsKit.isNotEmpty(entity)) {
-                cacheService.save(entity);
+//                cacheService.save(entity);
+                id = ((IdEntity)vo).getId();
+            }
+            if (ToolsKit.isNotEmpty(id)) {
+                cacheService.deleteById(id);
             }
             return entity;
         } catch (Exception e) {

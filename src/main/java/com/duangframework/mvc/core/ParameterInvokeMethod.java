@@ -1,8 +1,6 @@
 package com.duangframework.mvc.core;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.duangframework.db.convetor.KvItem;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.kit.ObjectKit;
@@ -83,6 +81,7 @@ public class ParameterInvokeMethod {
             }
             checkAnnotationValidator(annotations, parameterType, paramNameArray[i], paramValue);
         }
+        request.setMethodParameter(requestParamValueObj);
         return requestParamValueObj;
     }
 
@@ -196,12 +195,15 @@ public class ParameterInvokeMethod {
         // 如果是继承了IdEntity或对象有设置Bean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         // 如果不是以json的方式提交，则取看request.parameterMap里值
-        if(ToolsKit.isEmpty(json) || (json.startsWith("{") && json.endsWith("}"))) {
+        if(ToolsKit.isEmpty(json) || json.equals("{}")) {
             json = ToolsKit.toJsonString(request.getParameterMap());
         }
 //        System.out.println("genricTypeClass: " + parameterType);
         if(ApiDto.class.equals(parameterType) && ToolsKit.isNotEmpty(type)){
             Map<String,Object> jsonMap = ToolsKit.jsonParseObject(json, Map.class);
+            if (jsonMap == null || jsonMap.size() == 0){
+                jsonMap = request.getParameterMap();
+            }
             Object dataJson = jsonMap.get(ApiDto.DATA_FIELD);
             if(ToolsKit.isNotEmpty(dataJson)) {
                 Object genricEntity = ((JSONObject)dataJson).toJavaObject(type);

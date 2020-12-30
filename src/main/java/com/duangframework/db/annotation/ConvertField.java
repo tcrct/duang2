@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 实体与数据库表字段名称转换注解
- *
+ *  实体与数据库表字段名称转换注解
  * @author Created by laotang
  * @date on 2017/11/16.
  */

@@ -16,27 +16,12 @@ import java.util.*;
 
 /**
  * Vo集合对象属性转换
- *
  * @author laotang
  */
 public class VoCollEncoder extends Encoder {
 
-    public VoCollEncoder(Object value, Field field) {
+    public VoCollEncoder( Object value, Field field ) {
         super(value, field);
-    }
-
-    @SuppressWarnings("restriction")
-    private static Class<?> getParamTypesItemClass(Type type) {
-        if (type.getClass().equals(sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl.class)) {
-            ParameterizedType paramTypeItem = (ParameterizedType) type;
-            Type[] paramTypesItem = paramTypeItem.getActualTypeArguments();
-            if (paramTypesItem.length == 1) {
-                return (Class<?>) paramTypesItem[0];
-            } else if (paramTypesItem.length == 2) {
-                return (Class<?>) paramTypesItem[1];
-            }
-        }
-        return (Class<?>) type;
     }
 
     @Override
@@ -49,7 +34,7 @@ public class VoCollEncoder extends Encoder {
     public Object getValue() {
         Object result = null;
         Class<?> fieldType = field.getType();
-        if (fieldType.isArray()) {
+        if(fieldType.isArray()){
             result = encodeArray();
         } else if (DataType.isListType(fieldType)) {
             result = encodeList(value);
@@ -61,12 +46,26 @@ public class VoCollEncoder extends Encoder {
         return result;
     }
 
-    private Object encodeArray() {
+    @SuppressWarnings("restriction")
+    private static Class<?> getParamTypesItemClass(Type type) {
+        if(type.getClass().equals(sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl.class)){
+            ParameterizedType paramTypeItem = (ParameterizedType)type;
+            Type[] paramTypesItem = paramTypeItem.getActualTypeArguments();
+            if(paramTypesItem.length == 1){
+                return (Class<?>)paramTypesItem[0];
+            }  else if(paramTypesItem.length == 2){
+                return (Class<?>)paramTypesItem[1];
+            }
+        }
+        return (Class<?>)type;
+    }
+
+    private Object encodeArray(){
         int length = Array.getLength(value);
         List<Document> result = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
             Object obj = Array.get(value, i);
-            if (null != obj) {
+            if(null !=obj){
                 result.add((Document) MongoUtils.toBson(obj));
             }
         }
@@ -78,12 +77,13 @@ public class VoCollEncoder extends Encoder {
         List<Document> result = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
             Object obj = Array.get(value, i);
-            if (ToolsKit.isNotEmpty(obj)) {
+            if(ToolsKit.isNotEmpty(obj)){
                 result.add((Document) MongoUtils.toBson(obj));
             }
         }
         return result;
     }
+
 
 
     @SuppressWarnings("unchecked")
@@ -124,9 +124,9 @@ public class VoCollEncoder extends Encoder {
                     result.put(key, encodeSet(itemObj));
                 } else if (DataType.isMapType(objClass)) {
                     result.put(key, (Map<Object, Object>) encodeMap(itemObj));
-                } else if (DataType.isBaseType(objClass)) {
-                    result.put(key, value);
-                } else {
+                } else if(DataType.isBaseType(objClass)) {
+                    result.put(key,value);
+                }  else {
                     result.put(key, MongoUtils.toBson(itemObj));
                 }
             } else {
@@ -136,9 +136,9 @@ public class VoCollEncoder extends Encoder {
         return result;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void encodeCollection(Collection result, Class<?> objClass, Object obj) {
-        if (DataType.isBaseType(objClass)) {
+        if(DataType.isBaseType(objClass)) {
             result.add(obj);
         } else if (DataType.isListType(objClass)) {
             result.add((List<Document>) encodeList(obj));
@@ -154,6 +154,7 @@ public class VoCollEncoder extends Encoder {
     }
 
 
+
     private Object encodeCollection() {
 //		 return encodeCollection(value);
         List<Document> result = new ArrayList<>();
@@ -167,21 +168,21 @@ public class VoCollEncoder extends Encoder {
     }
 
     @SuppressWarnings("rawtypes")
-    private Object encodeCollection(Object value) {
+    private Object encodeCollection(Object value){
         List<Object> result = new ArrayList<Object>();
-        Collection coll = (Collection) value;
-        if (null != coll) {
-            for (Iterator it = coll.iterator(); it.hasNext(); ) {
+        Collection coll = (Collection)value;
+        if(null != coll){
+            for(Iterator it = coll.iterator(); it.hasNext();){
                 Object obj = it.next();
-                if (ToolsKit.isNotEmpty(obj)) {
-                    if (DataType.isListType(obj.getClass()) || DataType.isSetType(obj.getClass()) || DataType.isQueueType(obj.getClass())) {
+                if(ToolsKit.isNotEmpty(obj)){
+                    if(DataType.isListType(obj.getClass()) || DataType.isSetType(obj.getClass()) || DataType.isQueueType(obj.getClass())){
                         Object collectionObj = encodeCollection(obj);
-                        result.add((List) collectionObj);
-                    } else if (DataType.isMapType(obj.getClass())) {
-                        DBObject dboMap = new BasicDBObject((Map) encodeMap(obj));
+                        result.add((List)collectionObj);
+                    }else if(DataType.isMapType(obj.getClass())) {
+                        DBObject dboMap = new BasicDBObject((Map)encodeMap(obj));
                         result.add(dboMap);
                     } else {
-                        result.add(MongoUtils.toBson(obj));
+                        result.add( MongoUtils.toBson(obj));
                     }
                 }
             }
@@ -204,17 +205,17 @@ public class VoCollEncoder extends Encoder {
         return result;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private Object encodeMap1(Object value) {
-        Map map = (Map) value;
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private Object encodeMap1(Object value){
+        Map map = (Map)value;
         Map result = new HashMap(map.size());
-        for (Iterator<String> it = map.keySet().iterator(); it.hasNext(); ) {
+        for(Iterator<String> it = map.keySet().iterator(); it.hasNext();){
             String key = it.next();
             Object obj = map.get(key);
-            if (ToolsKit.isNotEmpty(obj)) {
-                if (DataType.isListType(obj.getClass()) || DataType.isSetType(obj.getClass()) || DataType.isQueueType(obj.getClass())) {
+            if(ToolsKit.isNotEmpty(obj)){
+                if(DataType.isListType(obj.getClass()) || DataType.isSetType(obj.getClass()) || DataType.isQueueType(obj.getClass())){
                     result.put(key, encodeCollection(obj));
-                } else if (DataType.isMapType(obj.getClass())) {
+                } else if(DataType.isMapType(obj.getClass())) {
                     result.put(key, encodeMap(obj));
                 } else {
                     result.put(key, MongoUtils.toBson(obj));

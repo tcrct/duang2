@@ -1,8 +1,10 @@
 package com.duangframework.mvc;
 
+import com.duangframework.exception.MobileSecurityException;
 import com.duangframework.exception.MvcException;
 import com.duangframework.exception.ServiceException;
-import com.duangframework.exception.TokenException;
+import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.core.MobileRequestNoSecurityHandler;
 import com.duangframework.mvc.core.RequestAccessHandler;
 import com.duangframework.mvc.core.helper.HandlerHelper;
 import com.duangframework.mvc.http.IRequest;
@@ -36,6 +38,7 @@ public class MvcMain {
         String target = request.getRequestURI();
         //  请求的URI是根路径或包含有.  则全部当作是静态文件的请求处理，直接返回
         if("/".equals(target) || target.contains(".")) {
+            logger.warn("request target: {}", target);
             throw new MvcException("not support static file access");
         }
 
@@ -49,6 +52,10 @@ public class MvcMain {
 
         if(target.startsWith("//")) {
             throw new MvcException("请检查uri是否正确,若使用了nginx,注意proxy_pass不要以/结尾");
+        }
+
+        if(target.contains("<") || target.contains(">")) {
+            throw new MvcException("请检查uri是否正确,uri不允许带有'<'或'>'字符");
         }
 
 //        // 验证该请求URI是否存在
@@ -72,13 +79,15 @@ public class MvcMain {
         String target = "";
         try {
             target = getResourcePath(request);
-            // 请求访问处理器前的处理器链，可以对请求进行过滤
-            HandlerHelper.doBeforeChain(target, request, response);
+            // 请求访问处理器前的处理器链，可以对请求进行过滤，如果返回false，则终止请求并不作返回
+            if (!HandlerHelper.doBeforeChain(target, request, response)) {
+                return;
+            }
             // 请求访问处理器
             RequestAccessHandler.doHandler(target, request, response);
         } catch (InvocationTargetException ite) {
             logger.warn(ite.getMessage(), ite);
-            WebKit.builderExceptionResponse(request, response, new ServiceException(ite.getCause().getMessage(), ite.getCause()));
+            WebKit.builderExceptionResponse(new ServiceException(ite.getCause().getMessage(), ite.getCause()), request, response);
         }
 //        catch (TokenException e) {
 //            logger.warn(e.getMessage(), e);
@@ -86,7 +95,15 @@ public class MvcMain {
 //        }
         catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            WebKit.builderExceptionResponse(request, response, e);
+            if (e instanceof MobileSecurityException){
+                try {
+                    MobileRequestNoSecurityHandler.doHandler(target, request, response, (MobileSecurityException) e);
+                } catch (Exception e1){
+                    WebKit.builderExceptionResponse(e1, request, response);
+                }
+            } else {
+                WebKit.builderExceptionResponse(e, request, response);
+            }
         }
         /**
         * 返回结果处理器链，可以对返回结果进行提交日志，二次包装等操作
@@ -94,6 +111,7 @@ public class MvcMain {
          * 仍继续返回结果到客户端
          */
         HandlerHelper.doAfterChain(target, request, response);
+        ToolsKit.removeThreadLocalDto();
     }
 
 }

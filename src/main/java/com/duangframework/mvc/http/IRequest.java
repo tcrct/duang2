@@ -1,5 +1,7 @@
 package com.duangframework.mvc.http;
 
+import com.duangframework.mvc.http.session.HttpSession;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -39,6 +41,10 @@ public interface IRequest {
 
     String[] getParameterValues(String name);
 
+
+    Object[] getMethodParameter();
+    void setMethodParameter(Object[] parameter);
+
     Map<String, Object> getParameterMap();
 
     String getLocalAddr();
@@ -57,6 +63,8 @@ public interface IRequest {
 
     String getRemoteHost();
 
+    int getRemotePort();
+
     void setAttribute(String name, Object o);
 
     void removeAttribute(String name);
@@ -68,6 +76,10 @@ public interface IRequest {
     boolean isSSL();
 
     boolean keepAlive();
+
+    void clearRequest();
+
+    String getContextPath();
 
     /************************************************  HEAD 部份 *************************************************************/
 
@@ -92,4 +104,6 @@ public interface IRequest {
 
     void setCookie(Cookie cookie);
 
+    /************************************************  Session 部份 *************************************************************/
+     HttpSession getSession();
 }

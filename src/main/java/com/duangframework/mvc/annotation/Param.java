@@ -42,4 +42,6 @@ public @interface Param {
     // 是否隐藏，默认为否 例如: <input  hidden="none" />
     boolean isHidden() default false;
 
+    // 操作日志是否不理会， 默认否。
+    boolean logIgnore() default false;
 }

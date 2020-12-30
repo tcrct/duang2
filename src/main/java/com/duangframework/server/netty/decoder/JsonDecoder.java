@@ -51,7 +51,7 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         }
         if(ToolsKit.isNotEmpty(json)) {
             // 去掉制表符
-            json = json.replace("\n", "").replace("\t", "").replace("\r", "");
+            json = json.replace("\n", "").replace("\t", "").replace("\r", "").trim();
         }
         if(ToolsKit.isMapJsonString(json)) {
             parseMap(JSON.parseObject(json, Map.class));

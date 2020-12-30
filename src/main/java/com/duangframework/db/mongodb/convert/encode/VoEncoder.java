@@ -8,12 +8,11 @@ import java.lang.reflect.Field;
 
 /**
  * Vo对象属性转换
- *
  * @author laotang
  */
 public class VoEncoder extends Encoder {
 
-    public VoEncoder(Object value, Field field) {
+    public VoEncoder( Object value, Field field ) {
         super(value, field);
     }
 

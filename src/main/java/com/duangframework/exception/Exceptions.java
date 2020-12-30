@@ -23,7 +23,7 @@ public class Exceptions {
 	}
 
 	public static IException getDuangException(Exception e) {
-		if(e instanceof IException) {
+		if(null != e && (e instanceof IException)) {
 			IException ie = (IException) e;
 			return  null == ie ? null : ie;
 		}

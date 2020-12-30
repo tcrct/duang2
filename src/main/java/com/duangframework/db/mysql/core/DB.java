@@ -5,15 +5,16 @@ import com.duangframework.db.annotation.Id;
 import com.duangframework.db.annotation.Vo;
 import com.duangframework.db.annotation.VoColl;
 import com.duangframework.db.mysql.client.MysqlClientAdapter;
-import com.duangframework.db.mysql.common.options.CreateCollectionOptions;
 import com.duangframework.kit.ClassKit;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.db.mysql.common.options.CreateCollectionOptions;
 import com.duangframework.utils.DataType;
 import com.duangframework.vtor.annotation.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,10 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DB {
 
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
-    private static final Object[] NULL_OBJECT = new Object[0];
+
+    private MysqlClientAdapter clientAdapter;
     private final ConcurrentHashMap<String, DBCollection> collectionCache;
     private final Set<String> collectionNameCache;
-    private MysqlClientAdapter clientAdapter;
+    private static final Object[] NULL_OBJECT = new Object[0];
 
     public DB(MysqlClientAdapter clientAdapter) {
         this.clientAdapter = clientAdapter;
@@ -39,18 +41,17 @@ public class DB {
 
     public DBCollection getCollection(String name) {
         DBCollection collection = collectionCache.get(name);
-        if (collection != null) {
+        if(collection != null) {
             return collection;
         }
         collection = new DBCollection(name, this);
         DBCollection old = collectionCache.putIfAbsent(name, collection);
-        return old != null ? old : collection;
+        return old != null?old:collection;
     }
 
     public String getId() {
         return clientAdapter.getId();
     }
-
     public String getName() {
         return clientAdapter.getDbName();
     }
@@ -65,11 +66,11 @@ public class DB {
 
     public Set<String> getCollectionNames() {
         try {
-            if (!collectionNameCache.isEmpty()) {
+            if(!collectionNameCache.isEmpty()) {
                 return collectionNameCache;
             }
-            List<String> collectionNames = DBSession.getMysqlTables(clientAdapter.getId());
-            if (ToolsKit.isNotEmpty(collectionNames)) {
+            List<String> collectionNames =  DBSession.getMysqlTables(clientAdapter.getId());
+            if(ToolsKit.isNotEmpty(collectionNames)) {
                 collectionNameCache.clear();
                 collectionNameCache.addAll(collectionNames);
             }
@@ -81,8 +82,7 @@ public class DB {
     }
 
     /**
-     * 创建表
-     *
+     *创建表
      * @param collectionName
      * @param options
      * @return
@@ -121,20 +121,18 @@ public class DB {
         return this.getCollection(collectionName);
     }
 
-    private String convertToType(Class<?> type, Field field) {
+    private String convertToType(Class<?> type, Field field){
         String sqlType = "";
         Length vtor = field.getAnnotation(Length.class);
         int len = 0;
-        if (null != vtor) {
-            len = vtor.value();
-        }
-        if (DataType.isString(type)) {
-            sqlType = "varchar(" + ((len > 0) ? len : 50) + ")";
-        } else if (DataType.isInteger(type) || DataType.isIntegerObject(type)) {
-            sqlType = "int(" + ((len > 0) ? len : 7) + ")";
-        } else if (DataType.isLong(type) || DataType.isLongObject(type)) {
-            sqlType = "bigint(" + ((len > 0) ? len : 11) + ")";
-        } else if (DataType.isDate(type)) {
+        if(null != vtor) {	len = vtor.value();}
+        if(DataType.isString(type)){
+            sqlType = "varchar("+ ((len>0) ? len : 50) +")";
+        } else if(DataType.isInteger(type) || DataType.isIntegerObject(type)) {
+            sqlType = "int("+ ((len>0) ? len : 7) +")";
+        } else if(DataType.isLong(type) || DataType.isLongObject(type)) {
+            sqlType = "bigint("+ ((len>0) ? len : 11) +")";
+        }  else if(DataType.isDate(type)) {
             sqlType = "datetime";
         }
         return sqlType.toLowerCase().trim();

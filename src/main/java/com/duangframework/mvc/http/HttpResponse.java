@@ -8,6 +8,8 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +38,9 @@ public class HttpResponse implements IResponse {
     }
 
     private void init() {
-        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString()));
+        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), "*");
         headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString()));
-        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString(), request.getHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString()));
+        headers.put(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString(), "*");
         String contentType = request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString());
         if(ToolsKit.isNotEmpty(contentType)) {
             headers.put(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
@@ -163,5 +165,14 @@ public class HttpResponse implements IResponse {
     @Override
     public void setDeleteFile(boolean isDelete) {
         this.isDelete = isDelete;
+    }
+
+    @Override
+    public String encodeURL(String url) {
+        try {
+            return URLEncoder.encode(url, ConstEnums.DEFAULT_CHAR_ENCODE.getValue());
+        } catch (Exception e) {
+            return url;
+        }
     }
 }

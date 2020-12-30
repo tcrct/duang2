@@ -19,17 +19,17 @@ import java.util.regex.Pattern;
  */
 public final class PathKit {
 
-    public static final String VAR_REGEXP = ":(\\w+)";
-    public static final String VAR_REPLACE = "([^#/?.]+)";
-    public static final Pattern VAR_REGEXP_PATTERN = Pattern.compile(VAR_REGEXP);
-    private static final String SLASH = "/";
-    private static final Pattern VAR_FIXPATH_PATTERN = Pattern.compile("\\s");
     private static String webRootPath;
     private static String rootClassPath;
 
+    public static final  String  VAR_REGEXP          = ":(\\w+)";
+    public static final  String  VAR_REPLACE         = "([^#/?.]+)";
+    private static final String  SLASH               = "/";
+    public static final  Pattern VAR_REGEXP_PATTERN  = Pattern.compile(VAR_REGEXP);
+    private static final Pattern VAR_FIXPATH_PATTERN = Pattern.compile("\\s");
+
     /**
      * 验证过滤路径，如果路径前没有 / 则添加，后有/则移除，并替换所有%20字符
-     *
      * @param path
      * @return
      */
@@ -58,7 +58,6 @@ public final class PathKit {
 
     /**
      * 根据class文件取该文件的绝对路径
-     *
      * @param clazz
      * @return
      */
@@ -69,7 +68,6 @@ public final class PathKit {
 
     /**
      * 根据包路径取出绝对路径
-     *
      * @param packagePath
      * @return
      */
@@ -81,14 +79,13 @@ public final class PathKit {
 
     /**
      * 根据包路径取出该路径下的所有文件URL对象
-     *
-     * @param packagePath
+    * @param packagePath
      * @return
      */
     public static Enumeration<URL> getPaths(String packagePath) {
         packagePath = packagePath.startsWith("/") ? packagePath.substring(1, packagePath.length()) : packagePath;
         try {
-            return ClassKit.getClassLoader().getResources(packagePath.replace(".", "/"));
+            return ClassKit.getClassLoader().getResources(packagePath.replace("." , "/"));
         } catch (IOException e) {
             throw new MvcException(e.getMessage(), e);
         }
@@ -100,7 +97,8 @@ public final class PathKit {
             try {
                 String path = ClassKit.getClassLoader().getResource("").toURI().getPath();
                 rootClassPath = new File(path).getAbsolutePath();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 try {
                     String path = PathKit.class.getProtectionDomain().getCodeSource().getLocation().getPath();
                     path = java.net.URLDecoder.decode(path, "UTF-8");
@@ -116,7 +114,6 @@ public final class PathKit {
 
     /**
      * 设置项目根路径
-     *
      * @param rootClassPath
      */
     public static void setRootClassPath(String rootClassPath) {
@@ -133,6 +130,17 @@ public final class PathKit {
         return p != null ? p.getName().replaceAll("\\.", "/") : "";
     }
 
+    /**
+     * 设置WebRoot路径
+     * @param webRootPath
+     */
+    public static void setWebRootPath(String webRootPath) {
+        if (webRootPath == null) {
+            return ;
+        }
+        PathKit.webRootPath = fixPath(webRootPath);
+    }
+
     public static String getWebRootPath() {
         if (webRootPath == null) {
             webRootPath = detectWebRootPath();
@@ -140,26 +148,18 @@ public final class PathKit {
         return webRootPath;
     }
 
-    /**
-     * 设置WebRoot路径
-     *
-     * @param webRootPath
-     */
-    public static void setWebRootPath(String webRootPath) {
-        if (webRootPath == null) {
-            return;
-        }
-        PathKit.webRootPath = fixPath(webRootPath);
-    }
-
     // 注意：命令行返回的是命令行所在路径的上层的上层路径
     private static String detectWebRootPath() {
         try {
             String path = PathKit.class.getResource("/").toURI().getPath();
+            if (path == null || "".equals(path.trim())){
+                return System.getProperty("user.dir");
+            }
             return new File(path).getParentFile().getParentFile().getCanonicalPath();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 
 }

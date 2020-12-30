@@ -5,11 +5,6 @@ import com.duangframework.mvc.annotation.Param;
 import com.duangframework.security.dto.RelationDto;
 import com.duangframework.vtor.annotation.NotEmpty;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * 登录成功后的用户对象信息
  * Created by laotang on 2018/11/26.
@@ -17,7 +12,7 @@ import java.util.Set;
 public class SecurityUser implements java.io.Serializable {
 
     @NotEmpty
-    @Param(label = "用户ID")
+    @Param(label = "用户编号")
     private String userId;
     @Param(label = "标识码")
     private String codeId;
@@ -37,6 +32,8 @@ public class SecurityUser implements java.io.Serializable {
     private String projectId;
     @Param(label = "部门ID")
     private String departmentId;
+    @Param(label = "更新时间")
+    private Long updateTime;
 
     public SecurityUser() {
     }
@@ -135,6 +132,17 @@ public class SecurityUser implements java.io.Serializable {
         this.departmentId = departmentId;
     }
 
+
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
+    }
+
+
+
     @Override
     public String toString() {
         return "SecurityUser{" +
@@ -148,6 +156,7 @@ public class SecurityUser implements java.io.Serializable {
                 ", companyId='" + companyId + '\'' +
                 ", projectId='" + projectId + '\'' +
                 ", departmentId='" + departmentId + '\'' +
+                ", updateTime=" + updateTime +
                 '}';
     }
 }

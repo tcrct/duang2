@@ -36,6 +36,14 @@ public class CacheModelOptions {
             return this;
         }
 
+        public Builder ttl(Integer ttl) {
+            if (ttl == null) {
+                return this;
+            }
+            this.ttl = ttl;
+            return this;
+        }
+
         public Builder customKey(String customKey) {
             this.customKey = customKey;
             return this;

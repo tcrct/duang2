@@ -8,11 +8,14 @@ import com.duangframework.mvc.core.helper.ClassHelper;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import sun.net.www.protocol.file.FileURLConnection;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -62,6 +65,29 @@ public abstract  class AbstractGenerateCode {
         try {
             URL url = GenerateCode.class.getClassLoader().getResource(TEMPLATE_DIR_FIDLE);
             String jarPath = url.toString().substring(0, url.toString().indexOf("!/") + 2);
+            if (url.toString().indexOf("!/") == -1){
+                // 如果不是jar包引入模式
+                String path = url.getPath();
+                File file = new File(path);
+                if (!file.exists()){
+                    return;
+                }
+                if (!file.isDirectory()) {
+                    return;
+                }
+                File[] files = file.listFiles();
+                for (File temp : files) {
+                    String name = temp.getName();
+                    if (name.endsWith(".txt") && !temp.isDirectory()) {
+                        InputStream input = new FileInputStream(temp);
+                        if(ToolsKit.isNotEmpty(input)) {
+                            String key = name.substring(name.lastIndexOf("/")+1, name.lastIndexOf("."));
+                            templateMap.put(key, IOUtils.toString(input));
+                        }
+                    }
+                }
+                return;
+            }
             URL jarURL = new URL(jarPath);
             JarURLConnection jarCon = (JarURLConnection) jarURL.openConnection();
             JarFile jarFile = jarCon.getJarFile();

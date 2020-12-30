@@ -25,19 +25,22 @@ public class MongoClientAdapter implements IClient<MongoClient> {
     private boolean isDefaultClient;
     private List<IProxy> proxyList = new ArrayList<>();
     /**
-     * 链接客户端ID, 如多实例里，用于区分
+     *链接客户端ID, 如多实例里，用于区分
      * 生成规则， MD5(this.toString())
      */
     private String id;
 
-    public MongoClientAdapter(MongoConnect mongodbConnect) {
+    public MongoClientAdapter(MongoConnect mongodbConnect){
         mongoConnect = mongodbConnect;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public boolean isDefaultClient() {
         return isDefaultClient;
     }
-
     public void setDefaultClient(boolean isDefaultClient) {
         this.isDefaultClient = isDefaultClient;
     }
@@ -52,14 +55,10 @@ public class MongoClientAdapter implements IClient<MongoClient> {
 
     @Override
     public String getId() {
-        if (ToolsKit.isEmpty(id) && ToolsKit.isNotEmpty(mongoConnect)) {
+        if(ToolsKit.isEmpty(id) && ToolsKit.isNotEmpty(mongoConnect)) {
             return MD5.MD5Encode(mongoConnect.toString());
         }
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override
@@ -69,14 +68,14 @@ public class MongoClientAdapter implements IClient<MongoClient> {
 
     @Override
     public MongoClient getClient() throws Exception {
-        if (null == mongoClient) {
+        if(null == mongoClient) {
             if (ToolsKit.isEmpty(mongoConnect)) {
                 return null;
             }
             if (ToolsKit.isEmpty(mongoConnect.getUrl())) {
                 try {
                     MongoClientOptions options = MongoClientOptions.builder().readPreference(ReadPreference.secondaryPreferred()).build();
-                    mongoClient = ToolsKit.isEmpty(auth()) ? new MongoClient(hosts(), options) : new MongoClient(hosts(), auth(), options);
+                    mongoClient = ToolsKit.isEmpty(auth()) ? new MongoClient(hosts(), options) :  new MongoClient(hosts(), auth(), options);
                 } catch (Exception e) {
                     throw new MongodbException("Can't connect mongodb: " + e.getMessage(), e);
                 }
@@ -89,7 +88,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
 
     @Override
     public void close() {
-        if (null != mongoClient) {
+        if(null != mongoClient) {
             mongoClient.close();
         }
     }
@@ -101,34 +100,35 @@ public class MongoClientAdapter implements IClient<MongoClient> {
     private List<ServerAddress> hosts() {
         List<String> nodeTmpList = mongoConnect.getRepliCaset();
         List<ServerAddress> mongoNodeList = new ArrayList<>();
-        if (ToolsKit.isNotEmpty(nodeTmpList)) {
-            for (String replicasetString : nodeTmpList) {
+        if( ToolsKit.isNotEmpty(nodeTmpList) ) {
+            for(String replicasetString : nodeTmpList) {
                 String[] replicasetItemArray = replicasetString.split(":");
-                if (ToolsKit.isEmpty(replicasetItemArray) || replicasetItemArray.length != 2) {
+                if(ToolsKit.isEmpty(replicasetItemArray) || replicasetItemArray.length != 2){
                     throw new RuntimeException("replicasetItemArray is null or length != 2 ");
                 }
                 mongoNodeList.add(new ServerAddress(replicasetItemArray[0], Integer.parseInt(replicasetItemArray[1])));
-                logger.warn("connect replicaset mongodb host: " + replicasetItemArray[0] + "           port: " + replicasetItemArray[1]);
+                logger.warn("connect replicaset mongodb host: " + replicasetItemArray[0]+"           port: "+ replicasetItemArray[1]);
             }
         } else {
-            if (ToolsKit.isNotEmpty(mongoConnect.getHost()) && mongoConnect.getPort() > -1) {
+            if(ToolsKit.isNotEmpty(mongoConnect.getHost()) && mongoConnect.getPort()>-1) {
                 mongoNodeList.add(new ServerAddress(mongoConnect.getHost(), mongoConnect.getPort()));
-                logger.warn("connect single mongodb host: " + mongoConnect.getHost() + "           port: " + mongoConnect.getPort());
+                logger.warn("connect single mongodb host: " + mongoConnect.getHost()+"           port: "+ mongoConnect.getPort());
             }
         }
 
-        if (ToolsKit.isEmpty(mongoNodeList)) {
+        if(ToolsKit.isEmpty(mongoNodeList)) {
             throw new MongodbException("connect mongdb, host and port is null or empty");
         }
         return mongoNodeList;
     }
 
     /**
-     * 数据库鉴权, 仅支持SHA1方式加密
+     *  数据库鉴权, 仅支持SHA1方式加密
+     *
      */
     private MongoCredential auth() {
         MongoCredential credential = null;
-        if (ToolsKit.isNotEmpty(mongoConnect.getUsername()) && ToolsKit.isNotEmpty(mongoConnect.getPassword())) {
+        if(ToolsKit.isNotEmpty(mongoConnect.getUsername()) && ToolsKit.isNotEmpty(mongoConnect.getPassword()) ) {
             credential = MongoCredential.createScramSha1Credential(
                     mongoConnect.getUsername(),
                     mongoConnect.getDatabase(),
@@ -142,7 +142,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
         MongoClientURI mongoClientURI = new MongoClientURI(mongoConnect.getUrl());
         //        logger.warn("mongodb connection url: " + connectionString);
         MongoClient mongoClient = new MongoClient(mongoClientURI);
-        if (null == mongoClient) {
+        if(null == mongoClient){
             throw new MongodbException("can't connect mongodb database! crate client fail");
         }
         // 设置链接的数据库
@@ -166,27 +166,22 @@ public class MongoClientAdapter implements IClient<MongoClient> {
             this.host = host;
             return this;
         }
-
         public Builder port(int port) {
             this.port = port;
             return this;
         }
-
         public Builder database(String database) {
             this.database = database;
             return this;
         }
-
         public Builder username(String username) {
             this.username = username;
             return this;
         }
-
         public Builder password(String password) {
             this.password = password;
             return this;
         }
-
         public Builder url(String url) {
             this.url = url;
             return this;
@@ -197,13 +192,13 @@ public class MongoClientAdapter implements IClient<MongoClient> {
             return this;
         }
 
-        public Builder proxy(IProxy proxy) {
+        public Builder proxy(IProxy proxy){
             this.proxyList.add(proxy);
             return this;
         }
 
         public MongoClientAdapter build() {
-            MongoClientAdapter adapter = ToolsKit.isEmpty(url) ? new MongoClientAdapter(new MongoConnect(host, port, database, username, password)) : new MongoClientAdapter(new MongoConnect(url));
+            MongoClientAdapter adapter =  ToolsKit.isEmpty(url) ? new MongoClientAdapter(new MongoConnect(host, port, database, username, password)) : new MongoClientAdapter(new MongoConnect(url));
             adapter.setDefaultClient(isDefault);
             adapter.setProxyList(proxyList);
             return adapter;

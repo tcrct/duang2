@@ -8,6 +8,7 @@ package com.duangframework.mvc.http;
  */
 public class Cookie {
 
+    public static final String CLIENT_COOKIE_NAME = "JSESSIONID";
     public static final String COOKIE_FIELD = "Cookie";
     private String  name     = null;
     private String  value    = null;

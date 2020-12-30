@@ -12,7 +12,10 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
@@ -81,15 +84,16 @@ public class WebSocketBaseHandler extends SimpleChannelInboundHandler<Object> {
 //            if (channelFuture.isSuccess()) {
                 boolean isQueryParams = target.contains("?");
                 String uri =isQueryParams ? target.substring(0, target.indexOf("?")) : target;
-                logger.warn("websocket uri: " +uri +"                    handshaker.uri: "+ handshaker.uri());
-                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, uri);
+                logger.warn("websocket uri: " +uri +"                    handshaker.uri: "+ handshaker.uri()+"    secWsProtocol: " + secWsProtocol);
+                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, uri, secWsProtocol);
                 ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).set(webSocketContext);// 路由设置
                 WebSocketSession socketSession = webSocketContext.getWebSocketSession();
                 String queryString = isQueryParams ? target.substring(target.indexOf("?")+1, target.length()) : "";
                 socketSession.setMessage(queryString);
+                // 设置进入map
+                WebSocketHandlerHelper.setWebSocketContextMap(webSocketContext);
                 // 链接成功，调用业务方法
                 webSocketContext.getWebSocketObj().onConnect(socketSession);
-                WebSocketHandlerHelper.setWebSocketContextMap(webSocketContext);
                 logger.warn("websocket connect["+target+"] is success");
                 return;
 //            }
@@ -150,7 +154,8 @@ public class WebSocketBaseHandler extends SimpleChannelInboundHandler<Object> {
             socketSession.setCause(cause);
             try {
                 webSocketContext.getWebSocketObj().onException(socketSession);
-                WebSocketHandlerHelper.getWebSocketContextMap().remove(socketSession.getUri());
+                WebSocketHandlerHelper.removeWebSocketContext(socketSession);
+//                WebSocketHandlerHelper.getWebSocketContextMap().remove(socketSession.getUri());
                 ctx.channel().close();
             } catch (Exception e) {
                 logger.warn(e.getMessage());
@@ -183,5 +188,34 @@ public class WebSocketBaseHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         onException(ctx, cause);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        try {
+            WebSocketContext webSocketContext = getWebSocketContext(ctx);
+            if (webSocketContext != null && webSocketContext.getWebSocketSession() != null && webSocketContext.getWebSocketObj() != null) {
+                webSocketContext.getWebSocketObj().onClose(webSocketContext.getWebSocketSession());
+                logger.info("通道即将失活。。。。。{}", webSocketContext.getWebSocketSession().getUri());
+            }
+        } catch (Exception e) {
+            logger.error("通道即将失活，关闭处理失败", e);
+        } finally {
+            super.channelInactive(ctx);
+        }
+    }
+
+    public static Boolean closeWebSocket(WebSocketSession session){
+        try {
+            WebSocketContext webSocketContext = WebSocketHandlerHelper.removeWebSocketContext(session);
+            if (webSocketContext != null) {
+                webSocketContext.getCtx().channel().close();
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+            return false;
+        }
+        logger.warn("websocket["+session.getUri()+"] close is success");
+        return true;
     }
 }

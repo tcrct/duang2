@@ -4,10 +4,8 @@ import com.duangframework.exception.NettyStartUpException;
 import com.duangframework.exception.ValidatorException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.MvcMain;
-import com.duangframework.mvc.http.HttpRequest;
-import com.duangframework.mvc.http.HttpResponse;
-import com.duangframework.mvc.http.IRequest;
-import com.duangframework.mvc.http.IResponse;
+import com.duangframework.mvc.http.*;
+import com.duangframework.mvc.http.session.HttpSessionManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -37,6 +35,10 @@ public class RequestTask implements Callable<IResponse> {
         if(ToolsKit.isEmpty(iRequest) || ToolsKit.isEmpty(iResponse)) {
             throw new NettyStartUpException("build duangframework request or response fail");
         }
+        //如果没有存在该session的话，则添加HttpSession
+//        if (null == HttpSessionManager.getSession(httpRequest)) {
+//            HttpSessionManager.addSessionAndHeader(iResponse);
+//        }
         // 执行请求任务
         MvcMain.doHttpTask(iRequest, iResponse);
         return iResponse;

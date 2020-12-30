@@ -10,8 +10,7 @@ import java.util.Properties;
 
 /**
  * Prop. Prop can load properties file from CLASSPATH or File object.
- *
- * @author laotang
+ * @author  laotang
  */
 public class Prop {
 
@@ -27,7 +26,6 @@ public class Prop {
 
     /**
      * Prop constructor.
-     *
      * @see #Prop(String, String)
      */
     public Prop(String fileName) {
@@ -40,7 +38,7 @@ public class Prop {
      * Example:<br>
      * Prop prop = new Prop("my_config.txt", "UTF-8");<br>
      * String userName = prop.get("userName");<br><br>
-     * <p>
+     *
      * prop = new Prop("com/jfinal/file_in_sub_path_of_classpath.txt", "UTF-8");<br>
      * String value = prop.get("key");
      *
@@ -58,20 +56,21 @@ public class Prop {
             properties.load(new InputStreamReader(inputStream, encoding));
         } catch (IOException e) {
             throw new RuntimeException("Error loading properties file.", e);
-        } finally {
+        }
+        finally {
             if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
+                try {inputStream.close();} catch (IOException e) {logger.error(e.getMessage(), e);}
             }
         }
     }
 
+    private ClassLoader getClassLoader() {
+        ClassLoader ret = Thread.currentThread().getContextClassLoader();
+        return ret != null ? ret : getClass().getClassLoader();
+    }
+
     /**
      * Prop constructor.
-     *
      * @see #Prop(File, String)
      */
     public Prop(File file) {
@@ -85,7 +84,7 @@ public class Prop {
      * Prop prop = new Prop(new File("/var/config/my_config.txt"), "UTF-8");<br>
      * String userName = prop.get("userName");
      *
-     * @param file     the properties File object
+     * @param file the properties File object
      * @param encoding the encoding
      */
     public Prop(File file, String encoding) {
@@ -103,20 +102,12 @@ public class Prop {
             properties.load(new InputStreamReader(inputStream, encoding));
         } catch (IOException e) {
             throw new RuntimeException("Error loading properties file.", e);
-        } finally {
+        }
+        finally {
             if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
+                try {inputStream.close();} catch (IOException e) {logger.error(e.getMessage(), e);}
             }
         }
-    }
-
-    private ClassLoader getClassLoader() {
-        ClassLoader ret = Thread.currentThread().getContextClassLoader();
-        return ret != null ? ret : getClass().getClassLoader();
     }
 
     public Prop append(String key, Object value) {

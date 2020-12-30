@@ -1,48 +1,60 @@
 package com.duangframework.mvc.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.duangframework.kit.ToolsKit;
+import com.duangframework.mvc.annotation.Param;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 手机访问后返回的信息头,每一个dto对象须包含
+ *	手机访问后返回的信息头,每一个dto对象须包含
  */
 public class HeadDto implements java.io.Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private int ret;
-    private String msg;
+	@Param(label = "状态码")
+	private int ret;
+	@Param(label = "信息")
+	private String msg;
+	@JSONField(serialize = false)
     private String uri;
+	@JSONField(serialize = false)
     private String method;
+	@JSONField(serialize = false)
     private String clientIp;
-    private String tokenId;
-    private String timestamp = ToolsKit.getCurrentDateString();
-    private String requestId;
+	@JSONField(serialize = false)
+	@Param(label = "token")
+	private String tokenId;
+	@Param(label = "请求时间")
+	private String timestamp = ToolsKit.getCurrentDateString();
+	@JSONField(serialize = false)
+	private String requestId;
+	@JSONField(serialize = false)
     private Map<String, String> headerMap = new HashMap<>();
 
-    public HeadDto() {
+	public HeadDto(){
 
-    }
+	}
 
-    public HeadDto(int ret, String msg) {
-        this.ret = ret;
-        this.msg = msg;
-    }
+	public HeadDto(int ret, String msg){
+		this.ret = ret;
+		this.msg = msg;
+	}
 
-    public HeadDto(int ret, String msg, String tokenId) {
-        this.ret = ret;
-        this.msg = msg;
-        this.tokenId = tokenId;
-    }
+	public HeadDto(int ret, String msg, String tokenId){
+		this.ret = ret;
+		this.msg = msg;
+		this.tokenId = tokenId;
+	}
 
-    public HeadDto(int ret, String msg, String tokenId, String uri) {
-        this.ret = ret;
-        this.msg = msg;
-        this.tokenId = tokenId;
-        this.uri = uri;
-    }
+	public HeadDto(int ret, String msg, String tokenId, String uri){
+		this.ret = ret;
+		this.msg = msg;
+		this.tokenId = tokenId;
+		this.uri = uri;
+	}
 
     public HeadDto(int ret, String msg, String uri, String method, String clientIp, String tokenId, String timestamp, String requestId, Map<String, String> headerMap) {
         this.ret = ret;
@@ -57,44 +69,40 @@ public class HeadDto implements java.io.Serializable {
     }
 
     public int getRet() {
-        return ret;
-    }
+		return ret;
+	}
+	public void setRet(int ret) {
+		this.ret = ret;
+	}
+	public String getMsg() {
+		return msg;
+	}
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+	public String getTokenId() {
+		return tokenId;
+	}
 
-    public void setRet(int ret) {
-        this.ret = ret;
-    }
+	public void setTokenId(String tokenId) {
+		this.tokenId = tokenId;
+	}
 
-    public String getMsg() {
-        return msg;
-    }
+	public String getTimestamp() {
+		return timestamp;
+	}
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public String getTokenId() {
-        return tokenId;
-    }
+	public String getRequestId() {
+		return requestId;
+	}
 
-    public void setTokenId(String tokenId) {
-        this.tokenId = tokenId;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
 
     public Map<String, String> getHeaderMap() {
         return headerMap;
@@ -103,7 +111,6 @@ public class HeadDto implements java.io.Serializable {
     public void setHeaderMap(Map<String, String> headerMap) {
         this.headerMap.putAll(headerMap);
     }
-
     public String getUri() {
         return uri;
     }
@@ -111,7 +118,6 @@ public class HeadDto implements java.io.Serializable {
     public void setUri(String uri) {
         this.uri = uri;
     }
-
     public String getMethod() {
         return method;
     }

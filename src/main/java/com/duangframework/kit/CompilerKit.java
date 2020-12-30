@@ -1,28 +1,43 @@
 package com.duangframework.kit;
-
+import com.duangframework.ext.ConstEnum;
 import com.duangframework.hotswap.ClassLoaderHelper;
 import com.duangframework.hotswap.CompilerUtils;
+import com.duangframework.hotswap.FileListener;
+import com.duangframework.mvc.http.enums.ConstEnums;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
  * 动态编译工具类
- *
  * @author laotang
  * @date 2019-5-31
  */
 public class CompilerKit {
 
     private static final Logger logger = LoggerFactory.getLogger(CompilerKit.class);
-    /****************************************************************************************/
-    private static String rootPath;
-    private String dirPath;
-    private String sourceDir;
-    private String targetDir;
+
+    private static class CompilerKitHolder {
+        private static final CompilerKit INSTANCE = new CompilerKit();
+    }
+    private CompilerKit() {
+//        fileListener();
+        rootPath = PathKit.getWebRootPath();
+        if(rootPath.endsWith("-web") || rootPath.endsWith("-WEB")) {
+            rootPath = rootPath.substring(0, rootPath.lastIndexOf(File.separator));
+        }
+    }
+    public static final CompilerKit duang() {
+        clear();
+        return CompilerKit.CompilerKitHolder.INSTANCE;
+    }
+    private static void clear(){
+
+    }
 //    private void fileListener() {
 //        rootPath = PathKit.getWebRootPath();
 //        String dirListenerPath = rootPath + rootItemPath() + File.separator + "com.signetz.openapi.controller".replace(".", File.separator);
@@ -33,26 +48,13 @@ public class CompilerKit {
 //            logger.warn(e.getMessage(),e);
 //        }
 //    }
-    private CompilerKit() {
-//        fileListener();
-        rootPath = PathKit.getWebRootPath();
-        if (rootPath.endsWith("-web") || rootPath.endsWith("-WEB")) {
-            rootPath = rootPath.substring(0, rootPath.lastIndexOf(File.separator));
-        }
-    }
-
-    public static final CompilerKit duang() {
-        clear();
-        return CompilerKit.CompilerKitHolder.INSTANCE;
-    }
-
-    private static void clear() {
-
-    }
-
+    /****************************************************************************************/
+    private static String rootPath;
+    private String dirPath;
+    private String sourceDir;
+    private String targetDir;
     /**
      * java文件夹目录，IDEA下到java目录
-     *
      * @return
      */
     public CompilerKit dir(String dirPath) {
@@ -61,8 +63,7 @@ public class CompilerKit {
     }
 
     /**
-     * 源代码目录
-     *
+     *  源代码目录
      * @param javaDir
      * @return
      */
@@ -72,9 +73,8 @@ public class CompilerKit {
     }
 
     /**
-     * 指定class目录
-     *
-     * @param classDir class目录
+     *  指定class目录
+     * @param classDir  class目录
      * @return
      */
     public CompilerKit classDir(String classDir) {
@@ -84,31 +84,29 @@ public class CompilerKit {
 
     /**
      * maven开发模式下的固定路径
-     *
      * @return
      */
     private String rootItemPath() {
-        return File.separator + "src" + File.separator + "main" + File.separator + "java";
+        return File.separator + "src" +File.separator + "main" + File.separator + "java";
     }
 
     /**
      * 设置默认值
      */
     private void setDefaultValue() {
-        if (ToolsKit.isEmpty(dirPath)) {
+        if(ToolsKit.isEmpty(dirPath)) {
             dirPath = rootPath;// + rootItemPath();
         }
-        if (ToolsKit.isEmpty(sourceDir)) {
+        if(ToolsKit.isEmpty(sourceDir)) {
             sourceDir = rootPath;// + rootItemPath();
         }
-        if (ToolsKit.isEmpty(targetDir)) {
+        if(ToolsKit.isEmpty(targetDir)) {
             targetDir = rootPath + File.separator + "target" + File.separator + "classes";
         }
     }
 
     /**
-     * 源代码根路径位置
-     *
+     *  源代码根路径位置
      * @return 源代码根目录
      */
     public String dir() {
@@ -118,14 +116,13 @@ public class CompilerKit {
     }
 
     /**
-     * 指定编译后的class保存位置
-     *
-     * @return dir目录路径
+     *  指定编译后的class保存位置
+     * @return  dir目录路径
      */
     public String classDir() {
 //        setDefaultValue();
 //        logger.warn("hotswap class path : " + targetDir);
-        if (ToolsKit.isEmpty(targetDir)) {
+        if(ToolsKit.isEmpty(targetDir)) {
             targetDir = rootPath + File.separator + "target" + File.separator + "classes";
         }
         return targetDir;
@@ -138,22 +135,18 @@ public class CompilerKit {
         boolean isSuccess = false;
         setDefaultValue();
         try {
-            if (ToolsKit.isNotEmpty(targetDir)) {
+            if(ToolsKit.isNotEmpty(targetDir)) {
                 FileUtils.forceMkdir(new File(targetDir));
             }
             isSuccess = CompilerUtils.getInstance().compiler(dirPath, sourceDir, targetDir);
         } catch (Exception e) {
             logger.warn("动态编译时出错: " + e.getMessage(), e);
         }
-        if (isSuccess) {
+        if(isSuccess) {
             ClassLoaderHelper.getInstance().hotSwap();
         } else {
             logger.warn("热部署失败");
         }
-    }
-
-    private static class CompilerKitHolder {
-        private static final CompilerKit INSTANCE = new CompilerKit();
     }
 
 }

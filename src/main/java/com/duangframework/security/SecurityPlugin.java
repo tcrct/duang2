@@ -22,8 +22,14 @@ public class SecurityPlugin implements IPlugin {
     private Set<String> uriPrefixSet = new HashSet<>();
     private ISecurity authObj;
     private IHandler handler;
+    private Integer index = 0;
 
     public SecurityPlugin(IHandler securityHandler){
+        this.handler = securityHandler;
+    }
+
+    public SecurityPlugin(Integer handlerIndex, IHandler securityHandler){
+        this.index = handlerIndex;
         this.handler = securityHandler;
     }
 
@@ -37,7 +43,7 @@ public class SecurityPlugin implements IPlugin {
         // 如果不为null
         if(ToolsKit.isNotEmpty(handler)) {
             // 添加到第一位
-            HandlerHelper.getBeforeHandlerList().add(0, handler);
+            HandlerHelper.getBeforeHandlerList().add(index, handler);
         }
     }
 

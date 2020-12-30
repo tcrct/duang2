@@ -18,6 +18,8 @@ import redis.clients.util.SafeEncoder;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Created by laotang
@@ -201,7 +203,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
      * @param keys
      * @return
      */
-    public Long del(final String... keys) {
+    public Long del(final String... keys){
         return call(new JedisAction<Long>(){
             @Override
             public Long execute(Jedis jedis) {
@@ -313,7 +315,7 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
      * @param options                        CacheModelOptions对象
      * @return
      *  1 如果成功设置过期时间。
-        0  如果key不存在或者不能设置过期时间。
+    0  如果key不存在或者不能设置过期时间。
      */
     public Long expire(final CacheModelOptions options) {
         return call(new JedisAction<Long>(){
@@ -458,7 +460,12 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
                 long isok = 0;
                 if(value instanceof String){
                     isok = jedis.sadd(options.getKey(), (String)value);
-                }else{
+                } else if (value instanceof Collection) {
+
+                    List<byte[]> collect =  ((Collection<Object>) value).stream().map(SerializableUtils::serialize).collect(Collectors.toList());
+//                    isok = jedis.sadd(options.getKey(), collect.toArray(new String[0]));
+                    isok =jedis.sadd(SafeEncoder.encode(options.getKey()), collect.toArray(new byte[0][0]));
+                } else {
                     isok =jedis.sadd(SafeEncoder.encode(options.getKey()), SerializableUtils.serialize(value));
                 }
                 if(isok > 0) {

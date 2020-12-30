@@ -1,6 +1,7 @@
 package com.duangframework.db.mysql.core;
 
 
+
 import com.duangframework.db.mysql.utils.MysqlUtils;
 import com.duangframework.exception.MysqlException;
 import com.duangframework.kit.ToolsKit;
@@ -19,27 +20,23 @@ import java.util.Map;
  */
 public class DBSession {
 
-    /**
-     * 每一个线程都有自己的连接
-     **/
+    private static final Logger logger = LoggerFactory.getLogger(DBSession.class);
+    /** 每一个线程都有自己的连接 **/
     public static final ThreadLocal<Connection> connContainer = new ThreadLocal<>();
     public static final Object[] NULL_OBJECT = new Object[0];
-    private static final Logger logger = LoggerFactory.getLogger(DBSession.class);
 
-    private static <T> T call(DBAction<T> dbAction) {
+    private static <T> T call(DBAction<T> dbAction){
         T result = null;
         Connection connection = null;
-        try {
-            connection = getConnection(dbAction.dataSourceKey());
-            if (null == connection) {
-                throw new MysqlException("connection is null");
-            }
+        try{
+            connection  = getConnection(dbAction.dataSourceKey());
+            if(null == connection){ throw new MysqlException("connection is null");}
             DBRunner dbRunner = new DBRunner(connection);
             result = dbAction.execute(dbRunner);
-        } catch (Exception e) {
+        } catch(Exception e){
             throw new MysqlException(e.getMessage(), e);
         } finally {
-            if (ToolsKit.isNotEmpty(connection)) {
+            if(ToolsKit.isNotEmpty(connection)){
                 close(connection);
             }
         }
@@ -48,20 +45,18 @@ public class DBSession {
 
     /**
      * 取出指定库里所有的表
-     *
-     * @return 表名集合
+     * @return		表名集合
      */
-    public static List<String> getMysqlTables(final String exampleCode) {
-        return call(new DBAction<List<String>>() {
+    public static  List<String> getMysqlTables(final String exampleCode){
+        return call(new DBAction<List<String>>(){
             @Override
             public List<String> execute(DBRunner dbRunner) throws SQLException {
                 String sql = "select table_name from information_schema.tables where table_schema=?";
                 Object[] params = {dbRunner.getConnection().getCatalog()};
-                List<Map<String, Object>> queryList = dbRunner.query(sql, null, params);
+                List<Map<String,Object>> queryList =  dbRunner.query(sql, null, params);
                 List<String> resultList = MysqlUtils.toList(queryList);
                 return resultList;
             }
-
             @Override
             public String dataSourceKey() {
                 return exampleCode;
@@ -71,22 +66,20 @@ public class DBSession {
 
     /**
      * 根据表名取出所有索引
-     *
-     * @param tableName 表名
-     * @return 索引数组集合
+     * @param tableName		表名
+     * @return		索引数组集合
      */
     public static List<String> getIndexs(final String exampleCode, final String tableName) {
-        return call(new DBAction<List<String>>() {
+        return call(new DBAction<List<String> >(){
             @Override
             public List<String> execute(DBRunner dbRunner) throws SQLException {
-                String sql = "show index from " + tableName;
+                String sql = "show index from "+ tableName;
                 List filterNames = new ArrayList(1);
                 filterNames.add("Key_name");
-                List<Map<String, Object>> queryList = dbRunner.query(sql, filterNames, NULL_OBJECT);
+                List<Map<String,Object>> queryList = dbRunner.query(sql, filterNames, NULL_OBJECT);
                 List<String> resultList = MysqlUtils.toList(queryList);
                 return resultList;
             }
-
             @Override
             public String dataSourceKey() {
                 return exampleCode;
@@ -96,18 +89,17 @@ public class DBSession {
 
     /**
      * 执行查询SQL语句
-     *
-     * @param exampleCode 数据库名称
-     * @param querySql    查询SQL语句
-     * @param params      参数数组
+     * @param exampleCode	 			数据库名称
+     * @param querySql		查询SQL语句
+     * @param params			参数数组
      * @return
      */
-    public static List<Map<String, Object>> query(final String exampleCode, final String querySql, final Object... params) throws Exception {
-        return call(new DBAction<List<Map<String, Object>>>() {
+    public static List<Map<String,Object>> query(final String exampleCode, final String querySql, final Object... params) throws Exception{
+        return call(new DBAction<List<Map<String,Object>>>(){
 
             @Override
-            public List<Map<String, Object>> execute(DBRunner dbRunner) throws SQLException {
-                return dbRunner.query(querySql, null, params);
+            public List<Map<String,Object>> execute(DBRunner dbRunner) throws SQLException {
+                return  dbRunner.query(querySql, null, params);
             }
 
             @Override
@@ -118,14 +110,13 @@ public class DBSession {
     }
 
     /**
-     * 执行SQL语句，用于update, delete等
-     *
+     *  执行SQL语句，用于update, delete等
      * @param sql
      * @param params
      * @return
      */
-    public static int execute(final String exampleCode, final String sql, final Object... params) throws Exception {
-        return call(new DBAction<Integer>() {
+    public static int execute(final String exampleCode, final String sql, final Object... params)  throws Exception {
+        return call(new DBAction<Integer>(){
             @Override
             public Integer execute(DBRunner dbRunner) throws Exception {
                 return dbRunner.execute(sql, params);
@@ -139,16 +130,16 @@ public class DBSession {
     }
 
 
-    private static Connection getConnection(String key) {
+    private static Connection getConnection(String key){
         Connection connection = connContainer.get();
         // 如果在当前线程里不存在连接，则重新取
-        if (null == connection) {
+        if(null == connection){
             try {
                 connection = MysqlUtils.getConnection(key);
             } catch (Exception e) {
                 throw new MysqlException("connection is null");
             }
-            if (null != connection) {
+            if(null != connection) {
                 connContainer.set(connection);
             }
         }
@@ -161,11 +152,11 @@ public class DBSession {
     public static void startTransaction(String exampleCode) {
         Connection connection = getConnection(exampleCode);
         try {
-            if (null != connection) {
+            if(null != connection){
                 connection.setAutoCommit(false);
             }
         } catch (SQLException e) {
-            throw new MysqlException("StartTransaction is Error: " + e.getMessage(), e);
+            throw new MysqlException("StartTransaction is Error: "+e.getMessage(), e);
         }
     }
 
@@ -175,12 +166,12 @@ public class DBSession {
     public static void commintTransaction(String exampleCode) {
         Connection connection = getConnection(exampleCode);
         try {
-            if (null != connection) {
+            if(null != connection){
                 connection.commit();
             }
         } catch (SQLException e) {
             throw new MysqlException("CommintTransaction is Error: " + e.getMessage(), e);
-        } finally {
+        } finally{
             close(connection);
         }
     }
@@ -191,19 +182,19 @@ public class DBSession {
     public static void rollbakcTransaction(String exampleCode) {
         Connection connection = getConnection(exampleCode);
         try {
-            if (null != connection) {
+            if(null != connection){
                 connection.rollback();
             }
         } catch (SQLException e) {
             logger.warn("RollbakcTransaction is Error: " + e.getMessage(), e);
-        } finally {
+        } finally{
             close(connection);
         }
     }
 
 
     public static void close(PreparedStatement stmt) {
-        if (ToolsKit.isNotEmpty(stmt)) {
+        if(ToolsKit.isNotEmpty(stmt)){
             try {
                 stmt.close();
             } catch (SQLException e) {
@@ -213,7 +204,7 @@ public class DBSession {
     }
 
     public static void close(Connection conn) {
-        if (ToolsKit.isNotEmpty(conn)) {
+        if(ToolsKit.isNotEmpty(conn)){
             try {
                 conn.close();
                 connContainer.remove();

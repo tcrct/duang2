@@ -2,15 +2,11 @@ package com.duangframework.websocket;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.core.helper.BeanHelper;
-import com.duangframework.utils.DuangId;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 /**
  * 自定义的WebSocketContext对象，用来封装ctx, session及message等对象
@@ -26,12 +22,14 @@ public class WebSocketContext {
     private ChannelHandlerContext ctx;
     private WebSocketServerHandshaker handshaker;
     private WebSocketSession webSocketSession;
+    private String secWsProtocol;
 
 
-    public WebSocketContext(ChannelHandlerContext ctx, WebSocketServerHandshaker handshaker, String uri) {
+    public WebSocketContext(ChannelHandlerContext ctx, WebSocketServerHandshaker handshaker, String uri, String secWsProtocol) {
         this.ctx = ctx;
         this.handshaker = handshaker;
         this.webSocketSession = new WebSocketSession(uri);
+        this.secWsProtocol = secWsProtocol;
     }
 
     public void push(String value) {
@@ -47,6 +45,10 @@ public class WebSocketContext {
         return webSocketSession;
     }
 
+    public String getSecWsProtocol() {
+        return secWsProtocol;
+    }
+
     public IWebSocket getWebSocketObj() {
         Class<? extends IWebSocket> webSocketClass = null;
         Iterator<String> iterator = WebSocketHandlerHelper.getWebSocketHandlerMap().keySet().iterator();
@@ -59,4 +61,9 @@ public class WebSocketContext {
         }
         return ToolsKit.isEmpty(webSocketClass) ? null : (IWebSocket) BeanHelper.getBean(webSocketClass);
     }
+
+    public ChannelHandlerContext getCtx() {
+        return ctx;
+    }
+
 }

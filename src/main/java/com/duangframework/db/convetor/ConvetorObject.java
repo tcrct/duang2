@@ -21,11 +21,9 @@ public class ConvetorObject {
         this.queryDoc = queryDoc;
         this.updateDoc = updateDoc;
     }
-
     public Document getUpdateDoc() {
         return updateDoc;
     }
-
     public Document getQueryDoc() {
         return queryDoc;
     }

@@ -19,13 +19,13 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractConvetorTemplate {
 
-    public static final String EMPTY_SPACE = " ";
-    public static final String SELECT_FIELD = "select";
-    public static final String INSERT_FIELD = "insert into";
+    public static final String EMPTY_SPACE= " ";
+    public static final String SELECT_FIELD =  "select";
+    public static final String INSERT_FIELD =  "insert into";
     public static final String UPDATE_FIELD = "update";
     public static final String SET_FIELD = "set";
     public static final String VALUES_FIELD = "values";
-    public static final String WHERE_FIELD = "where";
+    public static final String WHERE_FIELD ="where";
     public static final String DELETE_FILED = "delete from";
     public static final String FROM_FILED = "from";
     public static final String AND_FIELD = " and ";
@@ -34,7 +34,7 @@ public abstract class AbstractConvetorTemplate {
 
     private ConvetorObject convetorObject;
 
-    public AbstractConvetorTemplate(ConvetorObject convetorObject) {
+    public AbstractConvetorTemplate(ConvetorObject convetorObject ) {
         this.convetorObject = convetorObject;
     }
 
@@ -53,12 +53,12 @@ public abstract class AbstractConvetorTemplate {
             @Override
             public void accept(KvItem kvItem) {
                 Object value = kvItem.getValue();
-                if (value instanceof DuangId || value instanceof ObjectId) {
+                if(value instanceof DuangId || value instanceof ObjectId) {
                     value = value.toString();
                 }
-                if (value instanceof DBObject || value instanceof Document) {
-                    Map dboMap = ((DBObject) value).toMap();
-                    if (ToolsKit.isNotEmpty(dboMap)) {
+                if(value instanceof DBObject || value instanceof Document) {
+                    Map dboMap = ((DBObject)value).toMap();
+                    if(ToolsKit.isNotEmpty(dboMap)) {
                         for (Iterator<Map.Entry<String, Object>> iterator = dboMap.entrySet().iterator(); iterator.hasNext(); ) {
                             Map.Entry<String, Object> entry = iterator.next();
                             if (Operator.REGEX.equalsIgnoreCase(entry.getKey())) {

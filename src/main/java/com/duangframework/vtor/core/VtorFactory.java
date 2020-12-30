@@ -66,13 +66,13 @@ public final class VtorFactory {
 	 */
 	public static void validator(Collection<Object> beanCollections) throws Exception {
 		if(ToolsKit.isEmpty(beanCollections)) {
-			logger.warn("collection is null, so exit validator!");
+//			logger.warn("collection is null, so exit validator!");
 			return;
 		}
 		init();
 		boolean isValidator = false;
 		for(Object item : beanCollections) {
-			if(isValidatorObj(item)) {
+			if(item != null && isValidatorObj(item)) {
 				isValidator = true;
 				validator(item);
 			}
@@ -105,7 +105,7 @@ public final class VtorFactory {
 	}
 
 	private static void loggerInfo() {
-		logger.warn("框架并没进行注解验证，请注意对象或集合元素是否实现[ java.io.Serializable ]接口及设置了[ @Bean ]注解");
+//		logger.warn("框架并没进行注解验证，请注意对象或集合元素是否实现[ java.io.Serializable ]接口及设置了[ @Bean ]注解");
 	}
 
 	private static boolean isValidatorObj(Object item) {

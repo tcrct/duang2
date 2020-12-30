@@ -43,8 +43,13 @@ public class LoginDto  {
     private String securityServiceUrl;
 
     /**分account,phone等**/
-    @NotEmpty(message = "登录方式不能为空")
+    @NotEmpty(message = "登录类型不能为空")
     private String loginType;
+
+    /**
+     * 登录来源
+     */
+    private String loginMode;
 
     public LoginDto() {
     }
@@ -138,6 +143,14 @@ public class LoginDto  {
 
     public void setLoginType(String loginType) {
         this.loginType = loginType;
+    }
+
+    public String getLoginMode() {
+        return loginMode;
+    }
+
+    public void setLoginMode(String loginMode) {
+        this.loginMode = loginMode;
     }
 
     @Override

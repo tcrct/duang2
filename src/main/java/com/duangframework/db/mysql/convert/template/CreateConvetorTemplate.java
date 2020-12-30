@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  */
 public class CreateConvetorTemplate extends AbstractConvetorTemplate {
 
-    public CreateConvetorTemplate(ConvetorObject convetorObject) {
+    public CreateConvetorTemplate(ConvetorObject convetorObject ) {
         super(convetorObject);
     }
 
@@ -28,8 +28,8 @@ public class CreateConvetorTemplate extends AbstractConvetorTemplate {
             @Override
             public void accept(Map.Entry<String, Object> entry) {
                 Object value = entry.getValue();
-                if (ToolsKit.isNotEmpty(value)) {
-                    if (value instanceof DuangId) {
+                if(ToolsKit.isNotEmpty(value)) {
+                    if(value instanceof DuangId) {
 
                     }
                     kvModle.addUpdateKvItem(new KvItem(entry.getKey(), value));
@@ -51,8 +51,8 @@ public class CreateConvetorTemplate extends AbstractConvetorTemplate {
                 insertPlaceholderSql.append("?,");
             }
         });
-        insertFieldSql.deleteCharAt(insertFieldSql.length() - 1);
-        insertPlaceholderSql.deleteCharAt(insertPlaceholderSql.length() - 1);
+        insertFieldSql.deleteCharAt(insertFieldSql.length()-1);
+        insertPlaceholderSql.deleteCharAt(insertPlaceholderSql.length()-1);
         insertFieldSql.append(")");
         insertPlaceholderSql.append(")");
         StringBuilder insertSql = new StringBuilder();

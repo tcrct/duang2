@@ -24,6 +24,8 @@ import static org.objectweb.asm.Opcodes.ASM5;
  * @date createed in 2018/6/28.
  */
 public class MethodParameterNameDiscoverer {
+
+   // public static final int ASM5 = 5 << 16 | 0 << 8 | 0;
     /**
      * 要过滤的方法(Object自带方法及BaseController里的方法)
      */

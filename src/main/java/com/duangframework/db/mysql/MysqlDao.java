@@ -8,11 +8,11 @@ import com.duangframework.db.mysql.common.MysqlBaseDao;
  */
 public class MysqlDao<T> extends MysqlBaseDao<T> {
 
-    public MysqlDao(String clientId, Class<T> cls) {
+    public MysqlDao(String clientId, Class<T> cls){
         super(clientId, cls);
     }
 
-    public MysqlDao(MysqlClientAdapter clientAdapter, Class<T> cls) {
+    public MysqlDao(MysqlClientAdapter clientAdapter, Class<T> cls){
         super(clientAdapter, cls);
     }
 

@@ -138,7 +138,7 @@ public class WebSocketBaseHandler_bak {
                 boolean isQueryParams = target.contains("?");
                 String uri =isQueryParams ? target.substring(0, target.indexOf("?")) : target;
                 logger.warn("websocket uri: " +uri +"                    handshaker.uri: "+ handshaker.uri());
-                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, uri);
+                WebSocketContext webSocketContext = new WebSocketContext(ctx, handshaker, uri, secWsProtocol);
                 ctx.attr(AttributeKey.valueOf(ConstEnums.SOCKET.WEBSOCKET_CONTEXT_FIELD.getValue())).set(webSocketContext);// 路由设置
                 WebSocketSession socketSession = webSocketContext.getWebSocketSession();
                 String queryString = isQueryParams ? target.substring(target.indexOf("?")+1, target.length()) : "";

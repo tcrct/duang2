@@ -1,20 +1,20 @@
 package com.duangframework.mvc.core.helper;
 
 import com.duangframework.exception.MvcException;
+import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.IRequest;
 import com.duangframework.mvc.http.IResponse;
 import com.duangframework.mvc.http.handler.DuangHeadHandle;
 import com.duangframework.mvc.http.handler.IHandler;
+import com.duangframework.utils.WebKit;
+import com.duangframework.websocket.IWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 处理器链辅助类
- *
  * @author Created by laotang
  * @date createed in 2018/6/12.
  */
@@ -26,10 +26,6 @@ public class HandlerHelper {
      * 前置处理器集合
      */
     private static final List<IHandler> beforeHandlerList = new ArrayList<>();
-    /**
-     * 后置处理器集合
-     */
-    private static final List<IHandler> afterHandlerList = new ArrayList<>();
 
     public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList.clear();
@@ -49,6 +45,11 @@ public class HandlerHelper {
         beforeHandlerList.add(new DuangHeadHandle());  //检验tokenId及是否允许访问
     }
 
+    /**
+     * 后置处理器集合
+     */
+    private static final List<IHandler> afterHandlerList = new ArrayList<>();
+
     public static void setAfters(List<IHandler> afterHandlerList) {
         HandlerHelper.afterHandlerList.clear();
         HandlerHelper.afterHandlerList.addAll(afterHandlerList);
@@ -66,10 +67,15 @@ public class HandlerHelper {
      * @param response 响应对象
      * @throws MvcException
      */
-    public static void doBeforeChain(String target, IRequest request, IResponse response) throws MvcException {
+    public static boolean doBeforeChain(String target, IRequest request, IResponse response) throws MvcException {
         for (Iterator<IHandler> it = getBeforeHandlerList().iterator(); it.hasNext(); ) {
-            it.next().doHandler(target, request, response);
+            IHandler handler = it.next();
+            if (!handler.doHandler(target, request, response)) {
+                logger.warn("[{}]返回了false终止流程，如需要返回内容，请抛出异常！", handler.getClass().getName());
+                return false;
+            }
         }
+        return true;
     }
 
     /**
@@ -79,14 +85,19 @@ public class HandlerHelper {
      * @param request  请求对象
      * @param response 响应对象
      */
-    public static void doAfterChain(String target, IRequest request, IResponse response) {
+    public static boolean doAfterChain(String target, IRequest request, IResponse response)  {
         try {
             for (Iterator<IHandler> it = getAfterHandlerList().iterator(); it.hasNext(); ) {
-                it.next().doHandler(target, request, response);
+                IHandler handler = it.next();
+                if (!handler.doHandler(target, request, response)) {
+                    logger.warn("[{}]返回了false终止流程，如需要返回内容，请抛出异常！", handler.getClass().getName());
+                    return false;
+                }
             }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
         }
+        return true;
     }
 
 }

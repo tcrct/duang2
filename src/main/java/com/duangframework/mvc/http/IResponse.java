@@ -120,4 +120,9 @@ public interface IResponse {
      * @param newUri new url
      */
     void redirect(String newUri);
+
+    /**
+     *  encode url
+     */
+    String encodeURL(String url);
 }

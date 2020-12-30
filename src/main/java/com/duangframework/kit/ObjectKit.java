@@ -1,5 +1,6 @@
 package com.duangframework.kit;
 
+import com.duangframework.utils.DataType;
 import com.duangframework.utils.TypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -21,19 +23,17 @@ public class ObjectKit {
     private static final Logger logger = LoggerFactory.getLogger(ObjectKit.class);
     private static final Map<String, Map<String, Object>> FIELD_MAP = new HashMap<>();
     private static final Set<String> excludedMethodName = new HashSet<>();
-
     /**
      * 设置成员变量
-     *
-     * @param obj        需要设置成员变量的对象
-     * @param field      需要设置值的变量字段
-     * @param fieldValue 变量字段的值
-     * @param type       变量字段类型
+     * @param obj       需要设置成员变量的对象
+     * @param field     需要设置值的变量字段
+     * @param fieldValue    变量字段的值
+     * @param type              变量字段类型
      * @throws Exception
      */
     public static void setField(Object obj, Field field, Object fieldValue, Class<?> type) throws Exception {
         //如果为null,直接退出
-        if (null == fieldValue) {
+        if( null ==fieldValue) {
             return;
         }
         field.setAccessible(true);
@@ -116,10 +116,9 @@ public class ObjectKit {
 
     /**
      * 设置成员变量
-     *
-     * @param obj        需要设置成员变量的对象
-     * @param field      需要设置值的变量字段
-     * @param fieldValue 变量字段的值
+     * @param obj       需要设置成员变量的对象
+     * @param field     需要设置值的变量字段
+     * @param fieldValue    变量字段的值
      */
     public static void setField(Object obj, Field field, Object fieldValue) {
         try {
@@ -133,8 +132,7 @@ public class ObjectKit {
 
     /**
      * 获取成员变量
-     *
-     * @param obj 对象
+     * @param  obj 对象
      * @aram field  变量字段
      */
     public static Object getFieldValue(Object obj, Field field) {
@@ -187,7 +185,7 @@ public class ObjectKit {
      * 通过反射创建实例
      */
     @SuppressWarnings("unchecked")
-    public static <T> T newInstance(String className, String message, Class<?>... parameterTypes) {
+    public static <T> T newInstance(String className, String message, Class<?>... parameterTypes ) {
         T instance;
         try {
             Class<?> commandClass = Class.forName(className);
@@ -204,7 +202,7 @@ public class ObjectKit {
      * 通过反射创建实例
      */
     @SuppressWarnings("unchecked")
-    public static <T> T newInstance(String className, Object[] value, Class<?>... parameterTypes) {
+    public static <T> T newInstance(String className, Object[] value, Class<?>... parameterTypes ) {
         T instance;
         try {
             Class<?> commandClass = Class.forName(className);
@@ -216,7 +214,6 @@ public class ObjectKit {
         }
         return instance;
     }
-
     /**
      * 通过反射创建实例
      */
@@ -238,7 +235,7 @@ public class ObjectKit {
     public static Map<String, Object> getFieldMap(Object obj) {
         String key = obj.getClass().getName();
         Map<String, Object> fieldMap = FIELD_MAP.get(key);
-        if (ToolsKit.isEmpty(fieldMap)) {
+        if(ToolsKit.isEmpty(fieldMap)) {
             fieldMap = getFieldMap(obj, true);
             FIELD_MAP.put(key, fieldMap);
         }
@@ -279,19 +276,19 @@ public class ObjectKit {
 
     /**
      * 构建过滤方法名集合，默认包含Object类里公共方法
+     * @param excludeMethodClass  如果有指定，则添加指定类下所有方法名
      *
-     * @param excludeMethodClass 如果有指定，则添加指定类下所有方法名
      * @return
      */
     public static Set<String> buildExcludedMethodName(Class<?>... excludeMethodClass) {
-        if (excludedMethodName.isEmpty()) {
+        if(excludedMethodName.isEmpty()) {
             Method[] objectMethods = Object.class.getDeclaredMethods();
             for (Method m : objectMethods) {
                 excludedMethodName.add(m.getName());
             }
         }
         Set<String> tmpExcludeMethodName = null;
-        if (null != excludeMethodClass) {
+        if(null != excludeMethodClass) {
             tmpExcludeMethodName = new HashSet<>();
             for (Class excludeClass : excludeMethodClass) {
                 Method[] excludeMethods = excludeClass.getDeclaredMethods();
@@ -307,11 +304,10 @@ public class ObjectKit {
     }
 
     /**
-     * 过滤方法
-     *
-     * @param method             需要过滤的Method
-     * @param excludedMethodName 包含要过滤的方法名集合
-     * @return boolean 如果包含则返回true
+     *  过滤方法
+     *  @param method 需要过滤的Method
+     *  @param excludedMethodName 包含要过滤的方法名集合
+     *  @return boolean 如果包含则返回true
      */
     public static boolean isExcludeMethod(Method method, Set<String> excludedMethodName) {
         return excludedMethodName.contains(method.getName());
@@ -322,8 +318,7 @@ public class ObjectKit {
     /**
      * 是否正常公用的API方法
      * 正常方法是指访问权限是public的且不是抽像，静态，接口，Final的方法
-     *
-     * @param mod Modifier的mod
+     * @param mod       Modifier的mod
      * @return
      */
     public static boolean isNormalApiMethod(int mod) {

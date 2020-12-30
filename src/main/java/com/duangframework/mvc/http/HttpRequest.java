@@ -4,6 +4,8 @@ import com.duangframework.exception.HttpDecoderException;
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.mvc.http.enums.HttpMethod;
+import com.duangframework.mvc.http.session.HttpSession;
+import com.duangframework.mvc.http.session.HttpSessionManager;
 import com.duangframework.server.common.ServerConfig;
 import com.duangframework.server.netty.decoder.AbstractDecoder;
 import com.duangframework.server.netty.decoder.DecoderFactory;
@@ -12,7 +14,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,11 @@ import java.util.function.Consumer;
 
 /**
  * duang框架的请求对象
+ *
  * @author laotang
  * @date 2018/6/9.
  */
-public class HttpRequest implements IRequest{
+public class HttpRequest implements IRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
     private static final HttpDataFactory HTTP_DATA_FACTORY = new DefaultHttpDataFactory(true);
@@ -43,39 +45,77 @@ public class HttpRequest implements IRequest{
         DiskAttribute.deleteOnExitTemporaryFile = true;
         DiskAttribute.baseDirectory = null;
     }
-    /**netty 渠道处理器上下文**/
+
+    /**
+     * netty 渠道处理器上下文
+     **/
     private ChannelHandlerContext ctx;
-    /**netty封装的request对象**/
+    /**
+     * netty封装的request对象
+     **/
     private io.netty.handler.codec.http.HttpRequest nettyRequest;
-    /**请求ID，每个请求都必须有，duangId规则**/
+    /**
+     * 请求ID，每个请求都必须有，duangId规则
+     **/
     private String requestId;
-    /**字符串**/
+    /**
+     * 字符串
+     **/
     private Charset charset;
-    /**请求头**/
+    /**
+     * 请求头
+     **/
     private Map<String, String> headers;
-    /**请求参数**/
+    /**
+     * 请求参数
+     **/
     private Map<String, Object> params;
-    /**cookies**/
+    /**
+     * cookies
+     **/
     private Map<String, Cookie> cookies;
-    /**请求body内容**/
+    /**
+     * 请求body内容
+     **/
     private byte[] content;
-    /**参数关键字**/
+    /**
+     * 参数关键字
+     **/
     private Enumeration<String> paramKeyEnumeration;
-    /**空字符串数据**/
+    /**
+     * 空字符串数据
+     **/
     protected static String[] EMPTY_ARRAYS = new String[0];
-    /**远程IP**/
+    /**
+     * 远程IP
+     **/
     private InetSocketAddress remoteAddress;
-    /**本地IP**/
+    /**
+     * 本地IP
+     **/
     private InetSocketAddress localAddress;
-    /** 是否文件提交form表单里的Content-Type是multipart/form-data,如果是则返回true**/
+    /**
+     * 是否文件提交form表单里的Content-Type是multipart/form-data,如果是则返回true
+     **/
     private boolean isMultipart;
-    /** 是否是LastHttpContent，如果是则返回true**/
+    /**
+     * 是否是LastHttpContent，如果是则返回true
+     **/
     private boolean isEnd;
-    /** 文件上传HttpContent数据集合 */
+
+    private Object[] methodParameter;
+
+    /**
+     * 文件上传HttpContent数据集合
+     */
     private List<InterfaceHttpData> httpMultipartDataList = new ArrayList<>();
-    /**netty HttpContent集合**/
+    /**
+     * netty HttpContent集合
+     **/
     private Queue<HttpContent> httpContentList = new LinkedList<>();
-    /**请求头host关键字集合**/
+    /**
+     * 请求头host关键字集合
+     **/
     private static List<String> headerHostNameList = new ArrayList<String>() {
         {
             this.add(HttpHeaderNames.HOST.toString());
@@ -102,7 +142,7 @@ public class HttpRequest implements IRequest{
     public HttpRequest init() {
         try {
             // nettyRequest header
-            headers  = new ConcurrentHashMap<>(nettyRequest.headers().size());
+            headers = new ConcurrentHashMap<>(nettyRequest.headers().size());
             nettyRequest.headers().iteratorAsString().forEachRemaining(new Consumer<Map.Entry<String, String>>() {
                 @Override
                 public void accept(Map.Entry<String, String> stringStringEntry) {
@@ -113,27 +153,41 @@ public class HttpRequest implements IRequest{
             AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(this);
             params = decoder.decoder();
             // cookies
-            cookies = new ConcurrentHashMap<>();
-            String cookie = getHeader(Cookie.COOKIE_FIELD);
-            cookie = ToolsKit.isNotEmpty(cookie) ? cookie : getHeader(Cookie.COOKIE_FIELD.toLowerCase());
-            if (ToolsKit.isNotEmpty(cookie)) {
-                Set<io.netty.handler.codec.http.cookie.Cookie> cookies = ServerCookieDecoder.LAX.decode(cookie);
-                if(ToolsKit.isNotEmpty(cookies)) {
-                    for(io.netty.handler.codec.http.cookie.Cookie nettyCookie : cookies) {
-                        parseCookie(nettyCookie);
-                    }
-                }
-            }
-            remoteAddress = (InetSocketAddress)ctx.channel().remoteAddress();
-            localAddress = (InetSocketAddress)ctx.channel().localAddress();
+//            cookies = new ConcurrentHashMap<>();
+//            String cookie = getHeader(Cookie.COOKIE_FIELD);
+//            cookie = ToolsKit.isNotEmpty(cookie) ? cookie : getHeader(Cookie.COOKIE_FIELD.toLowerCase());
+//            if (ToolsKit.isNotEmpty(cookie)) {
+//                if (!cookies.containsKey(cookie)) {
+//                    Set<io.netty.handler.codec.http.cookie.Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookie);
+//                    if (ToolsKit.isNotEmpty(cookies)) {
+//                        for (io.netty.handler.codec.http.cookie.Cookie nettyCookie : cookies) {
+//                            parseCookie(nettyCookie);
+//                        }
+//                    }
+//                }
+//            }
+            remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+            localAddress = (InetSocketAddress) ctx.channel().localAddress();
             requestId = WebKit.getRequestId(headers, params);
             return this;
         } catch (Exception e) {
+            StringBuilder uri = new StringBuilder();
+            try {
+                uri.append("uri: ").append(getRequestURI()).append("      \n");
+                uri.append("url: ").append(getRequestURL()).append("      \n");
+                uri.append("host: ").append(getRemoteHost()).append("      \n");
+                uri.append("remoteAddr: ").append(getRemoteAddr()).append("      \n");
+                uri.append("remoteIp: ").append(getRemoteIp()).append("      \n");
+                uri.append("method: ").append(getMethod()).append("      \n");
+                uri.append("contentType: ").append(getContentType()).append("      \n");
+            } catch (Exception e1) {
+            }
+            logger.warn("转换失败, uri: {} ", uri.toString(), e);
             throw new HttpDecoderException(e.getMessage(), e);
         }
     }
 
-   public ChannelHandlerContext getCtx(){
+    public ChannelHandlerContext getCtx() {
         return ctx;
     }
 
@@ -149,7 +203,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        if(ToolsKit.isEmpty(paramKeyEnumeration)) {
+        if (ToolsKit.isEmpty(paramKeyEnumeration)) {
             paramKeyEnumeration = new Vector(params.keySet()).elements();
         }
         return paramKeyEnumeration;
@@ -157,7 +211,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getCharacterEncoding() {
-        if(null == charset) {
+        if (null == charset) {
             String charsetString = headers.get(HttpHeaderNames.CONTENT_ENCODING.toLowerCase());
             if (ToolsKit.isEmpty(charsetString)) {
                 charset = Charset.defaultCharset();
@@ -191,7 +245,7 @@ public class HttpRequest implements IRequest{
     @Override
     public <T> T getParameter(String name) {
         Object paramObj = params.get(name);
-        return ToolsKit.isEmpty(paramObj) ? null : (T)paramObj;
+        return ToolsKit.isEmpty(paramObj) ? null : (T) paramObj;
     }
 
     @Override
@@ -203,12 +257,22 @@ public class HttpRequest implements IRequest{
     public String[] getParameterValues(String name) {
         Object valueObj = params.get(name);
         return (ToolsKit.isNotEmpty(valueObj) && valueObj instanceof List) ?
-                        ((List<String>) valueObj).toArray(EMPTY_ARRAYS) : new String[1];
+                ((List<String>) valueObj).toArray(EMPTY_ARRAYS) : new String[1];
+    }
+
+    @Override
+    public Object[] getMethodParameter() {
+        return this.methodParameter;
+    }
+
+    @Override
+    public void setMethodParameter(Object[] parameter) {
+        this.methodParameter = parameter;
     }
 
     @Override
     public Map<String, Object> getParameterMap() {
-        if(null == params) {
+        if (null == params) {
             return new HashMap<>(1);
         }
         return params;
@@ -246,17 +310,22 @@ public class HttpRequest implements IRequest{
         for (String headerName : headerHostNameList) {
             String host = getHeader(headerName);
             if (ToolsKit.isNotEmpty(host)) {
-                remoteHost =  host;
+                remoteHost = host;
                 break;
             }
         }
 
-        if(ToolsKit.isEmpty(remoteHost)) {
+        if (ToolsKit.isEmpty(remoteHost)) {
             remoteHost = ctx.channel().remoteAddress().toString();
         }
 
         return (remoteHost.startsWith(ConstEnums.HTTP_SCHEME_FIELD.getValue()) ||
-                        remoteHost.startsWith(ConstEnums.HTTPS_SCHEME_FIELD.getValue()) ) ? remoteHost : getProtocol()+"://"+remoteHost;
+                remoteHost.startsWith(ConstEnums.HTTPS_SCHEME_FIELD.getValue())) ? remoteHost : getProtocol() + "://" + remoteHost;
+    }
+
+    @Override
+    public int getRemotePort() {
+        return remoteAddress.getPort();
     }
 
     /**
@@ -273,14 +342,14 @@ public class HttpRequest implements IRequest{
                 break;
             }
         }
-        if(ToolsKit.isEmpty(clientIp)) {
+        if (ToolsKit.isEmpty(clientIp)) {
             clientIp = remoteAddress.getAddress().getHostAddress();
         }
-        if(ToolsKit.isNotEmpty(clientIp)) {
+        if (ToolsKit.isNotEmpty(clientIp)) {
             clientIp = clientIp.toLowerCase().replace(ConstEnums.HTTPS_SCHEME_FIELD.getValue(), "")
                     .replace(ConstEnums.HTTP_SCHEME_FIELD.getValue(), "");
         }
-        if("0:0:0:0:0:0:0:1".equals(clientIp) || ToolsKit.isEmpty(clientIp)){
+        if ("0:0:0:0:0:0:0:1".equals(clientIp) || ToolsKit.isEmpty(clientIp)) {
             clientIp = "127.0.0.1";
         }
         return clientIp;
@@ -288,12 +357,13 @@ public class HttpRequest implements IRequest{
 
     /**
      * 取服务器P地址
+     *
      * @return
      */
     @Override
     public String getLocalAddr() {
 //        InetSocketAddress inetSocketAddress = BootStrap.getInstants().getSocketAddressList();
-        return getScheme()+"://"+localAddress.getHostString() + ":" + localAddress.getPort();
+        return getScheme() + "://" + localAddress.getHostString() + ":" + localAddress.getPort();
     }
 
     @Override
@@ -313,7 +383,11 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getHeader(String name) {
-        return getHeaderMap().get(name);
+        String value =  getHeaderMap().get(name);
+        if (ToolsKit.isEmpty(value)) {
+            value = getHeaderMap().get(name.toLowerCase());
+        }
+        return value;
     }
 
     @Override
@@ -337,7 +411,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRequestURI() {
-        String url =  nettyRequest.uri();
+        String url = nettyRequest.uri();
         int pathEndPos = url.indexOf('?');
         return (pathEndPos < 0) ? url : url.substring(0, pathEndPos);
     }
@@ -349,11 +423,11 @@ public class HttpRequest implements IRequest{
 
     @Override
     public Map<String, String> getHeaderMap() {
-        if(ToolsKit.isEmpty(headers)) {
+        if (ToolsKit.isEmpty(headers)) {
             HttpHeaders httpHeaders = nettyRequest.headers();
             if (!httpHeaders.isEmpty() && httpHeaders.size() > 0) {
                 headers = new HashMap<>(httpHeaders.size());
-                for(Iterator<Map.Entry<String,String>> it = httpHeaders.iteratorAsString(); it.hasNext();){
+                for (Iterator<Map.Entry<String, String>> it = httpHeaders.iteratorAsString(); it.hasNext(); ) {
                     Map.Entry<String, String> entry = it.next();
                     headers.put(entry.getKey(), entry.getValue());
                 }
@@ -367,7 +441,28 @@ public class HttpRequest implements IRequest{
     @Override
     public boolean keepAlive() {
         return HttpUtil.isKeepAlive(nettyRequest);
-}
+    }
+
+    @Override
+    public void clearRequest() {
+        HTTP_DATA_FACTORY.cleanRequestHttpData(nettyRequest);
+        if (nettyRequest instanceof DefaultHttpRequest) {
+            nettyRequest.headers().clear();
+        }
+        if (headers != null) {
+            headers = null;
+        }
+        if (params != null) {
+            params = null;
+        }
+        if (cookies != null) {
+            cookies.clear();
+            cookies = null;
+        }
+
+        content = null;
+
+    }
 
     @Override
     public Map<String, Cookie> cookies() {
@@ -382,6 +477,11 @@ public class HttpRequest implements IRequest{
     @Override
     public void setCookie(Cookie cookie) {
         this.cookies.put(cookie.name(), cookie);
+    }
+
+    @Override
+    public HttpSession getSession() {
+        return HttpSessionManager.getSession(this);
     }
 
     public boolean isEnd() {
@@ -399,27 +499,29 @@ public class HttpRequest implements IRequest{
         return nettyRequest;
     }
 
-    private void parseCookie(io.netty.handler.codec.http.cookie.Cookie nettyCookie) {
-        Cookie cookie = new Cookie();
-        cookie.name(nettyCookie.name());
-        cookie.value(nettyCookie.value());
-        cookie.httpOnly(nettyCookie.isHttpOnly());
-        cookie.path(nettyCookie.path());
-        cookie.domain(nettyCookie.domain());
-        cookie.maxAge(nettyCookie.maxAge());
-        cookies.put(cookie.name(), cookie);
-    }
+//    private void parseCookie(io.netty.handler.codec.http.cookie.Cookie nettyCookie) {
+//        Cookie cookie = new Cookie();
+//        cookie.name(nettyCookie.name());
+//        cookie.value(nettyCookie.value());
+//        cookie.httpOnly(nettyCookie.isHttpOnly());
+//        cookie.path(nettyCookie.path());
+//        cookie.domain(nettyCookie.domain());
+//        cookie.maxAge(nettyCookie.maxAge());
+//        cookies.put(cookie.name(), cookie);
+//    }
 
     private HttpData partialContent;
+
     /**
      * 取提交的body内容,get方法直接返回null
+     *
      * @return
      */
     public byte[] content() {
-        if(HttpMethod.GET.name().equalsIgnoreCase(getMethod())){
+        if (HttpMethod.GET.name().equalsIgnoreCase(getMethod())) {
             return null;
         }
-        if(null != content) {
+        if (null != content) {
             return content;
         }
         try {
@@ -430,35 +532,50 @@ public class HttpRequest implements IRequest{
                 if (!isMultipart) {
                     byteBuffs.add(content.content().copy());
                 }
-               try {
-                   decoder.offer(content);
-                   while (null != decoder && decoder.hasNext()) {
-                       InterfaceHttpData interfaceHttpData = decoder.next();
-                       if (null != interfaceHttpData) {
-                           httpMultipartDataList.add(interfaceHttpData);
-                       }
-                   }
-               } catch (Exception e) {
-                   logger.warn(e.getMessage(),e);
-               }
+                try {
+                    decoder.offer(content);
+//                   if (decoder != null && decoder.hasNext() && ToolsKit.isNotEmpty(decoder.getBodyHttpDatas())) {
+//                       httpMultipartDataList.addAll(decoder.getBodyHttpDatas());
+//                   }
+//                   while (null != decoder && decoder.hasNext()) {
+//                       InterfaceHttpData interfaceHttpData = decoder.next();
+//                       if (null != interfaceHttpData) {
+//                           httpMultipartDataList.add(interfaceHttpData);
+//                       }
+//                   }
+                } catch (Exception e) {
+                    logger.warn(e.getMessage(), e);
+                }
                 content.release();
             }
+            try {
+                httpMultipartDataList.addAll(decoder.getBodyHttpDatas());
+            } catch (Exception e) {
+                logger.warn(e.getMessage(), e);
+            }
             if (!byteBuffs.isEmpty()) {
-                this.content =Unpooled.copiedBuffer(byteBuffs.toArray(new ByteBuf[0])).array();
+                this.content = Unpooled.copiedBuffer(byteBuffs.toArray(new ByteBuf[0])).array();
+                // 释放ByteBuf
+                for (ByteBuf byteBuff : byteBuffs) {
+                    byteBuff.release();
+                }
             }
             return content;
         } catch (HttpPostRequestDecoder.EndOfDataDecoderException e) {
-            throw new HttpDecoderException("build decoder fail: "+e.getMessage() ,  e);
-        } finally {
-            HTTP_DATA_FACTORY.cleanRequestHttpData(nettyRequest);
+            logger.warn("build decoder fail......{} ", e.getMessage());
+            throw new HttpDecoderException("build decoder fail: " + e.getMessage(), e);
         }
     }
 
     public List<InterfaceHttpData> getBodyHttpDatas() {
-        if(httpMultipartDataList.isEmpty()) {
+        if (httpMultipartDataList.isEmpty()) {
             content();
         }
         return httpMultipartDataList;
     }
 
+    @Override
+    public String getContextPath() {
+        return null;
+    }
 }

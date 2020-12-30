@@ -19,19 +19,18 @@ import java.util.*;
 
 /**
  * 路由辅助类
- *
  * @author Created by laotang
  * @date createed in 2018/6/22.
  */
 public class RouteHelper {
 
-    // 拦截器
-    public static final Interceptor[] NULL_INTERS = new Interceptor[0];
     private static final Logger logger = LoggerFactory.getLogger(RouteHelper.class);
     // 普通风格
-    private static Map<String, Route> routeMap = new HashMap<>();
+   private static Map<String, Route> routeMap = new HashMap<>();
     // restful风格
     private static Map<String, Route> restfulRouteMap = new HashMap<>();
+    // 拦截器
+    public static final Interceptor[] NULL_INTERS = new Interceptor[0];
     private static Map<Class<? extends Interceptor>, Interceptor> intersMap = new HashMap<Class<? extends Interceptor>, Interceptor>();
 
     static {
@@ -43,24 +42,24 @@ public class RouteHelper {
             Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
             List<Class<?>> clontrllerClassList = ClassHelper.getControllerClassList();
             String productUriPrefix = PropKit.get(ConstEnums.PROPERTIES.PRODUCT_URI_PREFIX.getValue());
-            if (ToolsKit.isNotEmpty(productUriPrefix)) {
+            if(ToolsKit.isNotEmpty(productUriPrefix)) {
                 productUriPrefix = productUriPrefix.startsWith("/") ? productUriPrefix : "/" + productUriPrefix;
             }
             for (Class<?> controllerClass : clontrllerClassList) {
                 if (!controllerClass.isAnnotationPresent(Controller.class)) {
-                    logger.warn("Controller类[" + controllerClass.getName() + "]没有@Controller注解, 退出本次循环...");
+                    logger.warn("Controller类["+controllerClass.getName()+ "]没有@Controller注解, 退出本次循环...");
                     continue;
                 }
                 Mapping controllerMapping = controllerClass.getAnnotation(Mapping.class);
                 String controllerKey = buildMappingKey(controllerMapping, controllerClass.getSimpleName(), productUriPrefix);
                 // 遍历Controller类所有的方法
                 Method[] actionMethods = controllerClass.getDeclaredMethods();
-                if (ToolsKit.isEmpty(actionMethods)) {
+                if(ToolsKit.isEmpty(actionMethods)) {
                     continue;
                 }
                 for (Method actionMethod : actionMethods) {
                     //如果是Object, Controller公用方法名并且没有参数的方法, 则退出本次循环
-                    if (ObjectKit.isExcludeMethod(actionMethod, excludedMethodName)) {
+                    if(ObjectKit.isExcludeMethod(actionMethod, excludedMethodName)) {
                         continue;
                     }
                     Route route = new Route(controllerClass, buildMethodInterceptors(actionMethod), controllerKey, actionMethod);
@@ -81,16 +80,16 @@ public class RouteHelper {
     }
 
     private static String buildMappingKey(Mapping mapping, String mappingKey, String productUriPrefix) {
-        if (ToolsKit.isNotEmpty(mapping) && ToolsKit.isNotEmpty(mapping.value())) {
+        if(ToolsKit.isNotEmpty(mapping) && ToolsKit.isNotEmpty(mapping.value())) {
             mappingKey = mapping.value();
         } else {
-            if (mappingKey.toLowerCase().endsWith("controller")) {
-                mappingKey = "/" + mappingKey.substring(0, mappingKey.length() - "controller".length());
+            if(mappingKey.toLowerCase().endsWith("controller")) {
+                mappingKey = "/"+mappingKey.substring(0, mappingKey.length() - "controller".length());
             }
         }
-        String uri = mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length() - 1) : mappingKey;
+        String uri = mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1) : mappingKey;
         uri = mapping.lowerCase() ? uri.toLowerCase() : uri;
-        return ToolsKit.isEmpty(productUriPrefix)
+        return  ToolsKit.isEmpty(productUriPrefix)
                 ? uri : productUriPrefix + uri;
     }
 
@@ -100,7 +99,7 @@ public class RouteHelper {
         Collections.sort(keyList);
         logger.warn("**************** Controller Mapper Key ****************");
         for (String key : keyList) {
-            if (key.contains(ConstEnums.FRAMEWORK_MAPPING_KEY.getValue())) {
+            if(key.contains(ConstEnums.FRAMEWORK_MAPPING_KEY.getValue())) {
                 continue;
             }
             logger.warn(key);
@@ -117,7 +116,6 @@ public class RouteHelper {
 
     /**
      * 拦截器
-     *
      * @param method
      * @return
      */
@@ -134,10 +132,10 @@ public class RouteHelper {
 
         Interceptor[] result = new Interceptor[interceptorClasses.length];
         try {
-            for (int i = 0; i < result.length; i++) {
+            for (int i=0; i<result.length; i++) {
                 result[i] = intersMap.get(interceptorClasses[i]);
                 if (result[i] == null) {
-                    result[i] = (Interceptor) interceptorClasses[i].newInstance();
+                    result[i] = (Interceptor)interceptorClasses[i].newInstance();
                     intersMap.put(interceptorClasses[i], result[i]);
                 }
             }

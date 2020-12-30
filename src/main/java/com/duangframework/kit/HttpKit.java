@@ -13,12 +13,20 @@ import java.util.concurrent.FutureTask;
 /**
  * 静态内部类方式实现单例模式
  * 注意在循环体里调用的问题，在同步的情况下，有可能会导致返回数据不正确，如需要请使用FutureTask
- * <p>
+ *
  * Created by laotang on 2018/8/23.
  */
 public class HttpKit {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpKit.class);
+
+//    private static class HttpKitHolder {
+//        private static final HttpKit INSTANCE = new HttpKit();
+//    }
+//    private HttpKit() {}
+    public static final HttpKit duang() {
+        return new HttpKit();
+    }
     /*****************************************************************************/
 
     private Map<String, String> _headerMap = new HashMap<>();
@@ -27,14 +35,6 @@ public class HttpKit {
     private boolean _encode;
     private boolean _isAppend;
     private String _body;
-
-    //    private static class HttpKitHolder {
-//        private static final HttpKit INSTANCE = new HttpKit();
-//    }
-//    private HttpKit() {}
-    public static final HttpKit duang() {
-        return new HttpKit();
-    }
 
     private void clear() {
         _headerMap.clear();
@@ -47,33 +47,31 @@ public class HttpKit {
 
     /**
      * 设置http request header头信息
-     *
-     * @param headerMap header头信息集合
+     * @param headerMap     header头信息集合
      * @return
      */
-    public HttpKit header(Map<String, String> headerMap) {
+    public HttpKit header(Map<String,String> headerMap) {
         _headerMap.putAll(headerMap);
         return this;
     }
 
-    public HttpKit header(String key, String value) {
+    public HttpKit header(String key ,String value) {
         _headerMap.put(key, value);
         return this;
     }
 
     /**
      * 请求参数信息
-     *
      * @param paramMap
      * @return
      */
-    public HttpKit param(Map<String, Object> paramMap) {
+    public HttpKit param(Map<String,Object> paramMap) {
         _paramMap.putAll(paramMap);
         return this;
     }
 
     public HttpKit param(String key, Object value) {
-        if (null != value) {
+        if(null != value) {
             _paramMap.put(key, value);
         }
         return this;
@@ -83,25 +81,24 @@ public class HttpKit {
         body(body, null);
         return this;
     }
-
     /**
      * 请求体为json或xml等字符串时，使用该方法
-     *
      * @param body
      * @param charset
      * @return
      */
     public HttpKit body(String body, String charset) {
         String contentType = "";
-        if (body.startsWith("{") && body.endsWith("}")) {
+        if(body.startsWith("{") && body.endsWith("}")) {
             contentType = HttpRequest.CONTENT_TYPE_JSON;
-        } else if (body.startsWith("<") && body.endsWith(">")) {
+        }
+        else if(body.startsWith("<") && body.endsWith(">")) {
             contentType = HttpRequest.CONTENT_TYPE_XML;
         }
-        if (contentType.length() > 0) {
+        if(contentType.length() > 0) {
             _headerMap.put(HttpRequest.HEADER_ACCEPT, contentType);
             _headerMap.put(HttpRequest.HEADER_CONTENT_TYPE, contentType);
-            if (null == charset) {
+            if(null == charset) {
                 charset = HttpRequest.CHARSET_UTF8;
             }
             _headerMap.put(HttpRequest.HEADER_ACCEPT_CHARSET, charset);
@@ -113,7 +110,6 @@ public class HttpKit {
 
     /**
      * 请求URL地址
-     *
      * @param url
      * @return
      */
@@ -124,9 +120,8 @@ public class HttpKit {
 
     /**
      * 请求URL地址
-     *
      * @param url
-     * @param isAppend 是否将params参数追加到url
+     * @param isAppend    是否将params参数追加到url
      * @return
      */
     public HttpKit url(String url, boolean isAppend) {
@@ -135,10 +130,9 @@ public class HttpKit {
 
     /**
      * 请求URL地址
-     *
      * @param url
-     * @param encode   是否对url进行URL.ENCODE编码
-     * @param isAppend 是否将params参数追加到url
+     * @param encode       是否对url进行URL.ENCODE编码
+     * @param isAppend    是否将params参数追加到url
      * @return
      */
     public HttpKit url(String url, boolean isAppend, boolean encode) {
@@ -150,19 +144,18 @@ public class HttpKit {
 
     /**
      * GET请求
-     *
      * @return
      */
     public HttpResult get() {
         try {
-            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
-                @Override
-                public HttpResult call() throws Exception {
+//            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
+//                @Override
+//                public HttpResult call() throws Exception {
                     HttpRequest httpRequest = HttpRequest.get(_url, _paramMap, _encode).trustAllCerts().trustAllHosts().headers(_headerMap);
                     return new HttpResult(httpRequest);
-                }
-            });
-            return futureTask.get();
+//                }
+//            });
+//            return futureTask.get();
         } catch (Exception e) {
             logger.warn("发送get请求时出错: " + e.getMessage(), e);
             return null;
@@ -171,15 +164,14 @@ public class HttpKit {
 
     /**
      * POST请求
-     *
      * @return
      */
     public HttpResult post() {
 
         try {
-            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
-                @Override
-                public HttpResult call() throws Exception {
+//            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
+//                @Override
+//                public HttpResult call() throws Exception {
                     HttpRequest httpRequest = null;
                     if (_isAppend) {
                         httpRequest = HttpRequest.post(_url, _paramMap, _encode);
@@ -189,9 +181,9 @@ public class HttpKit {
                     httpRequest = ToolsKit.isEmpty(_body) ? httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().form(_paramMap)
                             : httpRequest.headers(_headerMap).trustAllCerts().trustAllHosts().send(_body.getBytes());
                     return new HttpResult(httpRequest);
-                }
-            });
-            return futureTask.get();
+//                }
+//            });
+//            return futureTask.get();
         } catch (Exception e) {
             logger.warn("发送post请求时出错: " + e.getMessage(), e);
             return null;
@@ -201,19 +193,18 @@ public class HttpKit {
 
     /**
      * OPTIONS 请求
-     *
      * @return
      */
     public HttpResult options() {
         try {
-            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
-                @Override
-                public HttpResult call() throws Exception {
+//            FutureTask<HttpResult> futureTask = ThreadPoolKit.execute(new Callable<HttpResult>() {
+//                @Override
+//                public HttpResult call() throws Exception {
                     HttpRequest httpRequest = HttpRequest.options(_url).trustAllCerts().trustAllHosts();
                     return new HttpResult(httpRequest);
-                }
-            });
-            return futureTask.get();
+//                }
+//            });
+//            return futureTask.get();
         } catch (Exception e) {
             logger.warn("发送post请求时出错: " + e.getMessage(), e);
             return null;

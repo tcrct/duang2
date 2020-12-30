@@ -6,13 +6,15 @@ import com.duangframework.mvc.http.enums.ConstEnums;
 import com.duangframework.utils.WebKit;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
-import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Created by laotang
@@ -29,7 +31,8 @@ public class CorsHandler extends ChannelDuplexHandler {
         this.add("192.168");
         this.add("localhost");
     }};
-    private static String ALLOW_STRING = "Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId,duang-auth";
+    private static Set<String> ALLOW_SET = Stream.of(("Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId,duang-auth").split(",")).collect(Collectors.toSet());
+    private static String ALLOW_STRING ="Accept,Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,Authoriza,duang-token-id,tokenId,duang-auth";
 //    private static final String HTTP_METHOD_STRING = HttpMethod.GET+","+HttpMethod.POST+","+HttpMethod.OPTIONS;
 
     public CorsHandler() {
@@ -56,6 +59,7 @@ public class CorsHandler extends ChannelDuplexHandler {
         }
         String corsAllowHeaders = PropKit.get(ConstEnums.PROPERTIES.CORS_ALLOW_HEADERS.getValue());
         if(ToolsKit.isNotEmpty(corsAllowHeaders)) {
+            ALLOW_SET.addAll(Stream.of(corsAllowHeaders.split(",")).collect(Collectors.toSet()));
             ALLOW_STRING += "," + corsAllowHeaders;
         }
         IS_ADD_ALLOW = true;
@@ -97,8 +101,8 @@ public class CorsHandler extends ChannelDuplexHandler {
         if(ToolsKit.isNotEmpty(origin)) {
             responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, Arrays.asList(ALLOW_STRING.split(",")));
-            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, Arrays.asList(ALLOW_STRING.split(",")));
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_SET);
+            responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_SET);
             responseHeaders.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
         }
 
@@ -115,8 +119,8 @@ public class CorsHandler extends ChannelDuplexHandler {
         if (ToolsKit.isNotEmpty(origin)) {
             headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, Arrays.asList(ALLOW_STRING.split(",")));
-            headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, Arrays.asList(ALLOW_STRING.split(",")));
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, ALLOW_STRING);
+            headers.set(HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, ALLOW_STRING);
             headers.set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, request.method().name());
         }
     }
@@ -146,7 +150,7 @@ public class CorsHandler extends ChannelDuplexHandler {
     }
 */
     private String getAllowOrigin(ChannelHandlerContext ctx, HttpRequest request) {
-      return WebKit.getAllowOrigin(ctx, request);
+        return WebKit.getAllowOrigin(ctx, request);
     }
 
 

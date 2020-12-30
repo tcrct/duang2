@@ -137,7 +137,10 @@ public class WebKit {
         }
         HttpResponse httpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
         setDownloadFileContentHeader(ctx, httpRequest, httpResponse, file);
-        httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH.toString(), fileLength);
+//        httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH.toString(), fileLength);
+//        HttpUtil.setTransferEncodingChunked(httpRequest, true);
+        logger.error("文件大小： {}", fileLength);
+
         if (keepAlive) {
             httpResponse.headers().set(HttpHeaderNames.CONNECTION.toString(), HttpHeaderNames.KEEP_ALIVE.toString());
         }
@@ -149,12 +152,11 @@ public class WebKit {
         ChannelFuture lastContentFuture = null;
         if (ctx.pipeline().get(SslHandler.class) == null) {
             sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), ctx.newProgressivePromise());
-            //用以代码时，chrome下载大文件时，会报文件下载被截断的异常
 //            try {
-//                sendFileFuture = ctx.write(new HttpChunkedInput(new ChunkedFile(raf, 0, fileLength, 8192)), ctx.newProgressivePromise());
+//                sendFileFuture = ctx.write(new HttpChunkedInput(new ChunkedFile(raf, 0, fileLength, 8192)), ctx.newProgressivePromise());;
 //            } catch (Exception e) {
 //                throw new RuntimeException(e.getMessage(), e);
-//            }
+//            }cEnum
 
             // Write the end marker.
             lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
@@ -204,22 +206,29 @@ public class WebKit {
             response.headers().set(HttpHeaderNames.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
         }
     }
-
     /**
      *  构建返回对象，异常信息部份
+     *  @param e
      * @param request
      * @param response
-     * @param e
+     *
      */
-    public static void builderExceptionResponse(IRequest request, IResponse response, Exception e) {
+    public static void builderExceptionResponse(Exception e, IRequest request, IResponse response) {
+        builderExceptionResponse(request, response, builderReturnDto(request, response, e));
+    }
+
+    private static ReturnDto<String> builderReturnDto(IRequest request,  IResponse response, Exception e) {
         ReturnDto<String> returnDto = new ReturnDto<>();
         HeadDto headDto = ToolsKit.getThreadLocalDto();
+        if (headDto == null) {
+            headDto = new HeadDto();
+        }
         headDto.setClientIp(request.getRemoteIp());
         headDto.setMethod(request.getMethod());
         headDto.setRequestId(request.getRequestId());
         IException ie = Exceptions.getDuangException(e);
         int code = IException.FAIL_CODE;
-        String message = e.getMessage();
+        String message = null != e ? e.getMessage() : "";
         if(null != ie) {
             code = ie.getCode();
             message = ie.getMessage();
@@ -228,10 +237,14 @@ public class WebKit {
         headDto.setUri(request.getRequestURI());
         headDto.setTimestamp(ToolsKit.getCurrentDateString());
         headDto.setMsg(message);
-        returnDto.setData(IException.FAIL_MESSAGE);
+        if (ToolsKit.isNotEmpty(message)) {
+            returnDto.setData(IException.FAIL_MESSAGE);
+        } else {
+            returnDto.setData(String.valueOf(response.getBody()));
+        }
         returnDto.setParams(request.getParameterMap());
         returnDto.setHead(headDto);
-        builderExceptionResponse(request, response, returnDto);
+        return returnDto;
     }
 
     /**
