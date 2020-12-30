@@ -4,5 +4,6 @@ public enum ConstEnum {
     ;
     private ConstEnum() {
     }
+
     
 }
