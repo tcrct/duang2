@@ -33,6 +33,7 @@
         <codec.version>1.10</codec.version>
         <encrypt.version>1.0-SNAPSHOT</encrypt.version>
         <ext.version>1.0-SNAPSHOT</ext.version>
+        <oshi.version>5.2.5</oshi.version>
     </properties>
 
     <build>
@@ -260,7 +261,7 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>5.2.5</version>
+            <version>${oshi.version}</version>
         </dependency>
 
         <!--<dependency>-->
