@@ -28,7 +28,7 @@
         <shiro.version>1.2.4</shiro.version>
         <!--<javassist.version>3.12.1.GA</javassist.version>-->
         <asm.version>6.2</asm.version>
-        <io.version>2.4</io.version>
+        <io.version>2.7</io.version>
         <common.version>3.4</common.version>
         <codec.version>1.10</codec.version>
         <encrypt.version>1.0-SNAPSHOT</encrypt.version>
